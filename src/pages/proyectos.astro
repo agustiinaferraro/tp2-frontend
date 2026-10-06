@@ -1,0 +1,32 @@
+---
+//pagina "proyectos": reusa la seccion del home
+//arriba del listado va la misma portada de videos del hero, con el titulo de la pagina
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import BackButton from '../components/BackButton.astro';
+import Portada from '../components/Portada.astro';
+import SeccionProyectos from '../components/SeccionProyectos.astro';
+---
+
+<Layout title="Proyectos | Agustina Ferraro">
+  <Navbar seccionActiva="proyectos" />
+  <main id="contenido" class="pt-16">
+    <script is:inline>
+      //si se abre el detalle de un proyecto (?id=), se oculta la portada con los videos
+      if (new URLSearchParams(location.search).get('id')) {
+        document.documentElement.classList.add('viendo-detalle');
+      }
+    </script>
+    <div class="max-w-6xl mx-auto px-4 pt-8 space-y-6 encabezado-proyectos">
+      <BackButton href="/" />
+      <Portada
+        titulo="Proyectos"
+        eyebrow="Trabajos"
+        bajada="Una selección de mis trabajos."
+      />
+    </div>
+    <SeccionProyectos vista="grilla" />
+  </main>
+  <Footer />
+</Layout>

@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+/*paleta de la identidad: violeta solo en botones, verde en detalles de texto*/
+@theme {
+  --color-violeta-app: #b884e7;
+  --color-verde-app: #69f5cc;
+  /*verde de la marca whatsapp, mas llamativo que el verde de la paleta*/
+  --color-whatsapp: #25d366;
+  --color-whatsapp-claro: #4ce783;
+  --color-black: #0e0e0e;
+  --color-white: #fffbfb;
+  /*tipografia: segoe ui (recta) para el cuerpo y plus jakarta sans (curva) para los titulos*/
+  --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-titulo: "Plus Jakarta Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/*titulos siempre con la fuente curva, el resto (parrafos, botones) con la recta*/
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-titulo);
+}
+
+/*todos los botones y el desplegable de servicios muestran la manito al pasar el mouse*/
+button,
+summary {
+  cursor: pointer;
+}
+
+/*boton flotante "hablemos": el icono de chat flota suavemente*/
+.fab-chat {
+  animation: flotar 2.5s ease-in-out infinite;
+}
+
+@keyframes flotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/*subrayado del nav: se dibuja de izquierda a derecha con scaleX (se anima en todos los navegadores)*/
+.nav-link {
+  position: relative;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: color 0.2s, background-color 0.2s, transform 0.2s;
+}
+
+/*al pasar el mouse el link crece un poco, seachica al presionarlo y cambia de color*/
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: scale(1.05);
+}
+
+.nav-link:active {
+  transform: scale(0.95);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  bottom: 0;
+  width: calc(100% - 16px);
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.3s ease-out;
+}
+
+/*la linea aparece al pasar el mouse, al resaltar la seccion con el scroll o cuando esta activa*/
+.nav-link:hover::after,
+.nav-link.activo::after,
+body:has(#inicio:target) a[href="/#inicio"]::after,
+body:has(#sobre-mi:target) a[href="/#sobre-mi"]::after,
+body:has(#proyectos:target) a[href="/#proyectos"]::after,
+body:has(#servicios:target) a[href="/#servicios"]::after,
+body:has(#contacto:target) a[href="/#contacto"]::after,
+header[data-activo="inicio"] a[data-link="inicio"]::after,
+header[data-activo="sobre-mi"] a[data-link="sobre-mi"]::after,
+header[data-activo="proyectos"] a[data-link="proyectos"]::after,
+header[data-activo="servicios"] a[data-link="servicios"]::after,
+header[data-activo="contacto"] a[data-link="contacto"]::after,
+header[data-activo="perfil"] a[data-link="perfil"]::after {
+  transform: scaleX(1);
+}
+
+/*cuando esta activa, el texto del link se resalta*/
+.nav-link.activo,
+body:has(#inicio:target) a[href="/#inicio"],
+body:has(#sobre-mi:target) a[href="/#sobre-mi"],
+body:has(#proyectos:target) a[href="/#proyectos"],
+body:has(#servicios:target) a[href="/#servicios"],
+body:has(#contacto:target) a[href="/#contacto"],
+header[data-activo="inicio"] a[data-link="inicio"],
+header[data-activo="sobre-mi"] a[data-link="sobre-mi"],
+header[data-activo="proyectos"] a[data-link="proyectos"],
+header[data-activo="servicios"] a[data-link="servicios"],
+header[data-activo="contacto"] a[data-link="contacto"],
+header[data-activo="perfil"] a[data-link="perfil"] {
+  color: #fffbfb;
+  font-weight: 700;
+}
+
+/*scroll suave al saltar entre secciones y margen para que el nav fijo no las tape*/
+html {
+  scroll-behavior: smooth;
+}
+
+main section[id] {
+  scroll-margin-top: 4rem;
+}
+
+/*accesibilidad: el foco del teclado siempre se ve, sin importar el mouse*/
+:focus-visible {
+  outline: 2px solid #69f5cc;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/*accesibilidad: link "saltar al contenido", oculto hasta recibir foco*/
+.saltar-a-contenido {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+
+.saltar-a-contenido:focus-visible {
+  left: 1rem;
+  top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #b884e7;
+  color: #0e0e0e;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+/*carruseles: barra de scroll fina y discreta*/
+.carrusel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+.carrusel-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.carrusel-scroll::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+
+.carrusel-scroll::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/*carrusel que avanza solo: la lista esta duplicada y se traslada la mitad de su ancho,
+  asi la segunda copia entra por la izquierda y el movimiento nunca se corta ni salta.
+  la duracion la define el componente en --carrusel-duracion (ms por tarjeta).*/
+.carrusel-auto {
+  /*el gap se vuelve variable para que el keyframe pueda compensarlo y el reinicio
+    de la animacion caiga justo sobre la segunda copia*/
+  --carrusel-gap: 1.5rem;
+  gap: var(--carrusel-gap);
+  will-change: transform;
+  animation: carrusel-desplazar var(--carrusel-duracion, 20s) linear infinite;
+}
+
+/*con el mouse encima o el teclado adentro, el avance se congela en el lugar*/
+.carrusel-auto-pausado {
+  animation-play-state: paused;
+}
+
+@keyframes carrusel-desplazar {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - var(--carrusel-gap, 1.5rem) / 2));
+  }
+}
+
+/*el avance automatico es opcional: lo usa el carrusel que recibe el prop "auto"
+  (hoy, el de proyectos destacados de la home). la variante "carrusel-auto-respetado"
+  apaga la animacion para quien tenga el movimiento reducido activado en el sistema.*/
+@media (prefers-reduced-motion: reduce) {
+  .carrusel-auto-respetado {
+    animation: none;
+    transform: none;
+  }
+}
+
+/*en el detalle de un proyecto (?id= en /proyectos) se esconde el encabezado con
+  la portada de videos: ahi solo va el detalle, la portada distrae*/
+html.viendo-detalle .encabezado-proyectos,
+html.viendo-detalle .encabezado-seccion-proyectos {
+  display: none;
+}
+
+/*aparicion suave de los carruseles cuando se filtra una categoria*/
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animacion-aparecer {
+  animation: aparecer 0.3s ease-out;
+}
+
+
+
+.animate-carrusel-loop { animation: carrusel-loop var(--carrusel-duracion,20s) linear infinite; display:flex; justify-content:flex-start; }
+.carrusel-auto-pausado { animation-play-state: paused; }
+@keyframes carrusel-loop { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+

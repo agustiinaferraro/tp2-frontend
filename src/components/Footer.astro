@@ -1,0 +1,18 @@
+---
+//pie de pagina: navegacion, redes y copyright
+//las redes y el nombre salen del perfil de la api (componente cliente)
+import FooterRedes from './FooterRedes.jsx';
+---
+
+<footer class="border-t border-zinc-800 bg-black">
+  <div class="max-w-6xl mx-auto px-4 py-10 flex flex-col items-center gap-6 text-center">
+    <a
+      href="/contacto"
+      class="inline-block rounded-xl px-2 py-1 font-titulo text-4xl font-bold text-verde-app hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200"
+    >
+      Contactate
+    </a>
+
+    <FooterRedes client:idle />
+  </div>
+</footer>

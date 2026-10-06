@@ -1,0 +1,52 @@
+---
+//seccion de servicios: marco y titulo (estaticos)
+//la grilla con los datos dinamicos vive en grillaservicios.jsx (isla de react)
+//"vista" decide como se ven: carrusel (home) o grilla (pagina de servicios)
+import GrillaServicios from './GrillaServicios.jsx';
+import SaludoPersonalizado from './SaludoPersonalizado.jsx';
+
+const { vista = 'carrusel', mostrarTitulo = true } = Astro.props;
+---
+
+<section id="servicios" class="py-16 px-4 bg-zinc-900/40 border-y border-zinc-800/50">
+  <div class="max-w-5xl mx-auto space-y-6">
+    {/*en la pagina de servicios el titulo ya esta en la portada de arriba*/}
+    {
+      mostrarTitulo && (
+        <div class="text-left space-y-4">
+          <h2 class="text-4xl font-bold text-white inline-flex items-center gap-3">
+            <svg
+              aria-hidden="true"
+              class="w-9 h-9 text-verde-app"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.27 6.96 12 12.01l8.73-5.05" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 22.08V12" />
+            </svg>
+            <SaludoPersonalizado
+              client:load
+              sinNombre="¿Cómo puedo ayudarte?"
+              conNombre="¿Cómo puedo ayudarte, {nombre}?"
+            />
+          </h2>
+        </div>
+      )
+    }
+    <p class="text-zinc-400 text-left">
+      <SaludoPersonalizado
+        client:load
+        sinNombre="Lo que puedo ofrecerte para llevar tu proyecto del concepto al resultado."
+        conNombre="Estos servicios te van a gustar, {nombre}."
+      />
+    </p>
+    <GrillaServicios client:load vista={vista} />
+  </div>
+</section>

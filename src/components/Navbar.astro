@@ -1,0 +1,126 @@
+---
+//componente de navegacion
+//menu fijo en la parte superior con links a las pags y un buscador
+//responsive en pantallas chicas se convierte en un menu hamburguesa
+import Buscador from './Buscador.jsx';
+import AvatarAdmin from './AvatarAdmin.jsx';
+
+//prop opcional para resaltar el link activo del nav
+//"servicios" se pasa desde las paginas de servicio
+const { seccionActiva = '' } = Astro.props;
+
+//enlaces del nav. cada uno lleva su clave "activo" para resaltarse en su pagina
+const enlaces = [
+  { href: '/#inicio', texto: 'Inicio', activo: 'inicio' },
+  { href: '/sobre-mi', texto: 'Sobre mí', activo: 'sobre-mi' },
+  { href: '/proyectos', texto: 'Proyectos', activo: 'proyectos' },
+  { href: '/servicios', texto: 'Servicios', activo: 'servicios' },
+  { href: '/contacto', texto: 'Contacto', activo: 'contacto' },
+];
+---
+
+<header class="fixed top-0 inset-x-0 z-50 bg-black/80 backdrop-blur-md border-b border-zinc-800" data-activo={seccionActiva}>
+  <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4" aria-label="Principal">
+   <a href="/#inicio" class="flex items-center gap-2 rounded-lg px-2 py-1 font-bold text-verde-app hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200">
+      <img src="/img/logo.png" alt="Logo" class="w-15 h-15 object-cover rounded-full"/>
+    </a>
+
+    <!--menu de escritorio: buscador a la izquierda y luego los links-->
+    <ul class="hidden md:flex items-center gap-6">
+      <li>
+        <Buscador client:idle />
+      </li>
+      {
+        enlaces.map((enlace) => (
+          <li>
+            <a href={enlace.href} data-link={enlace.activo ?? ''} class="nav-link text-sm text-zinc-300 hover:text-white transition-colors">
+              {enlace.texto}
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a href="/perfil" data-link="perfil" class="nav-link text-sm text-zinc-300 hover:text-white transition-colors">
+          Perfil
+        </a>
+      </li>
+      <li>
+        <AvatarAdmin client:idle />
+      </li>
+    </ul>
+
+    <!--btn menu hamburguesa-->
+    <button
+      type="button"
+      class="md:hidden flex flex-col items-center justify-center gap-1.5 w-10 h-10 rounded-lg text-zinc-300 hover:text-white hover:scale-105 active:scale-95 active:bg-zinc-800 transition-all duration-200"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      data-menu-boton
+    >
+      <span class="block w-6 h-0.5 bg-current"></span>
+      <span class="block w-6 h-0.5 bg-current"></span>
+      <span class="block w-6 h-0.5 bg-current"></span>
+    </button>
+  </nav>
+
+  <!--menu movil (oculto, se muestra con el boton)-->
+  <div class="md:hidden hidden border-t border-zinc-800 bg-black px-4 py-4" data-menu>
+    <ul class="space-y-1">
+      <li class="pb-3">
+        <Buscador client:idle />
+      </li>
+      {
+        enlaces.map((enlace) => (
+          <li>
+            <a href={enlace.href} data-link={enlace.activo ?? ''} class="nav-link block py-2 text-zinc-300 hover:text-white transition-colors">
+              {enlace.texto}
+            </a>
+          </li>
+        ))
+      }
+      {/*el avatar ya es el acceso al perfil: no se repite el link de texto*/}
+      <li>
+        <AvatarAdmin client:idle />
+      </li>
+    </ul>
+  </div>
+
+  </header>
+
+<script>
+  //toggle del menu movil: muestra/oculta el menu y actualiza el btn
+  const boton = document.querySelector('[data-menu-boton]');
+  const menu = document.querySelector('[data-menu]');
+  if (boton && menu) {
+    boton.addEventListener('click', () => {
+      const seAbre = menu.classList.toggle('hidden');
+      boton.setAttribute('aria-expanded', String(!seAbre));
+      boton.setAttribute('aria-label', seAbre ? 'Abrir menú' : 'Cerrar menú');
+    });
+  }
+
+  //resalta el link de la seccion que esta en pantalla al scrollear
+  //en la home "inicio" queda siempre resaltado, por mas que se baje hasta servicios o proyectos
+  const header = document.querySelector('header');
+  const links = [...document.querySelectorAll('header a[data-link]')];
+  const ids = [...document.querySelectorAll('main section[id]')].map((s) => s.id);
+  const esLaHome = header?.dataset.activo === 'inicio';
+  function resaltarActivo() {
+    //en la home no hay que calcular nada: siempre se esta en inicio
+    if (esLaHome) {
+      links.forEach((link) => link.classList.toggle('activo', link.dataset.link === 'inicio'));
+      return;
+    }
+    const centro = window.scrollY + window.innerHeight * 0.35;
+    let activo = '';
+    for (const id of ids) {
+      const seccion = document.getElementById(id);
+      if (seccion && seccion.offsetTop <= centro) activo = id;
+    }
+    //las secciones que no son un link del nav (ej. destacados) dejan activo el link anterior
+    links.forEach((link) => link.classList.toggle('activo', link.dataset.link === activo));
+  }
+  window.addEventListener('scroll', resaltarActivo, { passive: true });
+  window.addEventListener('load', resaltarActivo);
+  resaltarActivo();
+</script>

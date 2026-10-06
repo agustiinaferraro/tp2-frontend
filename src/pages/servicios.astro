@@ -1,0 +1,26 @@
+---
+//pagina "servicios": listado de todos los servicios (reusa la seccion del home)
+//arriba del listado va la misma portada de videos del hero, con el titulo de la pagina
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import BackButton from '../components/BackButton.astro';
+import Portada from '../components/Portada.astro';
+import SeccionServicios from '../components/SeccionServicios.astro';
+---
+
+<Layout title="Servicios | Agustina Ferraro">
+  <Navbar seccionActiva="servicios" />
+  <main id="contenido" class="pt-16">
+    <div class="max-w-6xl mx-auto px-4 pt-8 space-y-6">
+      <BackButton href="/" />
+      <Portada
+        titulo="Servicios"
+        eyebrow="Lo que hago"
+        bajada="Diseño, motion y desarrollo web. Cada proyecto se ilustra con un trabajo real, no con imágenes genéricas."
+      />
+    </div>
+    <SeccionServicios vista="grilla" />
+  </main>
+  <Footer />
+</Layout>

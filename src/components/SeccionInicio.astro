@@ -1,0 +1,33 @@
+---
+//seccion de inicio (hero): presentacion principal del portfolio
+//el carrusel de videos queda de fondo y la presentacion encima
+//reusa Portada con la variante "hero" (mismo bloque que las paginas, pero a pantalla completa)
+import Portada from './Portada.astro';
+---
+
+<section id="inicio">
+  <Portada variante="hero">
+    <p class="text-verde-app font-medium tracking-widest uppercase text-sm">Agustina Ferraro</p>
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
+      Diseñadora Multimedia <span class="text-verde-app">&amp;</span> Desarrolladora Full Stack
+    </h1>
+    <p class="text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+      Diseño experiencias digitales, interfaces e interacciones donde la tecnología y la estética
+      conectan con las personas.
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center pt-2">
+      <a
+        href="/proyectos"
+        class="px-6 py-3 rounded-full bg-violeta-app hover:bg-violeta-app/90 hover:scale-105 active:scale-95 active:bg-violeta-app/80 transition-all duration-200 font-medium text-black"
+      >
+        Ver proyectos
+      </a>
+      <a
+        href="/contacto"
+        class="px-6 py-3 rounded-full border border-zinc-700 hover:border-zinc-500 hover:text-white hover:scale-105 active:scale-95 active:bg-zinc-700 active:border-zinc-500 transition-all duration-200 font-medium text-zinc-300"
+      >
+        Contactame
+      </a>
+    </div>
+  </Portada>
+</section>

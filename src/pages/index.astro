@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import SeccionInicio from '../components/SeccionInicio.astro';
+import SeccionDestacados from '../components/SeccionDestacados.astro';
+import SeccionSobreMi from '../components/SeccionSobreMi.astro';
+import SeccionProyectos from '../components/SeccionProyectos.astro';
+import SeccionServicios from '../components/SeccionServicios.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout>
+  {/*en la home el link "inicio" del nav queda siempre resaltado, aunque se scrollee*/}
+  <Navbar seccionActiva="inicio" />
+  <main id="contenido" class="pt-16">
+    <SeccionInicio />
+    <SeccionDestacados />
+    <SeccionSobreMi />
+    <SeccionProyectos />
+    <SeccionServicios />
+  </main>
+  <Footer />
+</Layout>

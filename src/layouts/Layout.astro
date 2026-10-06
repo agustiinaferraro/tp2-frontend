@@ -1,0 +1,53 @@
+---
+//layout base: estructura html para todas las paginas
+//recibe una "title" (titulo de la pagina) como prop opcional
+//importa los estilos globales (tailwind) para todas las paginas
+import '../styles/global.css';
+import BotonHablemos from '../components/BotonHablemos.astro';
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta
+			name="description"
+			content="Portfolio de Agustina Ferraro - Diseñadora Multimedia & Desarrolladora Full Stack"
+		/>
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<title>{title ?? 'Agustina Ferraro | Diseñadora Multimedia'}</title>
+	</head>
+	<body class="bg-black text-zinc-100 font-sans antialiased">
+		{/*accesibilidad: link para saltar al contenido con el teclado*/}
+		<a href="#contenido" class="saltar-a-contenido">
+			Saltar al contenido
+		</a>
+		<slot />
+		<BotonHablemos />
+	</body>
+</html>
+
+<style>
+	html {
+		scroll-behavior: smooth;
+	}
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+	}
+	body {
+		min-height: 100%;
+	}
+</style>

@@ -1,0 +1,20 @@
+---
+//pagina "perfil": nombre de usuario, foto y gestion de la cuenta
+//sin sesion el perfil se ve igual, como "Anónimo", con la opcion de entrar o crear cuenta
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import BackButton from '../components/BackButton.astro';
+import CuentaUsuario from '../components/CuentaUsuario.jsx';
+---
+
+<Layout title="Perfil | Agustina Ferraro">
+  <Navbar seccionActiva="perfil" />
+  <main id="contenido" class="pt-16">
+    <div class="max-w-6xl mx-auto px-4 pt-8">
+      <BackButton href="/" />
+    </div>
+    <CuentaUsuario client:load />
+  </main>
+  <Footer />
+</Layout>

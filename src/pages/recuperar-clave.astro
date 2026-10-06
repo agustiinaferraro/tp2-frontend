@@ -1,0 +1,21 @@
+---
+//pagina "recuperar contraseña": se pide el email y firebase manda el link con el codigo
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import BackButton from '../components/BackButton.astro';
+import RecuperarClave from '../components/RecuperarClave.jsx';
+---
+
+<Layout title="Recuperar contraseña | Agustina Ferraro">
+  <Navbar />
+  <main id="contenido" class="pt-16">
+    <div class="max-w-6xl mx-auto px-4 pt-8">
+      <BackButton href="/perfil" />
+    </div>
+    <div class="max-w-md mx-auto px-4 pb-16">
+      <RecuperarClave client:load />
+    </div>
+  </main>
+  <Footer />
+</Layout>

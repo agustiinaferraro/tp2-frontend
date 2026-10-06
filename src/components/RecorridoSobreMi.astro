@@ -1,0 +1,405 @@
+---
+//recorrido sobre mi: linea de tiempo con el trayecto completo del cv
+//se agrupa en presentacion, numeros, recorrido, habilidades y certificaciones
+//el tipo de cada paso decide el color (verde = estudio, violeta = trabajo, dorado = logro)
+import Certificaciones from './Certificaciones.jsx';
+import LogoHerramienta from './LogoHerramienta.jsx';
+
+const estadisticas = [
+  {
+    valor: '4º',
+    descripcion: 'año de la Licenciatura en Tecnología Multimedial',
+  },
+  {
+    valor: '3',
+    descripcion: 'materias que enseño como ayudante de cátedra',
+  },
+  {
+    valor: '2022',
+    descripcion: 'desde cuando diseño, programo y animo',
+  },
+  {
+    valor: '1',
+    descripcion: 'pieza ganadora en una competencia por votación',
+  },
+];
+
+const recorrido = [
+  {
+    periodo: '2010 – 2015',
+    tipo: 'estudio',
+    titulo: 'Bachiller en Economía y Administración',
+    lugar: 'Escuela Comercial N.º 22 Héroes de Malvinas',
+    texto: 'El punto de partida: en la escuela descubrí que quería crear y comunicar.',
+  },
+  {
+    periodo: 'Mar 2022 – Actualidad',
+    tipo: 'estudio',
+    titulo: 'Licenciatura en Tecnología Multimedial',
+    lugar: 'Universidad Maimónides',
+    texto:
+      'Mi formación principal: diseño, programación, video y UX/UI conviviendo en un mismo plan. Hoy estoy en 4º año.',
+  },
+  {
+    periodo: 'Mar 2022 – Abr 2026',
+    tipo: 'logro',
+    titulo: 'Técnica en Comunicación Interactiva y Diseño Multimedial',
+    lugar: 'Universidad Maimónides',
+    insignia: 'Título obtenido',
+    texto:
+      'Primera etapa terminada: ya soy técnica en comunicación interactiva y diseño multimedial.',
+  },
+  {
+    periodo: 'Mar 2022 – Actualidad',
+    tipo: 'trabajo',
+    titulo: 'Diseñadora multimedial',
+    lugar: 'Iglesia Cristiana Evangélica',
+    texto: 'Diseño gráfico, edición de video, animación, desarrollo web y UX/UI aplicados a proyectos reales.',
+  },
+  {
+    periodo: 'Abr 2022 – Actualidad',
+    tipo: 'trabajo',
+    titulo: 'Freelance: diseño y desarrollo web',
+    lugar: 'Proyectos propios',
+    texto: 'Llevo proyectos de punta a punta, desde la idea hasta el código.',
+  },
+  {
+    periodo: 'Oct 2022',
+    tipo: 'trabajo',
+    titulo: 'UI Designer – UX Challenge',
+    lugar: 'Universidad Maimónides',
+    texto: 'Mi primera inmersión en UX/UI aplicada a un desafío real.',
+  },
+  {
+    periodo: 'Dic 2022 – Feb 2023',
+    tipo: 'trabajo',
+    titulo: 'UI Designer – Gift Blame',
+    lugar: 'Proyecto de producto digital',
+    texto: 'Diseñé la interfaz de un producto digital completo, trabajando en equipo.',
+  },
+  {
+    periodo: 'Mar 2024 – Jun 2024',
+    tipo: 'trabajo',
+    titulo: 'Ayudante de cátedra – Diseño de Interfaces',
+    lugar: 'Universidad Maimónides',
+    texto: 'Enseñar me hizo entender el diseño todavía mejor.',
+  },
+  {
+    periodo: 'Sep 2024 – Dic 2024',
+    tipo: 'logro',
+    titulo: 'Diseñadora gráfica institucional',
+    lugar: 'Universidad Maimónides',
+    destacado: true,
+    texto:
+      'Creé los certificados de Illustrator y Photoshop para la universidad. Uno de ellos fue elegido ganador en una competencia por votación.',
+  },
+  {
+    periodo: 'Ago 2025 – Nov 2025',
+    tipo: 'trabajo',
+    titulo: 'Ayudante de cátedra – Negocios Digitales II',
+    lugar: 'Universidad Maimónides',
+    texto: 'Lo digital también se trata de estrategia y de entender el negocio.',
+  },
+  {
+    periodo: 'Mar 2026 – Actualidad',
+    tipo: 'trabajo',
+    titulo: 'Ayudante de cátedra – Marketing Digital',
+    lugar: 'Universidad Maimónides',
+    texto: 'Sumo la mirada de marketing a todo lo que diseño.',
+  },
+];
+
+//habilidades agrupadas por area
+//cada herramienta con logo se marca con { texto, logo }; las demas son texto solo
+const habilidades = [
+  {
+    grupo: 'Diseño',
+    version: 'pen-tool',
+    items: [
+      { texto: 'Photoshop', logo: 'photoshop' },
+      { texto: 'Illustrator', logo: 'illustrator' },
+      'Certificados institucionales',
+    ],
+  },
+  {
+    grupo: 'UX / UI',
+    version: 'layout',
+    items: [
+      { texto: 'Figma', logo: 'figma' },
+      'Experiencia de usuario',
+      'Diseño de interfaces',
+    ],
+  },
+  {
+    grupo: 'Video',
+    version: 'video',
+    items: [
+      { texto: 'Premiere', logo: 'premiere' },
+      { texto: 'After Effects', logo: 'aftereffects' },
+      'Animación',
+    ],
+  },
+  {
+    grupo: 'Desarrollo',
+    version: 'codigo',
+    items: [
+      { texto: 'HTML', logo: 'html' },
+      { texto: 'CSS', logo: 'css' },
+      { texto: 'JavaScript', logo: 'javascript' },
+      { texto: 'React', logo: 'react' },
+    ],
+  },
+];
+
+
+
+//estilos por tipo de paso en el recorrido (punto, pildora de periodo y borde de tarjeta)
+const colores = {
+  estudio: {
+    punto: 'bg-verde-app ring-verde-app/25',
+    pildora: 'bg-verde-app/10 text-verde-app border-verde-app/30',
+    borde: 'hover:border-verde-app/50',
+  },
+  trabajo: {
+    punto: 'bg-violeta-app ring-violeta-app/25',
+    pildora: 'bg-violeta-app/10 text-violeta-app border-violeta-app/30',
+    borde: 'hover:border-violeta-app/50',
+  },
+  logro: {
+    punto: 'bg-amber-400 ring-amber-400/25',
+    pildora: 'bg-amber-400/10 text-amber-300 border-amber-400/30',
+    borde: 'hover:border-amber-400/50',
+  },
+};
+
+//iconos de cada grupo de habilidades (se eligen abajo segun la version)
+---
+
+<section class="animacion-aparecer">
+  {/*presentacion y numero que resumen el trayecto*/}
+  <div class="px-4 pt-10 pb-4 max-w-4xl mx-auto space-y-8">
+    <div class="space-y-4">
+      <h1 class="text-4xl md:text-5xl font-bold text-white text-left leading-tight">
+        Un recorrido entre el <span class="text-verde-app">diseño</span>, la{' '}
+        <span class="text-violeta-app">tecnología</span> y la{' '}
+        <span class="text-verde-app">enseñanza</span>.
+      </h1>
+      <p class="text-zinc-300 leading-relaxed text-lg text-left">
+        Soy <span class="font-bold text-white">técnica en comunicación interactiva y diseño multimedial</span>{' '}
+        y estudio 4º año de la Licenciatura en Tecnología Multimedial en la Universidad
+        Maimónides. Además, soy ayudante de cátedra en UX/UI, Negocios Digitales y Marketing
+        Digital. En la universidad también me encargué del diseño institucional: creé los
+        certificados de Illustrator y Photoshop, y uno fue elegido{' '}
+        <span class="font-bold text-amber-300">ganador en una competencia por votación</span>.
+      </p>
+    </div>
+
+    <dl class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {
+        estadisticas.map((numero) => (
+          <div class="rounded-2xl bg-zinc-900 border border-zinc-800 p-5 text-left transition-colors hover:border-violeta-app/40">
+            <dt class="text-sm text-zinc-400 mb-2">{numero.descripcion}</dt>
+            <dd class="text-4xl font-bold bg-gradient-to-r from-verde-app to-violeta-app bg-clip-text text-transparent">
+              {numero.valor}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+
+  {/*titulo universitario: formacion destacada con la imagen del diploma*/}
+  <div class="px-4 py-10 max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
+      <svg aria-hidden="true" class="w-8 h-8 text-violeta-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+      </svg>
+      Mi título universitario
+    </h2>
+    <div class="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start transition-colors hover:border-verde-app/40">
+      <a
+        href="/img/titulo.jpg"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Ver mi título en tamaño completo"
+        class="block w-full md:w-60 shrink-0 group"
+      >
+        <img
+          src="/img/titulo.jpg"
+          alt="Título de Técnica en Comunicación Interactiva y Diseño Multimedial"
+          loading="lazy"
+          class="w-full rounded-xl border border-zinc-700 object-cover bg-zinc-800 transition-transform duration-300 group-hover:scale-[1.02]"
+        />
+      </a>
+      <div class="space-y-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs px-3 py-1 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/30 font-bold">
+            Título universitario
+          </span>
+          <span class="text-xs px-3 py-1 rounded-full bg-verde-app/10 text-verde-app border border-verde-app/30 font-bold">
+            Sigo estudiando
+          </span>
+        </div>
+        <h3 class="text-xl md:text-2xl font-bold text-white">
+          Técnica en Comunicación Interactiva y Diseño Multimedial
+        </h3>
+        <p class="text-sm text-violeta-app">Universidad Maimónides</p>
+        <p class="text-zinc-400 text-sm leading-relaxed">
+          Este es mi título universitario: lo obtuve en la Universidad Maimónides y con él sigo
+          formándome. Hoy estoy en 4º año de la Licenciatura en Tecnología Multimedial en la misma
+          universidad.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/*el recorrido en linea de tiempo: alterna las tarjetas a los lados en pantallas grandes*/}
+  <div class="px-4 py-14 max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
+      <svg aria-hidden="true" class="w-8 h-8 text-violeta-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+      Mi recorrido
+    </h2>
+
+    <ol class="relative space-y-8 md:space-y-12">
+      <div aria-hidden="true" class="absolute top-2 bottom-2 left-5 w-px bg-gradient-to-b from-violeta-app via-zinc-700 to-verde-app md:left-1/2 md:-translate-x-1/2"></div>
+      {
+        recorrido.map((paso, index) => {
+          const color = colores[paso.tipo];
+          const par = index % 2 === 0;
+          return (
+            <li class={par ? 'md:flex md:justify-start' : 'md:flex md:justify-end'}>
+              <span
+                aria-hidden="true"
+                class={`absolute left-5 top-6 md:left-1/2 md:-translate-x-1/2 w-3.5 h-3.5 rounded-full ring-4 ${color.punto}`}
+              ></span>
+              <div
+                class={`ml-12 md:ml-0 md:w-[calc(50%_-_2.5rem)] rounded-2xl bg-zinc-900 border border-zinc-800 p-6 transition-colors ${color.borde} ${
+                  paso.destacado
+                    ? 'border-amber-400/60 shadow-lg shadow-amber-400/5'
+                    : ''
+                } ${par ? 'md:mr-auto md:text-right' : 'md:ml-auto'}`}
+              >
+                <div
+                  class={`inline-flex items-center gap-2 flex-wrap mb-3 ${
+                    par ? 'md:flex-row-reverse' : ''
+                  }`}
+                >
+                  <span class={`text-xs px-3 py-1 rounded-full border ${color.pildora}`}>
+                    {paso.periodo}
+                  </span>
+                  {
+                    paso.destacado && (
+                      <span class="text-xs px-3 py-1 rounded-full bg-amber-400 text-black font-bold">
+                        Ganadora por votación
+                      </span>
+                    )
+                  }
+                  {
+                    paso.insignia && (
+                      <span class={`text-xs px-3 py-1 rounded-full border font-bold ${color.pildora}`}>
+                        {paso.insignia}
+                      </span>
+                    )
+                  }
+                </div>
+                <h3 class="text-xl font-bold text-white">{paso.titulo}</h3>
+                <p class="text-sm text-violeta-app mt-1">{paso.lugar}</p>
+                <p class="text-zinc-400 text-sm leading-relaxed mt-3">{paso.texto}</p>
+              </div>
+            </li>
+          );
+        })
+      }
+      {/*cierre del recorrido: donde estoy hoy*/}
+      <li class="hidden md:flex md:justify-center">
+        <div class="inline-flex items-center gap-3 rounded-full bg-zinc-900 border border-zinc-800 px-6 py-3 text-zinc-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-verde-app animate-pulse"></span>
+          Hoy: diseño, enseño y sigo aprendiendo.
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  {/*habilidades agrupadas por area*/}
+  <div class="px-4 pb-14 max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
+      <svg aria-hidden="true" class="w-8 h-8 text-violeta-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+      Lo que manejo
+    </h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      {
+        habilidades.map((grupo) => (
+          <div class="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 transition-colors hover:border-verde-app/40">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-verde-app/10 text-verde-app border border-verde-app/20">
+                {
+                  grupo.version === 'pen-tool' && (
+                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                      <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                      <path d="M2 2l7.586 7.586" />
+                      <circle cx="11" cy="11" r="2" />
+                    </svg>
+                  )
+                }
+                {
+                  grupo.version === 'layout' && (
+                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <line x1="3" y1="9" x2="21" y2="9" />
+                      <line x1="9" y1="21" x2="9" y2="9" />
+                    </svg>
+                  )
+                }
+                {
+                  grupo.version === 'video' && (
+                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
+                      <line x1="7" y1="2" x2="7" y2="22" />
+                      <line x1="17" y1="2" x2="17" y2="22" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                    </svg>
+                  )
+                }
+                {
+                  grupo.version === 'codigo' && (
+                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <polyline points="16 18 22 12 16 6" />
+                      <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                  )
+                }
+              </span>
+              <h3 class="text-lg font-bold text-white">{grupo.grupo}</h3>
+            </div>
+            <ul class="flex flex-wrap gap-2">
+              {
+                grupo.items.map((item) => (
+                  <li class="flex items-center gap-2 text-sm px-3 py-1.5 rounded-full bg-zinc-800/80 border border-zinc-700 text-zinc-300">
+                    {typeof item === 'string' ? (
+                      item
+                    ) : (
+                      <>
+                        <LogoHerramienta logo={item.logo} className="w-4 h-4 shrink-0" />
+                        <span>{item.texto}</span>
+                      </>
+                    )}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  {/*certificaciones: imagen que se abre en grande (isla de react)*/}
+  <Certificaciones client:visible />
+</section>

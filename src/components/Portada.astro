@@ -1,0 +1,55 @@
+---
+//portada con los videos de los proyectos: el mismo carrusel del hero de la home
+//se reusa en la home (variante "hero", a pantalla completa con el contenido en el slot) y
+//debajo del titulo de otras paginas (variante "banner", con titulo, bajada y eyebrow)
+import HeroCarrusel from './HeroCarrusel.jsx';
+
+const {
+  titulo,
+  bajada = '',
+  eyebrow = '',
+  variante = 'banner',
+  alto = 'h-[clamp(16rem,45vh,26rem)]',
+} = Astro.props;
+
+//en la home el bloque ocupa toda la pantalla: sin bordes ni esquinas redondeadas
+const esHero = variante === 'hero';
+const claseContenedor = esHero
+  ? 'relative min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 overflow-hidden'
+  : `relative overflow-hidden rounded-3xl border border-zinc-800 ${alto}`;
+const claseContenido = esHero
+  ? 'relative w-full max-w-3xl mx-auto text-center space-y-6'
+  : 'relative h-full flex flex-col justify-end gap-2 p-6 sm:p-10';
+const claseVelo = esHero
+  ? 'absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/70'
+  : 'absolute inset-0 bg-gradient-to-b from-black/75 via-black/55 to-black/75';
+---
+
+<section class={claseContenedor}>
+  {/*los videos de los proyectos van de fondo*/}
+  <div class="absolute inset-0 -z-10">
+    <HeroCarrusel client:load variante={variante} />
+  </div>
+  {/*velo para que el texto se lea siempre encima del video*/}
+  <div aria-hidden="true" class={`absolute inset-0 -z-10 ${claseVelo}`} />
+
+  {/*en la home entra el contenido por el slot (presentacion + botones);
+  en las paginas se arma con el titulo, el eyebrow y la bajada*/}
+  <div class={claseContenido}>
+    {
+      Astro.slots.has('default') ? (
+        <slot />
+      ) : (
+        <>
+          {eyebrow && (
+            <p class="text-verde-app font-medium tracking-widest uppercase text-sm">{eyebrow}</p>
+          )}
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+            {titulo}
+          </h1>
+          {bajada && <p class="text-zinc-300 max-w-2xl leading-relaxed">{bajada}</p>}
+        </>
+      )
+    }
+  </div>
+</section>
