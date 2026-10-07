@@ -228,3 +228,55 @@ html.viendo-detalle .encabezado-seccion-proyectos {
 .carrusel-auto-pausado { animation-play-state: paused; }
 @keyframes carrusel-loop { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
+/*aparicion al hacer scroll: los bloques marcados con data-anim entran desde abajo.
+  la clase "con-js" solo existe si hay javascript y el sistema no pide menos movimiento,
+  asi quien no cumple esas condiciones ve todo el contenido sin animacion (nada oculto).*/
+html.con-js [data-anim] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--anim-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+html.con-js [data-anim].animado {
+  opacity: 1;
+  transform: none;
+}
+
+/*grupos con hijos escalonados: la grilla de proyectos entra tarjeta por tarjeta*/
+html.con-js .animar-grupo > * {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+html.con-js .animar-grupo.animado > * {
+  opacity: 1;
+  transform: none;
+}
+
+html.con-js .animar-grupo.animado > *:nth-child(1) { transition-delay: 40ms; }
+html.con-js .animar-grupo.animado > *:nth-child(2) { transition-delay: 100ms; }
+html.con-js .animar-grupo.animado > *:nth-child(3) { transition-delay: 160ms; }
+html.con-js .animar-grupo.animado > *:nth-child(4) { transition-delay: 220ms; }
+html.con-js .animar-grupo.animado > *:nth-child(5) { transition-delay: 280ms; }
+html.con-js .animar-grupo.animado > *:nth-child(6) { transition-delay: 340ms; }
+html.con-js .animar-grupo.animado > *:nth-child(7) { transition-delay: 400ms; }
+html.con-js .animar-grupo.animado > *:nth-child(8) { transition-delay: 460ms; }
+
+/*si el sistema pide menos movimiento, no se anima nada y todo queda visible*/
+@media (prefers-reduced-motion: reduce) {
+  html.con-js [data-anim],
+  html.con-js .animar-grupo > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+

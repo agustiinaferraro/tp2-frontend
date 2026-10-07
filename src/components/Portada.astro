@@ -35,7 +35,8 @@ const claseVelo = esHero
 
   {/*en la home entra el contenido por el slot (presentacion + botones);
   en las paginas se arma con el titulo, el eyebrow y la bajada*/}
-  <div class={claseContenido}>
+  {/*en la home el slot anima sus propias lineas; en el banner animamos el bloque entero*/}
+  <div class={claseContenido} data-anim={esHero ? undefined : ''}>
     {
       Astro.slots.has('default') ? (
         <slot />

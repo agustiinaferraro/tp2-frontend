@@ -65,7 +65,7 @@ function SeccionGrilla({ nombre, items }) {
       <h2 className="text-2xl font-bold text-white">
         {nombre} <span className="ml-2 text-sm font-normal text-zinc-500">({items.length})</span>
       </h2>
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <ul className="animar-grupo grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {items.map((proyecto) => (
           //mismo alto que en los carruseles: si se pone otro numero aqui, las tarjetas
           //de la grilla se quedan cortas y el resumen queda cortado a la mitad

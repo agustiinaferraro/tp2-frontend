@@ -27,6 +27,11 @@ const { title } = Astro.props;
 			rel="stylesheet"
 		/>
 		<title>{title ?? 'Agustina Ferraro | Diseñadora Multimedia'}</title>
+		{/*se marca el html como "con javascript" antes de pintar: asi los bloques que
+		    entran al scrollear arrancan ocultos sin que se vea un parpadeo*/}
+		<script is:inline>
+			document.documentElement.classList.add('con-js');
+		</script>
 	</head>
 	<body class="bg-black text-zinc-100 font-sans antialiased">
 		{/*accesibilidad: link para saltar al contenido con el teclado*/}
@@ -35,6 +40,50 @@ const { title } = Astro.props;
 		</a>
 		<slot />
 		<BotonHablemos />
+		{/*animaciones de entrada al hacer scroll: observa los bloques con data-anim
+		    (y los grupos con .animar-grupo) y les agrega "animado" cuando entran en
+		    pantalla. si el sistema pide menos movimiento o no hay javascript, se
+		    quita "con-js" y todo queda visible y quieto.*/}
+		<script is:inline>
+			(function () {
+				var html = document.documentElement;
+				var menosMovimiento =
+					window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+				if (menosMovimiento || !('IntersectionObserver' in window)) {
+					html.classList.remove('con-js');
+					return;
+				}
+				var selector = '[data-anim], .animar-grupo';
+				var observador = new IntersectionObserver(
+					function (entradas) {
+						entradas.forEach(function (entrada) {
+							if (entrada.isIntersecting) {
+								entrada.target.classList.add('animado');
+								observador.unobserve(entrada.target);
+							}
+						});
+					},
+					//threshold 0: se dispara apenas asoma el bloque, aunque sea mas alto que la pantalla
+					{ rootMargin: '0px 0px -10% 0px', threshold: 0 }
+				);
+				function observar(raiz) {
+					raiz.querySelectorAll(selector).forEach(function (el) {
+						if (!el.classList.contains('animado')) observador.observe(el);
+					});
+				}
+				observar(document);
+				/*el contenido dinamico (islas de react) se agrega despues: hay que observarlo tambien*/
+				new MutationObserver(function (mutaciones) {
+					mutaciones.forEach(function (mutacion) {
+						mutacion.addedNodes.forEach(function (nodo) {
+							if (nodo.nodeType !== 1) return;
+							if (nodo.matches && nodo.matches(selector)) observador.observe(nodo);
+							if (nodo.querySelectorAll) observar(nodo);
+						});
+					});
+				}).observe(document.body, { childList: true, subtree: true });
+			})();
+		</script>
 	</body>
 </html>
 
