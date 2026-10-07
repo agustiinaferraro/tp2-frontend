@@ -89,6 +89,7 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
   //se lee la url del lado del cliente (en el server no existe window)
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('id');
+    setDetalleId(id);
     const esDetalle = Boolean(id);
     document.documentElement.classList.toggle('viendo-detalle', esDetalle);
     const tituloSeccion = document.querySelector('.encabezado-seccion-proyectos');
@@ -109,6 +110,7 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
   //si el usuario usa el boton "atras" del navegador, se re-sincroniza con la url
   useEffect(() => {
     const alVolverPagina = () => {
+      const id = new URLSearchParams(window.location.search).get('id');
       const esDetalle = Boolean(id);
       setDetalleId(id);
       document.documentElement.classList.toggle('viendo-detalle', esDetalle);
