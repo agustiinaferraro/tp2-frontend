@@ -115,9 +115,9 @@ export default function CuentaUsuario() {
   const [emailDueno, setEmailDueno] = useState('');
   //input oculto para elegir la foto de perfil
   const fotoInputRef = useRef(null);
-  //edicion del nombre (la foto se guarda al instante al elegirla)
-  const [editando, setEditando] = useState(false);
+  //edicion del perfil: nombre y foto se editan y se confirman con un solo boton
   const [nombreEditado, setNombreEditado] = useState('');
+  const [fotoNueva, setFotoNueva] = useState(null);
   const [guardando, setGuardando] = useState(false);
   //dialogo de cuentas: "" (cerrado) | "cambiar" | "agregar"
   const [ventana, setVentana] = useState('');
@@ -134,11 +134,13 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   const esDueno = !!sesion && sesion.email?.toLowerCase() === emailDueno.toLowerCase();
 
   //hay cambios sin guardar en el perfil: habilita el boton general de guardado
-  //(la foto se guarda al instante, asi que por ahora solo cuenta el nombre)
-  const hayCambios = editando && nombreEditado.trim() !== (sesion?.nombre ?? '').trim();
+  const hayCambios =
+    Boolean(fotoNueva) || nombreEditado.trim() !== (sesion?.nombre ?? '').trim();
 
   useEffect(() => {
-    setSesion(leerSesion());
+    const guardada = leerSesion();
+    setSesion(guardada);
+    setNombreEditado(guardada?.nombre ?? '');
     setMontado(true);
     obtenerEmailDueno()
       .then((email) => setEmailDueno(email ?? ''))
@@ -160,52 +162,34 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     guardarSesion(nuevaSesion);
     setSesion(nuevaSesion);
     setForm({ nombre: '', email: '', clave: '' });
-    salirDeEdicion();
+    limpiarEdicion(nuevaSesion.nombre);
     if (desdeVentana) setVentana('');
     //vuelve al punto de partida (la pagina donde estaba antes de registrarse)
     if (volver) window.location.assign(volver);
   }
 
-  //sale del modo edicion dejando los valores como estaban guardados
-  function salirDeEdicion() {
-    setEditando(false);
-    setNombreEditado('');
+  //deja los campos de edicion como los datos guardados
+  function limpiarEdicion(nombre) {
+    setNombreEditado(nombre ?? '');
+    setFotoNueva(null);
     setError('');
   }
 
-  //abre la edicion del nombre con el valor actual
-  function empezarEditar() {
-    setNombreEditado(sesion?.nombre ?? '');
-    setError('');
-    setEditando(true);
-  }
-
-  //tocar afuera NO descarta los cambios: se confirman con el boton "Guardar cambios"
-  //el boton "Cancelar" es el unico que vuelve atras
-  function cancelarEdicion() {
-    salirDeEdicion();
-  }
-
-  //elige una foto de perfil, la comprime y la guarda al instante (sin pasar por "guardar cambios")
+  //elige una foto de perfil: se comprime y queda lista para guardar con el boton general
   async function cambiarFoto(e) {
     const archivo = e.target.files?.[0];
     if (!archivo) return;
     setError('');
     try {
-      const foto = await comprimirImagen(archivo);
-      //la foto se guarda solo en el navegador de esta persona y queda lista al momento
-      const sesionActual = actualizarFoto(foto);
-      guardarCuenta(sesionActual);
-      setCuentas(listarCuentas());
-      setSesion(sesionActual);
+      setFotoNueva(await comprimirImagen(archivo));
     } catch (err) {
       setError(err.message);
     }
   }
 
-  //guarda el nombre editado (la foto ya se guardo al elegirla)
+  //guarda los cambios del perfil (nombre y foto) con el boton general
   async function guardarCambios() {
-    if (guardando) return;
+    if (guardando || !hayCambios) return;
     const nombreLimpio = nombreEditado.trim();
     if (!nombreLimpio) {
       setError('El nombre no puede estar vacío.');
@@ -219,13 +203,17 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
       //el nombre vive en firebase (para que lo vean los demas al comentar)
       if (nombreLimpio !== sesion?.nombre) {
         sesionActual = await actualizarNombre(nombreLimpio);
+      }
+      //la foto se guarda solo en el navegador de esta persona
+      if (fotoNueva) {
+        sesionActual = actualizarFoto(fotoNueva);
+      }
+      if (sesionActual) {
         guardarCuenta(sesionActual);
         setCuentas(listarCuentas());
         setSesion(sesionActual);
       }
-      setNombreEditado(sesionActual?.nombre ?? nombreLimpio);
-      setEditando(false);
-      setGuardado(true);
+      limpiarEdicion(sesionActual?.nombre ?? nombreLimpio);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -302,7 +290,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   function cambiarCuentaActiva(cuenta) {
     guardarSesion(cuenta);
     setSesion(cuenta);
-    salirDeEdicion();
+    limpiarEdicion(cuenta.nombre);
     setGuardado(false);
     setConfirmandoBorrado(false);
     setVentana('');
@@ -314,7 +302,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     borrarSesion();
     setSesion(null);
     setModo('login');
-    salirDeEdicion();
+    limpiarEdicion('');
     setGuardado(false);
     setConfirmandoBorrado(false);
     setVentana('');
@@ -474,7 +462,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
             >
               <span className="flex items-center justify-center w-20 h-20 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 transition-colors group-hover:border-verde-app">
                 <AvatarPerfil
-                  foto={sesion.foto}
+                  foto={fotoNueva || sesion.foto}
                   nombre={sesion.nombre}
                   className="w-full h-full object-cover"
                   classNameInicial="text-verde-app font-extrabold text-3xl"
@@ -485,9 +473,9 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               </span>
             </button>
             <div className="min-w-0 text-left">
-              {/*nombre que se ve en la cabecera: el que esta por guardar si se esta editando*/}
+              {/*nombre que se ve en la cabecera: refleja lo que se esta por guardar*/}
               <p className="font-bold text-white text-lg truncate">
-                {editando ? nombreEditado || sesion.nombre : sesion.nombre}
+                {nombreEditado.trim() || sesion.nombre}
               </p>
               <p className="text-zinc-400 text-sm truncate">{sesion.email}</p>
               <div className="flex items-center gap-2 flex-wrap">
@@ -503,29 +491,14 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
           <div className="border-t border-zinc-800 divide-y divide-zinc-800">
             <div className="px-6 py-4">
               <p className="text-xs text-zinc-500 mb-1 uppercase tracking-wide">Nombre de usuario</p>
-              {editando ? (
-                <input
-                  type="text"
-                  autoFocus
-                  maxLength={30}
-                  value={nombreEditado}
-                  onChange={(e) => setNombreEditado(e.target.value)}
-                  aria-label="Nombre de usuario"
-                  className={claseInput}
-                />
-              ) : (
-                <button
-                  type="button"
-                  onClick={empezarEditar}
-                  className="w-full flex items-center justify-between gap-3 text-left cursor-pointer group"
-                >
-                  <span className="font-medium text-zinc-100 truncate">{sesion.nombre}</span>
-                  <span className="inline-flex items-center gap-1.5 text-sm text-zinc-400 group-hover:text-white transition-colors shrink-0">
-                    <IconoLapiz className="w-4 h-4" />
-                    Editar
-                  </span>
-                </button>
-              )}
+              <input
+                type="text"
+                maxLength={30}
+                value={nombreEditado}
+                onChange={(e) => setNombreEditado(e.target.value)}
+                aria-label="Nombre de usuario"
+                className={claseInput}
+              />
               <p className="text-xs text-zinc-500 mt-1">Así te ven los demás en los comentarios.</p>
             </div>
 
@@ -537,27 +510,16 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               </div>
             </div>
 
-            {/*boton general de guardado: maneja cualquier cambio del perfil (por ahora el nombre)*/}
+            {/*boton general de guardado: maneja cualquier cambio del perfil (nombre y foto)*/}
             <div className="px-6 py-4">
-              <div className="flex items-center gap-3">
-                {editando && (
-                  <button
-                    type="button"
-                    onClick={cancelarEdicion}
-                    className="shrink-0 px-4 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 hover:text-white active:bg-zinc-600 active:scale-95 text-zinc-300 text-sm border border-zinc-700 transition-all duration-200 cursor-pointer"
-                  >
-                    Cancelar
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={guardarCambios}
-                  disabled={!hayCambios || guardando}
-                  className="flex-1 px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 active:scale-95 text-black text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-verde-app disabled:active:scale-100 cursor-pointer"
-                >
-                  {guardando ? 'Guardando...' : 'Guardar'}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={guardarCambios}
+                disabled={!hayCambios || guardando}
+                className="w-full px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 active:scale-95 text-black text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-verde-app disabled:active:scale-100 cursor-pointer"
+              >
+                {guardando ? 'Guardando...' : 'Guardar'}
+              </button>
             </div>
 
             <div className="px-6 py-4 border-t border-zinc-800 space-y-3">
