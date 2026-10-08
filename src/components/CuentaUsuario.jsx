@@ -489,11 +489,20 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                 {nombreEditado.trim() || sesion.nombre}
               </p>
               <p className="text-zinc-400 text-sm truncate">{sesion.email}</p>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="inline-flex items-center gap-1.5 text-xs text-verde-app mt-1">
+              <div className="flex items-center gap-2 flex-wrap mt-1">
+                <span className="inline-flex items-center gap-1.5 text-xs text-verde-app">
                   <span className="w-1.5 h-1.5 rounded-full bg-verde-app" aria-hidden="true"></span>
                   Sesión activa
                 </span>
+                {/*la cuenta de la dueña se marca aca, ademas del acceso al panel de abajo*/}
+                {esDueno && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-black bg-verde-app rounded-full px-2 py-0.5">
+                    <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                    </svg>
+                    Dueña del sitio
+                  </span>
+                )}
               </div>
             </div>
           </div>

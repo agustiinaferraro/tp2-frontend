@@ -1,7 +1,7 @@
 //avatar del navbar: muestra la foto de la cuenta que esta conectada (o la inicial del nombre
 //si todavia no hay foto elegida) y es el acceso al perfil
 import { useEffect, useState } from 'react';
-import { leerSesion, sesionConTokenFresco } from '../api/usuarios.js';
+import { leerSesion, sesionConTokenFresco, soyDueno } from '../api/usuarios.js';
 
 function inicial(nombre) {
   return (nombre ?? '?').trim().charAt(0).toUpperCase() || '?';
@@ -14,6 +14,8 @@ export default function AvatarAdmin() {
   const [listo, setListo] = useState(false);
   //si la foto no carga (por ejemplo una url vencida), se cae a la inicial del nombre
   const [fotoFalla, setFotoFalla] = useState(false);
+  //si la cuenta conectada es la dueña del sitio, se marca en el nav
+  const [esDueno, setEsDueno] = useState(false);
 
   useEffect(() => {
     const actualizar = () => {
@@ -37,6 +39,23 @@ export default function AvatarAdmin() {
   useEffect(() => {
     setFotoFalla(false);
   }, [sesion?.foto]);
+
+  //pregunta al backend si la cuenta conectada es la dueña, para marcarla en el nav
+  useEffect(() => {
+    if (!sesion?.email) {
+      setEsDueno(false);
+      return;
+    }
+    let activo = true;
+    soyDueno()
+      .then((es) => {
+        if (activo) setEsDueno(es);
+      })
+      .catch(() => {});
+    return () => {
+      activo = false;
+    };
+  }, [sesion?.email]);
 
   const nombre = sesion?.nombre ?? '';
   //sin sesion el perfil se ve igual, como "Anonimo"
@@ -71,11 +90,30 @@ export default function AvatarAdmin() {
       title="Mi perfil"
       className="flex flex-col items-center gap-1 rounded-lg px-2 py-1 hover:bg-zinc-800 hover:scale-105 active:scale-95 active:bg-zinc-700 transition-all duration-200"
     >
-      <span className="w-9 h-9 hover:border-verde-app hover:text-white transition-colors">
+      <span
+        className={`relative w-9 h-9 hover:border-verde-app hover:text-white transition-colors ${
+          esDueno ? 'ring-2 ring-verde-app rounded-full' : ''
+        }`}
+      >
         {circulo}
+        {/*insignia de dueña: escudito verde sobre el avatar*/}
+        {esDueno && (
+          <span
+            title="Dueña del sitio"
+            className="absolute -bottom-0.5 -right-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-verde-app text-black border-2 border-black"
+          >
+            <svg aria-hidden="true" className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+            </svg>
+          </span>
+        )}
       </span>
       {/*el nombre de usuario va abajo del circulo: se ve quien esta conectado sin abrir nada*/}
-      <span className="max-w-20 truncate text-[11px] leading-none text-zinc-400 hover:text-white transition-colors">
+      <span
+        className={`max-w-20 truncate text-[11px] leading-none transition-colors ${
+          esDueno ? 'text-verde-app font-semibold' : 'text-zinc-400'
+        } hover:text-white`}
+      >
         {nombreMostrado}
       </span>
     </a>
