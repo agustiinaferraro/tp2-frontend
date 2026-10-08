@@ -3,7 +3,7 @@
 // que se subio a behance y el boton para visitar el proyecto publicado.
 // el link externo nunca va dentro del principal (html no anida links), va aparte al pie de la card
 // se reusa en los carruseles y en la grilla de proyectos
-// titulo y resumen se acotan con line-clamp (2 y 3 lineas): asi el recorte se adapta al ancho
+// titulo y resumen se acotan con line-clamp (2 y 2 lineas): asi el recorte se adapta al ancho
 // de la tarjeta y todas las tarjetas quedan con la misma altura. el texto completo se ve en el detalle
 import ImagenProyecto from './ImagenProyecto.jsx';
 import { textoVisitar } from '../utils/proyectos.js';
@@ -19,6 +19,20 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
     <article
       className={`group relative z-0 hover:z-10 focus-within:z-10 h-full flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
     >
+      {/* etiqueta de destacado: va encima de la portada para no agrandar la tarjeta */}
+      {destacado && (
+        <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 rounded-full bg-zinc-900/85 backdrop-blur-sm px-2 py-1 text-xs font-medium text-orange-300 border border-orange-400/50">
+          <svg aria-hidden="true" className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.4l6.1-.8z"
+            />
+          </svg>
+          Destacado
+        </span>
+      )}
+
       {/* link principal: siempre al detalle del proyecto en el sitio */}
       <a href={`/proyectos/?id=${proyecto._id}`} className={claseEnlacePrincipal}>
         {/* portada: la imagen que mejor representa al proyecto
@@ -40,18 +54,6 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
           >
             {proyecto.titulo}
           </h3>
-          {destacado && (
-            <span className="inline-flex w-fit items-center gap-1 rounded-full bg-orange-400/15 px-2 py-1 text-xs font-medium text-orange-300 border border-orange-400/40">
-              <svg aria-hidden="true" className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.4l6.1-.8z"
-                />
-              </svg>
-              Destacado
-            </span>
-          )}
           {/* tags / roles aplicados */}
           {proyecto.tags?.length > 0 && (
             <ul className="flex flex-wrap gap-2" aria-label="Etiquetas del proyecto">
@@ -65,10 +67,10 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
               ))}
             </ul>
           )}
-          {/* el resumen se limita a 3 lineas con line-clamp. lleva shrink-0 porque, sin eso, el
+          {/* el resumen se limita a 2 lineas con line-clamp. lleva shrink-0 porque, sin eso, el
               flexbox de la card lo aplasta para que entre todo y el texto se corta a la
               mitad de una linea, sin los puntos suspensivos */}
-          <p className="text-zinc-400 text-sm leading-relaxed line-clamp-3 shrink-0">
+          <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2 shrink-0">
             {proyecto.resumen}
           </p>
         </div>

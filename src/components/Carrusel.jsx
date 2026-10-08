@@ -14,9 +14,9 @@ import { Children, Fragment, useCallback, useEffect, useMemo, useRef, useState }
 //asi siempre queda a la vista un fragmento de la siguiente
 export const TARJETA_CARRUSEL = 'w-[clamp(9.5rem,58%,13rem)]';
 
-//alto de las tarjetas de proyecto: todas iguales. el resumen va recortado a 3 lineas
-//(el texto completo se ve en el detalle) y el link queda anclado abajo
-export const TARJETA_PROYECTO = 'h-[21rem]';
+//alto de las tarjetas de proyecto: todas iguales y compactas. el resumen va recortado a
+//2 lineas (el texto completo se ve en el detalle) y el link queda anclado abajo
+export const TARJETA_PROYECTO = 'h-[18.5rem]';
 
 //distancia que se avanza cada vez que se aprieta una flecha (ancho de la card + separacion)
 function pasoDe(lista) {
