@@ -3,13 +3,14 @@
 // que se subio a behance y el boton para visitar el proyecto publicado.
 // el link externo nunca va dentro del principal (html no anida links), va aparte al pie de la card
 // se reusa en los carruseles y en la grilla de proyectos
-// titulo y resumen se acotan con line-clamp (2 y 2 lineas): asi el recorte se adapta al ancho
-// de la tarjeta y todas las tarjetas quedan con la misma altura. el texto completo se ve en el detalle
+// titulo y resumen se acotan con line-clamp (2 y 2 lineas): el recorte se adapta al ancho de
+// la tarjeta y el texto completo se ve en el detalle. la card mide su contenido, asi el
+// link de "ver proyecto" queda pegado al resumen y no queda aire de mas
 import ImagenProyecto from './ImagenProyecto.jsx';
 import { textoVisitar } from '../utils/proyectos.js';
 
 export default function ProyectoCard({ proyecto, destacado = false }) {
-  const claseEnlacePrincipal = 'flex flex-col flex-1 min-h-0';
+  const claseEnlacePrincipal = 'flex flex-col';
   //los destacados del carrusel de la home llevan un borde naranja para que se distingan de una vez
   const claseBorde = destacado
     ? 'border-orange-400/70 ring-2 ring-orange-400/25 hover:border-orange-400'
@@ -17,7 +18,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
 
   return (
     <article
-      className={`group relative z-0 hover:z-10 focus-within:z-10 h-full flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
+      className={`group relative z-0 hover:z-10 focus-within:z-10 flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
     >
       {/* etiqueta de destacado: va encima de la portada para no agrandar la tarjeta */}
       {destacado && (
@@ -46,7 +47,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
             />
           </figure>
         )}
-        <div className="p-3 flex flex-col gap-1.5 flex-1 min-h-0">
+        <div className="p-3 flex flex-col gap-1.5">
           <h3
             className={`text-base font-bold text-white line-clamp-2 shrink-0 transition-colors ${
               destacado ? 'group-hover:text-orange-300' : 'group-hover:text-verde-app/80'
