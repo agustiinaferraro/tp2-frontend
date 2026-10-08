@@ -28,11 +28,11 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
             <ImagenProyecto
               proyecto={proyecto}
               alternativa={false}
-              className="w-full h-28 object-cover group-hover:opacity-90 transition-opacity"
+              className="w-full h-24 object-cover group-hover:opacity-90 transition-opacity"
             />
           </figure>
         )}
-        <div className="p-4 flex flex-col gap-1.5 flex-1 min-h-0">
+        <div className="p-3 flex flex-col gap-1.5 flex-1 min-h-0">
           <h3
             className={`text-base font-bold text-white line-clamp-2 shrink-0 transition-colors ${
               destacado ? 'group-hover:text-orange-300' : 'group-hover:text-verde-app/80'
@@ -75,7 +75,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
       </a>
       {/* link externo del proyecto: va al sitio publicado (behance, vercel, etc) */}
       {proyecto.link && (
-        <p className="px-4 pb-4">
+        <p className="px-3 pb-3">
           <a
             href={proyecto.link}
             target="_blank"

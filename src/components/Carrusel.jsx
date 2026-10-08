@@ -10,15 +10,15 @@
 //    flechas siguen funcionando
 import { Children, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-//ancho de una tarjeta: hasta 15rem pero nunca mas del 68% del ancho disponible,
+//ancho de una tarjeta: hasta 13rem pero nunca mas del 58% del ancho disponible,
 //asi siempre queda a la vista un fragmento de la siguiente
-export const TARJETA_CARRUSEL = 'w-[clamp(11rem,68%,15rem)]';
+export const TARJETA_CARRUSEL = 'w-[clamp(9.5rem,58%,13rem)]';
 
 //alto de las tarjetas de proyecto, la mas alta de las tres grillas
 //va holgado a proposito: con el titulo en 2 lineas, el resumen en 3 y las etiquetas, el
 //contenido pide cerca de 400px. si la tarjeta queda mas chica, el flexbox aplasta el
 //titulo o el resumen en vez de recortarlos con puntos suspensivos
-export const ALTO_PROYECTO = 'h-[25rem]';
+export const ALTO_PROYECTO = 'h-[23rem]';
 
 //distancia que se avanza cada vez que se aprieta una flecha (ancho de la card + separacion)
 function pasoDe(lista) {
