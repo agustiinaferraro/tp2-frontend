@@ -3,34 +3,7 @@
 import { useEffect, useState } from 'react';
 import Carrusel from './Carrusel.jsx';
 
-//certificaciones: cada una con su imagen (carpeta public/img/certificaciones)
-const CERTIFICACIONES = [
-  {
-    nombre: 'Photoshop',
-    descripcion: 'Certificado académico de Adobe Photoshop',
-    imagen: '/img/certificaciones/photoshop.jpg',
-  },
-  {
-    nombre: 'Illustrator',
-    descripcion: 'Certificado académico de Adobe Illustrator',
-    imagen: '/img/certificaciones/illustrator.jpg',
-  },
-  {
-    nombre: 'Figma',
-    descripcion: 'Certificado de diseño de interfaces con Figma',
-    imagen: '/img/certificaciones/figma.jpg',
-  },
-  {
-    nombre: 'Ayudantía en Negocios Digitales II',
-    descripcion: 'Ayudantía en la materia Negocios Digitales II',
-    imagen: '/img/certificaciones/negocios-digitales.png',
-  },
-  {
-    nombre: 'Ayudantía en Diseño de Interfaces',
-    descripcion: 'Ayudantía en la materia Diseño de Interfaces',
-    imagen: '/img/certificaciones/diseno-de-interfaces.png',
-  },
-];
+//las certificaciones llegan por props (desde el backend, via la pagina sobre-mi)
 
 function Cruz() {
   return (
@@ -58,7 +31,7 @@ function Check({ className = '' }) {
   );
 }
 
-export default function Certificaciones() {
+export default function Certificaciones({ certificaciones = [] }) {
   const [abierta, setAbierta] = useState(null);
 
   // Escape tambien cierra
@@ -92,7 +65,7 @@ export default function Certificaciones() {
         </h2>
 
         <Carrusel etiqueta="Certificaciones" clave="certificaciones">
-          {CERTIFICACIONES.map((cert) => (
+          {certificaciones.map((cert) => (
             <li
               key={cert.nombre}
               className="shrink-0 snap-start w-[clamp(15rem,72%,20rem)] h-full"

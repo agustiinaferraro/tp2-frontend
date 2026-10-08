@@ -1,10 +1,37 @@
 ---
 //pagina "sobre mi": presenta el recorrido completo (linea de tiempo del cv)
+//el contenido viene del backend (GET /api/perfil) y se pide en el build.
+//si la api no responde, se usa un respaldo local para no romper el sitio.
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import BackButton from '../components/BackButton.astro';
 import RecorridoSobreMi from '../components/RecorridoSobreMi.astro';
+import { contenidoRespaldo } from '../data/contenido-respaldo.js';
+
+//url base del backend (misma que usa el resto del front)
+const API_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:4000';
+
+//por defecto arranca con el respaldo; si la api responde, se reemplaza
+let contenido = contenidoRespaldo;
+try {
+  const respuesta = await fetch(`${API_BASE}/api/perfil`);
+  if (respuesta.ok) {
+    const perfil = await respuesta.json();
+    contenido = {
+      estadisticas: perfil.estadisticas?.length ? perfil.estadisticas : contenidoRespaldo.estadisticas,
+      recorrido: perfil.recorrido?.length ? perfil.recorrido : contenidoRespaldo.recorrido,
+      habilidades: perfil.habilidades?.length ? perfil.habilidades : contenidoRespaldo.habilidades,
+      certificaciones: perfil.certificaciones?.length
+        ? perfil.certificaciones
+        : contenidoRespaldo.certificaciones,
+    };
+  } else {
+    console.warn(`No se pudo obtener el perfil (${respuesta.status}); se usa el respaldo local.`);
+  }
+} catch (error) {
+  console.warn(`No se pudo conectar a la api; se usa el respaldo local. ${error.message}`);
+}
 ---
 
 <Layout title="Sobre mí | Agustina Ferraro">
@@ -13,7 +40,7 @@ import RecorridoSobreMi from '../components/RecorridoSobreMi.astro';
     <div class="max-w-6xl mx-auto px-4 pt-8">
       <BackButton href="/" />
     </div>
-    <RecorridoSobreMi />
+    <RecorridoSobreMi {...contenido} />
   </main>
   <Footer />
 </Layout>
