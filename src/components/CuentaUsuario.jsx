@@ -115,10 +115,9 @@ export default function CuentaUsuario() {
   const [emailDueno, setEmailDueno] = useState('');
   //input oculto para elegir la foto de perfil
   const fotoInputRef = useRef(null);
-  //edicion de los datos: se edita nombre y foto juntos y se confirma con un solo boton
+  //edicion del nombre (la foto se guarda al instante al elegirla)
   const [editando, setEditando] = useState(false);
   const [nombreEditado, setNombreEditado] = useState('');
-  const [fotoNueva, setFotoNueva] = useState(null);
   const [guardando, setGuardando] = useState(false);
   //dialogo de cuentas: "" (cerrado) | "cambiar" | "agregar"
   const [ventana, setVentana] = useState('');
@@ -166,15 +165,13 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   //sale del modo edicion dejando los valores como estaban guardados
   function salirDeEdicion() {
     setEditando(false);
-    setFotoNueva(null);
     setNombreEditado('');
     setError('');
   }
 
-  //abre la edicion: arranca con los valores actuales (nombre de la sesion y foto guardada)
+  //abre la edicion del nombre con el valor actual
   function empezarEditar() {
     setNombreEditado(sesion?.nombre ?? '');
-    setFotoNueva(null);
     setError('');
     setEditando(true);
   }
@@ -185,25 +182,25 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     salirDeEdicion();
   }
 
-  //elige una foto de perfil, se comprime y queda esperando el "Guardar cambios"
+  //elige una foto de perfil, la comprime y la guarda al instante (sin pasar por "guardar cambios")
   async function cambiarFoto(e) {
     const archivo = e.target.files?.[0];
     if (!archivo) return;
     setError('');
     try {
       const foto = await comprimirImagen(archivo);
-      setFotoNueva(foto);
-      //si recien arranca la edicion por la foto, se completa el nombre actual
-      //asi cambiar solo la foto no obliga a volver a escribir el nombre
-      setNombreEditado((previo) => previo || sesion?.nombre || '');
-      setEditando(true);
+      //la foto se guarda solo en el navegador de esta persona y queda lista al momento
+      const sesionActual = actualizarFoto(foto);
+      guardarCuenta(sesionActual);
+      setCuentas(listarCuentas());
+      setSesion(sesionActual);
+      setGuardado(true);
     } catch (err) {
       setError(err.message);
     }
   }
 
-  //guarda TODOS los cambios edits (nombre y foto) con un solo boton
-  //si solo cambio la foto, no hace falta tocar firebase
+  //guarda el nombre editado (la foto ya se guardo al elegirla)
   async function guardarCambios() {
     if (guardando) return;
     const nombreLimpio = nombreEditado.trim();
@@ -219,19 +216,10 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
       //el nombre vive en firebase (para que lo vean los demas al comentar)
       if (nombreLimpio !== sesion?.nombre) {
         sesionActual = await actualizarNombre(nombreLimpio);
-      }
-      //la foto se guarda solo en el navegador de esta persona
-      if (fotoNueva) {
-        sesionActual = actualizarFoto(fotoNueva);
-      }
-
-      if (sesionActual) {
         guardarCuenta(sesionActual);
         setCuentas(listarCuentas());
-        guardarSesion(sesionActual);
         setSesion(sesionActual);
       }
-      setFotoNueva(null);
       setNombreEditado(sesionActual?.nombre ?? nombreLimpio);
       setEditando(false);
       setGuardado(true);
@@ -483,7 +471,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
             >
               <span className="flex items-center justify-center w-20 h-20 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 transition-colors group-hover:border-verde-app">
                 <AvatarPerfil
-                  foto={fotoNueva || sesion.foto}
+                  foto={sesion.foto}
                   nombre={sesion.nombre}
                   className="w-full h-full object-cover"
                   classNameInicial="text-verde-app font-extrabold text-3xl"
