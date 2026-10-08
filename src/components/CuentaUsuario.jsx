@@ -133,6 +133,10 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   //solo deja ver el panel si la cuenta logueada es de la dueña
   const esDueno = !!sesion && sesion.email?.toLowerCase() === emailDueno.toLowerCase();
 
+  //hay cambios sin guardar en el perfil: habilita el boton general de guardado
+  //(la foto se guarda al instante, asi que por ahora solo cuenta el nombre)
+  const hayCambios = editando && nombreEditado.trim() !== (sesion?.nombre ?? '').trim();
+
   useEffect(() => {
     setSesion(leerSesion());
     setMontado(true);
@@ -495,30 +499,6 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
             </div>
           </div>
 
-          {/*barra general de edicion: se gathers todo (foto y nombre) y se confirma con un boton*/}
-          {editando && (
-            <div className="border-t border-zinc-800 px-6 py-3 flex items-center justify-between gap-3">
-              <p className="text-xs text-zinc-400">Tenés cambios sin guardar</p>
-              <div className="flex gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={cancelarEdicion}
-                  className="shrink-0 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 hover:text-white active:bg-zinc-600 active:scale-95 hover:scale-105 text-zinc-300 text-sm border border-zinc-700 transition-all duration-200 cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={guardarCambios}
-                  disabled={guardando}
-                  className="shrink-0 px-4 py-2 rounded-xl bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 active:scale-95 hover:scale-105 text-black text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
-                >
-                  {guardando ? 'Guardando...' : 'Guardar cambios'}
-                </button>
-              </div>
-            </div>
-          )}
-
           {/*opciones del perfil: una fila por dato (nombre editable, email fijo)*/}
           <div className="border-t border-zinc-800 divide-y divide-zinc-800">
             <div className="px-6 py-4">
@@ -554,6 +534,29 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               <div className="flex items-center justify-between gap-3">
                 <span className="font-medium text-zinc-100 truncate">{sesion.email}</span>
                 <span className="text-xs text-zinc-500 shrink-0">Lo usás para entrar</span>
+              </div>
+            </div>
+
+            {/*boton general de guardado: maneja cualquier cambio del perfil (por ahora el nombre)*/}
+            <div className="px-6 py-4">
+              <div className="flex items-center gap-3">
+                {editando && (
+                  <button
+                    type="button"
+                    onClick={cancelarEdicion}
+                    className="shrink-0 px-4 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 hover:text-white active:bg-zinc-600 active:scale-95 text-zinc-300 text-sm border border-zinc-700 transition-all duration-200 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={guardarCambios}
+                  disabled={!hayCambios || guardando}
+                  className="flex-1 px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 active:scale-95 text-black text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-verde-app disabled:active:scale-100 cursor-pointer"
+                >
+                  {guardando ? 'Guardando...' : 'Guardar'}
+                </button>
               </div>
             </div>
 
