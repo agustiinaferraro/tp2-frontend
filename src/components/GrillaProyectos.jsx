@@ -9,7 +9,7 @@ import { obtenerProyectos } from '../api/proyectos.js';
 import { obtenerServicios } from '../api/servicios.js';
 import ProyectoDetalle from './ProyectoDetalle.jsx';
 import ProyectoCard from './ProyectoCard.jsx';
-import Carrusel, { ALTO_PROYECTO, TARJETA_CARRUSEL } from './Carrusel.jsx';
+import Carrusel, { TARJETA_PROYECTO, TARJETA_CARRUSEL } from './Carrusel.jsx';
 import Loading from './Loading.jsx';
 
 //marca interna para el chip "sin categoria"
@@ -40,7 +40,7 @@ function SeccionCarrusel({ clave, nombre, items }) {
       {items.map((proyecto) => (
         <li
           key={proyecto._id}
-          className={`shrink-0 snap-start ${TARJETA_CARRUSEL} ${ALTO_PROYECTO}`}
+          className={`shrink-0 snap-start ${TARJETA_CARRUSEL} ${TARJETA_PROYECTO}`}
         >
           <ProyectoCard proyecto={proyecto} />
         </li>
@@ -58,9 +58,8 @@ function SeccionGrilla({ nombre, items }) {
       </h2>
       <ul className="animar-grupo grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {items.map((proyecto) => (
-          //mismo alto que en los carruseles: si se pone otro numero aqui, las tarjetas
-          //de la grilla se quedan cortas y el resumen queda cortado a la mitad
-          <li key={proyecto._id} className={ALTO_PROYECTO}>
+          //cada tarjeta mide lo que mide su contenido: termina justo debajo del link
+          <li key={proyecto._id} className={TARJETA_PROYECTO}>
             <ProyectoCard proyecto={proyecto} />
           </li>
         ))}

@@ -17,7 +17,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
 
   return (
     <article
-      className={`group relative z-0 hover:z-10 focus-within:z-10 h-full flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
+      className={`group relative z-0 hover:z-10 focus-within:z-10 flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
     >
       {/* link principal: siempre al detalle del proyecto en el sitio */}
       <a href={`/proyectos/?id=${proyecto._id}`} className={claseEnlacePrincipal}>
