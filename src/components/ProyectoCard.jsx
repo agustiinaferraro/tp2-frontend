@@ -9,7 +9,7 @@ import ImagenProyecto from './ImagenProyecto.jsx';
 import { textoVisitar } from '../utils/proyectos.js';
 
 export default function ProyectoCard({ proyecto, destacado = false }) {
-  const claseEnlacePrincipal = 'flex flex-col flex-1 min-h-0';
+  const claseEnlacePrincipal = 'flex flex-col';
   //los destacados del carrusel de la home llevan un borde naranja para que se distingan de una vez
   const claseBorde = destacado
     ? 'border-orange-400/70 ring-2 ring-orange-400/25 hover:border-orange-400'
@@ -32,7 +32,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
             />
           </figure>
         )}
-        <div className="p-3 flex flex-col gap-1.5 flex-1 min-h-0">
+        <div className="p-3 flex flex-col gap-1.5">
           <h3
             className={`text-base font-bold text-white line-clamp-2 shrink-0 transition-colors ${
               destacado ? 'group-hover:text-orange-300' : 'group-hover:text-verde-app/80'

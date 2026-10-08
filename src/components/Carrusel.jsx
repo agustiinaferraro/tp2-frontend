@@ -14,11 +14,10 @@ import { Children, Fragment, useCallback, useEffect, useMemo, useRef, useState }
 //asi siempre queda a la vista un fragmento de la siguiente
 export const TARJETA_CARRUSEL = 'w-[clamp(9.5rem,58%,13rem)]';
 
-//alto de las tarjetas de proyecto, la mas alta de las tres grillas
-//va holgado a proposito: con el titulo en 2 lineas, el resumen en 3 y las etiquetas, el
-//contenido pide cerca de 400px. si la tarjeta queda mas chica, el flexbox aplasta el
-//titulo o el resumen en vez de recortarlos con puntos suspensivos
-export const ALTO_PROYECTO = 'h-[23rem]';
+//alto minimo de las tarjetas de proyecto. no es fijo: si el contenido pide mas, la
+//tarjeta crece; y como la fila estira todas a la mas alta, todas quedan parejas sin
+//dejar huecos de mas cuando el resumen es corto
+export const ALTO_PROYECTO = 'min-h-[21rem]';
 
 //distancia que se avanza cada vez que se aprieta una flecha (ancho de la card + separacion)
 function pasoDe(lista) {
