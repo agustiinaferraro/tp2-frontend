@@ -4,13 +4,17 @@
 // el link externo nunca va dentro del principal (html no anida links), va aparte al pie de la card
 // se reusa en los carruseles y en la grilla de proyectos
 // titulo y resumen se acotan con line-clamp (2 y 2 lineas): el recorte se adapta al ancho de
-// la tarjeta. la card tiene un alto fijo (TARJETA_PROYECTO) igual para todas y el link de "ver
-// proyecto" queda pegado al resumen. los tags se acotan a una fila asi no estiran la tarjeta
+// la tarjeta. la card tiene un alto minimo igual al de una tarjeta con descripcion (la de
+// "Certificado - Bautismo"), asi las que no tienen descripcion no quedan mas bajas que el
+// resto. el link de "ver proyecto" queda anclado abajo. los tags se acotan a una fila
 import ImagenProyecto from './ImagenProyecto.jsx';
 import { textoVisitar } from '../utils/proyectos.js';
 
 export default function ProyectoCard({ proyecto, destacado = false }) {
-  const claseEnlacePrincipal = 'flex flex-col';
+  const claseEnlacePrincipal = 'flex flex-col flex-1';
+  //alto minimo de la tarjeta: el de una tarjeta con resumen de 2 lineas. las que tienen mas
+  //contenido (titulo largo en 2 lineas) crecen un poco; nunca quedan mas bajas que esto
+  const ALTO_MINIMO = 'min-h-[16.75rem]';
   //los destacados del carrusel de la home llevan un borde naranja para que se distingan de una vez
   const claseBorde = destacado
     ? 'border-orange-400/70 ring-2 ring-orange-400/25 hover:border-orange-400'
@@ -18,7 +22,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
 
   return (
     <article
-      className={`group relative z-0 hover:z-10 focus-within:z-10 h-full flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
+      className={`group relative z-0 hover:z-10 focus-within:z-10 ${ALTO_MINIMO} flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
     >
       {/* etiqueta de destacado: va encima de la portada para no agrandar la tarjeta */}
       {destacado && (

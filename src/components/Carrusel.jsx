@@ -14,11 +14,6 @@ import { Children, Fragment, useCallback, useEffect, useMemo, useRef, useState }
 //asi siempre queda a la vista un fragmento de la siguiente
 export const TARJETA_CARRUSEL = 'w-[clamp(9.5rem,58%,13rem)]';
 
-//alto de las tarjetas de proyecto: todas iguales, con el alto de la tarjeta de referencia
-//(la de "Certificado - Bautismo"). el link de "ver proyecto" queda pegado al resumen; las
-//tarjetas con menos texto dejan el aire abajo, nunca entre el resumen y el boton
-export const TARJETA_PROYECTO = 'h-[18.5rem]';
-
 //distancia que se avanza cada vez que se aprieta una flecha (ancho de la card + separacion)
 function pasoDe(lista) {
   const hijo = lista.firstElementChild;
