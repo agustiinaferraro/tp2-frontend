@@ -4,17 +4,18 @@
 // el link externo nunca va dentro del principal (html no anida links), va aparte al pie de la card
 // se reusa en los carruseles y en la grilla de proyectos
 // titulo y resumen se acotan con line-clamp (2 y 2 lineas): el recorte se adapta al ancho de
-// la tarjeta. la card tiene un alto minimo igual al de una tarjeta con descripcion (la de
-// "Certificado - Bautismo"), asi las que no tienen descripcion no quedan mas bajas que el
-// resto. el link de "ver proyecto" queda anclado abajo. los tags se acotan a una fila
+// la tarjeta. la card tiene un alto fijo (el de una tarjeta con descripcion, la de "Certificado
+// - Bautismo") igual para todas: si el titulo ocupa 2 lineas, la descripcion se achica para que
+// todo entre y la tarjeta no crezca. el link de "ver proyecto" queda anclado abajo. los tags se
+// acotan a una fila
 import ImagenProyecto from './ImagenProyecto.jsx';
 import { textoVisitar } from '../utils/proyectos.js';
 
 export default function ProyectoCard({ proyecto, destacado = false }) {
-  const claseEnlacePrincipal = 'flex flex-col flex-1';
-  //alto minimo de la tarjeta: el de una tarjeta con resumen de 2 lineas. las que tienen mas
-  //contenido (titulo largo en 2 lineas) crecen un poco; nunca quedan mas bajas que esto
-  const ALTO_MINIMO = 'min-h-[16.75rem]';
+  const claseEnlacePrincipal = 'flex flex-col flex-1 min-h-0';
+  //alto fijo de la tarjeta: el de una tarjeta con resumen de 2 lineas y titulo de 1. la
+  //descripcion ocupa el espacio que sobra, asi el titulo puede usar 2 lineas sin estirar la card
+  const ALTO_TARJETA = 'h-[16.75rem]';
   //los destacados del carrusel de la home llevan un borde naranja para que se distingan de una vez
   const claseBorde = destacado
     ? 'border-orange-400/70 ring-2 ring-orange-400/25 hover:border-orange-400'
@@ -22,7 +23,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
 
   return (
     <article
-      className={`group relative z-0 hover:z-10 focus-within:z-10 ${ALTO_MINIMO} flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
+      className={`group relative z-0 hover:z-10 focus-within:z-10 ${ALTO_TARJETA} flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
     >
       {/* etiqueta de destacado: va encima de la portada para no agrandar la tarjeta */}
       {destacado && (
@@ -51,7 +52,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
             />
           </figure>
         )}
-        <div className="p-3 flex flex-col gap-1.5">
+        <div className="p-3 flex flex-col gap-1.5 flex-1 min-h-0">
           <h3
             className={`text-base font-bold text-white line-clamp-2 shrink-0 transition-colors ${
               destacado ? 'group-hover:text-orange-300' : 'group-hover:text-verde-app/80'
@@ -73,17 +74,16 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
               ))}
             </ul>
           )}
-          {/* el resumen se limita a 2 lineas con line-clamp. lleva shrink-0 porque, sin eso, el
-              flexbox de la card lo aplasta para que entre todo y el texto se corta a la
-              mitad de una linea, sin los puntos suspensivos */}
-          <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2 shrink-0">
+          {/* el resumen ocupa el espacio que sobra (flex-1) cuando el titulo usa 2 lineas, asi
+              la tarjeta mantiene el mismo alto. se recorta a 2 lineas con line-clamp */}
+          <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2 flex-1 min-h-0 overflow-hidden">
             {proyecto.resumen}
           </p>
         </div>
       </a>
       {/* link externo del proyecto: va al sitio publicado (behance, vercel, etc) */}
       {proyecto.link && (
-        <p className="px-3 pb-3">
+        <p className="px-3 pb-3 shrink-0">
           <a
             href={proyecto.link}
             target="_blank"
