@@ -3,7 +3,6 @@
 //son los que el visitante marco como destacados y no lleva filtros.
 import { useEffect, useState } from 'react';
 import { obtenerProyectosDestacados } from '../api/proyectos.js';
-import Carrusel from './Carrusel.jsx';
 import ProyectoCard from './ProyectoCard.jsx';
 import Loading from './Loading.jsx';
 
@@ -26,13 +25,41 @@ export default function CarruselDestacados() {
   //si no hay nada destacado todavia, la seccion no se muestra
   if (proyectos.length === 0) return null;
 
+  // Para evitar huecos vacíos cuando hay pocos ítems, duplicamos lo suficiente el array
+  const multiplicador = proyectos.length < 5 ? 4 : 2;
+  const loopProyectos = Array(multiplicador).fill(proyectos).flat();
+
   return (
-    <Carrusel etiqueta="Proyectos destacados" clave="destacados" auto conFlechas={false} claseLista="">
-      {proyectos.map((proyecto) => (
-        <li key={proyecto._id} className={`shrink-0 snap-start ${TARJETA_DESTACADA} h-[26rem]`}>
-          <ProyectoCard proyecto={proyecto} destacado />
-        </li>
-      ))}
-    </Carrusel>
+    <div className="relative w-full overflow-hidden py-5">
+      <h2 className="px-10 text-3xl font-bold mb-10 relative z-10 text-left">
+        Proyectos destacados
+      </h2>
+      <div className="flex gap-6 w-max animate-carousel hover:[animation-play-state:paused]">
+        {loopProyectos.map((proyecto, index) => (
+          <div
+            key={`${proyecto._id || index}-${index}`}
+            className={`relative inline-block ${TARJETA_DESTACADA} shrink-0 cursor-pointer overflow-visible rounded-lg transition-transform duration-300 hover:scale-105`}
+          >
+            <ProyectoCard proyecto={proyecto} destacado />
+          </div>
+        ))}
+      </div>
+
+      <style jsx>{`
+        @keyframes carousel {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-carousel {
+          display: flex;
+          width: max-content;
+          animation: carousel 30s linear infinite;
+        }
+      `}</style>
+    </div>
   );
 }
