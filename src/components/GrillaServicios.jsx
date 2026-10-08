@@ -124,7 +124,7 @@ export default function GrillaServicios({ vista = 'carrusel' }) {
   return (
     <Carrusel etiqueta="Servicios" clave="servicios">
       {servicios.map((servicio) => (
-        <li key={servicio._id} className="shrink-0 snap-start w-[clamp(12rem,58%,15rem)]">
+        <li key={servicio._id} className="shrink-0 snap-start w-[clamp(11rem,55%,14rem)]">
           {tarjeta(servicio)}
         </li>
       ))}
