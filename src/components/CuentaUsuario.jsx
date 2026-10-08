@@ -194,7 +194,6 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
       guardarCuenta(sesionActual);
       setCuentas(listarCuentas());
       setSesion(sesionActual);
-      setGuardado(true);
     } catch (err) {
       setError(err.message);
     }
