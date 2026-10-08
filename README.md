@@ -112,17 +112,6 @@ Como **fuente externa**, el script `backend/scripts/importar-behance.js` consume
 - **Behance** como fuente externa (feed RSS público del propio perfil).
 - Imágenes y contenidos propios de la autora (Agustina Ferraro).
 
-## Sincronización automática y fuente externa
-
-El backend incluye dos workflows de **GitHub Actions** (en el repositorio [`tp2-backend`](https://github.com/agustiinaferraro/tp2-backend)) que mantienen el portfolio actualizado sin intervención manual:
-
-- **`importar-behance.yml`**: importa los proyectos publicados en el feed RSS de Behance.
-- **`importar-vercel.yml`**: importa los proyectos de programación desplegados en Vercel.
-
-Ambos corren cada 6 horas y también se pueden ejecutar a mano desde la pestaña *Actions*.
-
-**Manejo de errores y límites:** cada componente muestra su estado de carga, error y vacío (por ejemplo, si la API no responde se muestra "Verificá que el backend esté corriendo"). El script de importación avisa si el feed no se puede descargar y nunca repite proyectos (deduplica por link). El panel avisa al usuario si una imagen pesa demasiado o si la galería completa excede el límite para no fallar el guardado.
-
 ## Evidencia de proceso y defensa
 
 - [`docs/consigna.md`](docs/consigna.md): enunciado del examen y criterios.
