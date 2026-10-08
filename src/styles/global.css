@@ -163,42 +163,6 @@ main section[id] {
   background: #52525b;
 }
 
-/*carrusel que avanza solo: la lista esta duplicada y se traslada la mitad de su ancho,
-  asi la segunda copia entra por la izquierda y el movimiento nunca se corta ni salta.
-  la duracion la define el componente en --carrusel-duracion (ms por tarjeta).*/
-.carrusel-auto {
-  /*el gap se vuelve variable para que el keyframe pueda compensarlo y el reinicio
-    de la animacion caiga justo sobre la segunda copia*/
-  --carrusel-gap: 1.5rem;
-  gap: var(--carrusel-gap);
-  will-change: transform;
-  animation: carrusel-desplazar var(--carrusel-duracion, 20s) linear infinite;
-}
-
-/*con el mouse encima o el teclado adentro, el avance se congela en el lugar*/
-.carrusel-auto-pausado {
-  animation-play-state: paused;
-}
-
-@keyframes carrusel-desplazar {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-50% - var(--carrusel-gap, 1.5rem) / 2));
-  }
-}
-
-/*el avance automatico es opcional: lo usa el carrusel que recibe el prop "auto"
-  (hoy, el de proyectos destacados de la home). la variante "carrusel-auto-respetado"
-  apaga la animacion para quien tenga el movimiento reducido activado en el sistema.*/
-@media (prefers-reduced-motion: reduce) {
-  .carrusel-auto-respetado {
-    animation: none;
-    transform: none;
-  }
-}
-
 /*en el detalle de un proyecto (?id= en /proyectos) se esconde el encabezado con
   la portada de videos: ahi solo va el detalle, la portada distrae*/
 html.viendo-detalle .encabezado-proyectos,
@@ -224,9 +188,29 @@ html.viendo-detalle .encabezado-seccion-proyectos {
 
 
 
-.animate-carrusel-loop { animation: carrusel-loop var(--carrusel-duracion,20s) linear infinite; display:flex; justify-content:flex-start; }
-.carrusel-auto-pausado { animation-play-state: paused; }
-@keyframes carrusel-loop { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+/*carrusel que avanza solo (lo usan el carrusel de proyectos y el de destacados):
+  la lista esta duplicada y se traslada la mitad de su ancho, asi la segunda copia
+  entra por la izquierda y el movimiento nunca se corta. la duracion la define cada
+  componente con la variable --carrusel-duracion.*/
+.animate-carrusel-loop {
+  display: flex;
+  justify-content: flex-start;
+  animation: carrusel-loop var(--carrusel-duracion, 20s) linear infinite;
+}
+
+/*con el mouse encima o el teclado adentro, el avance se congela en el lugar*/
+.carrusel-auto-pausado {
+  animation-play-state: paused;
+}
+
+@keyframes carrusel-loop {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
 
 /*aparicion al hacer scroll: los bloques marcados con data-anim entran desde abajo.
   la clase "con-js" solo existe si hay javascript y el sistema no pide menos movimiento,
@@ -272,6 +256,11 @@ html.con-js .animar-grupo.animado > *:nth-child(8) { transition-delay: 460ms; }
 
 /*si el sistema pide menos movimiento, no se anima nada y todo queda visible*/
 @media (prefers-reduced-motion: reduce) {
+  /*el carrusel automatico deja de avanzar*/
+  .animate-carrusel-loop {
+    animation: none;
+  }
+
   html.con-js [data-anim],
   html.con-js .animar-grupo > * {
     opacity: 1;
