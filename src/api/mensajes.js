@@ -21,23 +21,22 @@ export function obtenerMensajesPublicos(email, token) {
   );
 }
 
-//devuelve los mensajes agrupados por persona (como chats, solo admin)
-export function obtenerConversaciones(clave) {
-  return peticionAdmin('GET', '/api/mensajes/conversaciones', undefined, clave);
+//devuelve los mensajes agrupados por persona (como chats, solo la dueña del sitio)
+export function obtenerConversaciones() {
+  return peticionAdmin('GET', '/api/mensajes/conversaciones');
 }
 
-//guarda una respuesta del dueño del portfolio dentro del chat de una persona (solo admin)
+//guarda una respuesta del dueño del portfolio dentro del chat de una persona (solo la dueña)
 //email es el id de la conversacion (el email en minusculas de esa persona)
-export function responderConversacion(email, respuesta, nombre, clave) {
+export function responderConversacion(email, respuesta, nombre) {
   return peticionAdmin(
     'POST',
     `/api/mensajes/conversaciones/${encodeURIComponent(email)}/respuesta`,
-    { respuesta, nombre },
-    clave
+    { respuesta, nombre }
   );
 }
 
-//borra un mensaje (solo admin)
-export function borrarMensaje(id, clave) {
-  return peticionAdmin('DELETE', `/api/mensajes/${id}`, undefined, clave);
+//borra un mensaje (solo la dueña del sitio)
+export function borrarMensaje(id) {
+  return peticionAdmin('DELETE', `/api/mensajes/${id}`);
 }

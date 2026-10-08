@@ -17,7 +17,7 @@ import {
   guardarCuenta,
   olvidarCuenta,
   cuentaConfigurada,
-  obtenerEmailDueno,
+  soyDueno,
   eliminarCuenta,
   cerrarSesionFirebase,
 } from '../api/usuarios.js';
@@ -111,8 +111,8 @@ export default function CuentaUsuario() {
   const [form, setForm] = useState({ nombre: '', email: '', clave: '' });
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState('');
-  //email de la dueña del sitio, para ofrecerle el panel de administracion
-  const [emailDueno, setEmailDueno] = useState('');
+  //true si la cuenta logueada es la dueña del sitio (para ofrecerle el panel de administracion)
+  const [esDueno, setEsDueno] = useState(false);
   //input oculto para elegir la foto de perfil
   const fotoInputRef = useRef(null);
   //edicion del perfil: nombre y foto se editan y se confirman con un solo boton
@@ -130,9 +130,6 @@ const [aviso, setAviso] = useState('');
 //cuentas guardadas en el navegador (varias cuentas como en ig)
 const [cuentas, setCuentas] = useState(() => listarCuentas());
 
-  //solo deja ver el panel si la cuenta logueada es de la dueña
-  const esDueno = !!sesion && sesion.email?.toLowerCase() === emailDueno.toLowerCase();
-
   //hay cambios sin guardar en el perfil: habilita el boton general de guardado
   const hayCambios =
     Boolean(fotoNueva) || nombreEditado.trim() !== (sesion?.nombre ?? '').trim();
@@ -142,10 +139,24 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     setSesion(guardada);
     setNombreEditado(guardada?.nombre ?? '');
     setMontado(true);
-    obtenerEmailDueno()
-      .then((email) => setEmailDueno(email ?? ''))
-      .catch(() => {});
   }, []);
+
+  //dice si la cuenta logueada es la dueña del sitio (para mostrar el acceso al panel)
+  useEffect(() => {
+    if (!sesion?.email) {
+      setEsDueno(false);
+      return;
+    }
+    let activo = true;
+    soyDueno()
+      .then((es) => {
+        if (activo) setEsDueno(es);
+      })
+      .catch(() => {});
+    return () => {
+      activo = false;
+    };
+  }, [sesion?.email]);
 
   //guarda la sesion devuelta por firebase, la suma a las cuentas guardadas y actualiza la pantalla
   //si viene del dialogo "agregar cuenta", al final lo cierra
@@ -596,18 +607,6 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                     interacciones. No se puede deshacer.
                   </p>
           {error && <p role="alert" className="text-red-400 text-sm text-center">{error}</p>}
-          {errorExisteCuenta && (
-            <button
-              type="button"
-              onClick={() => {
-                setModo('login');
-                setError('');
-              }}
-              className="w-full px-5 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 hover:text-white active:bg-zinc-600 text-zinc-200 border border-zinc-700 text-sm font-medium transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer"
-            >
-              Iniciar sesión con esta cuenta
-            </button>
-          )}
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"

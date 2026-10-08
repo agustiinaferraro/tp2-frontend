@@ -1,5 +1,5 @@
 //capa de datos: funciones para consultar proyectos y gestionar los del admin
-import { peticionGET, peticionPOST, peticionAdmin } from './client.js';
+import { peticionGET, peticionAdmin } from './client.js';
 
 //devuelve todos los proyectos
 export function obtenerProyectos() {
@@ -26,22 +26,17 @@ export function obtenerProyectoPorId(id) {
   return peticionGET(`/api/proyectos/${encodeURIComponent(id)}`);
 }
 
-//verifica si el usuario y la clave de administrador son correctos
-export function verificarClave(usuario, clave) {
-  return peticionPOST('/api/admin/verificar', { usuario, clave });
+//crea un proyecto nuevo (solo la dueña del sitio)
+export function crearProyecto(datos) {
+  return peticionAdmin('POST', '/api/proyectos', datos);
 }
 
-//crea un proyecto nuevo (solo admin)
-export function crearProyecto(datos, clave) {
-  return peticionAdmin('POST', '/api/proyectos', datos, clave);
+//actualiza un proyecto existente (solo la dueña del sitio)
+export function actualizarProyecto(id, datos) {
+  return peticionAdmin('PUT', `/api/proyectos/${id}`, datos);
 }
 
-//actualiza un proyecto existente (solo admin)
-export function actualizarProyecto(id, datos, clave) {
-  return peticionAdmin('PUT', `/api/proyectos/${id}`, datos, clave);
-}
-
-//borra un proyecto (solo admin)
-export function borrarProyecto(id, clave) {
-  return peticionAdmin('DELETE', `/api/proyectos/${id}`, undefined, clave);
+//borra un proyecto (solo la dueña del sitio)
+export function borrarProyecto(id) {
+  return peticionAdmin('DELETE', `/api/proyectos/${id}`);
 }

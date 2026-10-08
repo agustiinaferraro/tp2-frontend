@@ -1,12 +1,11 @@
 //panel de administracion: sirve para cargar, editar y borrar proyectos
 //y para editar el perfil publico (foto, nombre, contacto y redes)
 //tiene tres vistas: portada (tipo behance), proyecto (cargar/editar) y perfil
-//se pide usuario y clave al entrar y las modificaciones se envian con esa clave
+//solo entra la dueña: el panel se abre cuando la cuenta logueada es la suya
 //la imagen se convierte a base64 y se guarda en la base junto al resto de los datos
 import { useEffect, useState, useRef } from 'react';
 import {
   obtenerProyectos,
-  verificarClave,
   crearProyecto,
   actualizarProyecto,
   borrarProyecto,
@@ -14,22 +13,16 @@ import {
 import { obtenerServicios, crearServicio } from '../api/servicios.js';
 import { obtenerPerfil, actualizarPerfil } from '../api/perfil.js';
 import { obtenerConversaciones } from '../api/mensajes.js';
-import { leerSesion, guardarSesion, borrarSesion } from '../api/sesionAdmin.js';
-import {
-  leerSesion as leerSesionUsuario,
-  borrarSesion as borrarSesionUsuario,
-  obtenerEmailDueno,
-  linkPerfil,
-} from '../api/usuarios.js';
+import { soyDueno, borrarSesion as borrarSesionUsuario, linkPerfil } from '../api/usuarios.js';
 import { comprimirImagen } from '../utils/imagen.js';
 import AdminMensajes from './AdminMensajes.jsx';
 import AdminProyectoCard from './AdminProyectoCard.jsx';
 import Loading from './Loading.jsx';
 import SelectorImagenes from './SelectorImagenes.jsx';
 
-//mensaje de error para saber si el problema fue la clave (401) o algo mas
+//reconoce el error 401: la sesion vencio y hay que volver a entrar
 function claveIncorrecta(error) {
-  return /401/.test(error.message);
+  return error.status === 401;
 }
 
 //modal de confirmacion para borrar un proyecto (reemplaza al alert del navegador)
@@ -281,13 +274,9 @@ function CarruselAdmin({ grupo, numero, alEditar, alEliminar }) {
 }
 
 export default function AdminProyectos() {
-  const [usuario, setUsuario] = useState('');
-  const [clave, setClave] = useState('');
   const [sesion, setSesion] = useState(false);
-  const [cargandoSesion, setCargandoSesion] = useState(false);
-  //marcan en rojo el campo del login que no coincide (usuario y/o clave)
-  const [errorUsuario, setErrorUsuario] = useState(false);
-  const [errorClave, setErrorClave] = useState(false);
+  //mientras se comprueba si la cuenta logueada es la dueña no se muestra el panel
+  const [cargandoSesion, setCargandoSesion] = useState(true);
 
   //vista actual del panel: portada (tipo behance) | proyecto (cargar/editar) | perfil
   const [vista, setVista] = useState('portada');
@@ -336,38 +325,27 @@ export default function AdminProyectos() {
   const [listaServicios, setListaServicios] = useState([]);
   const [mensaje, setMensaje] = useState(null);
 
-  //al entrar: si ya hay sesion guardada (por ejemplo desde el detalle de un proyecto) se reusa.
-  //si no, la dueña puede abrir el panel con su cuenta de "mi cuenta" (sesion de firebase)
+  //al entrar: el panel solo se abre si la cuenta logueada es la dueña del sitio.
+  //el backend lo verifica con el token de firebase y las escrituras usan esa misma sesion.
   useEffect(() => {
-    const sesion = leerSesion();
-    if (sesion) {
-      setSesion(true);
-      setClave(sesion.clave);
-      setUsuario(sesion.usuario);
-      cargarProyectos();
-      cargarPerfil();
-      cargarCantidadConversaciones();
-    } else {
-      obtenerEmailDueno()
-        .then((email) => {
-          const cuenta = leerSesionUsuario();
-          const esDueno =
-            cuenta?.token &&
-            (cuenta.email ?? '').toLowerCase() === (email ?? '').toLowerCase();
-          if (esDueno) {
-            //la sesion de la dueña se manda sola (las peticiones usan su token, sin clave)
-            setSesion(true);
-            setUsuario(cuenta.email);
-            cargarProyectos();
-            cargarPerfil();
-            cargarCantidadConversaciones();
-          }
-        })
-        .catch(() => {});
-    }
+    let activo = true;
+    soyDueno()
+      .then((es) => {
+        if (!activo || !es) return;
+        setSesion(true);
+        cargarProyectos();
+        cargarPerfil();
+        cargarCantidadConversaciones();
+      })
+      .finally(() => {
+        if (activo) setCargandoSesion(false);
+      });
     obtenerServicios()
       .then((lista) => setListaServicios(lista))
       .catch(() => {});
+    return () => {
+      activo = false;
+    };
   }, []);
 
   function mostrarMensaje(texto, tipo = 'ok') {
@@ -376,7 +354,7 @@ export default function AdminProyectos() {
 
   //trae cuantas personas escribieron, para el contador del icono de mensajes
   function cargarCantidadConversaciones() {
-    obtenerConversaciones(clave)
+    obtenerConversaciones()
       .then((lista) => setCantidadConversaciones(lista.length))
       .catch(() => {});
   }
@@ -409,36 +387,9 @@ export default function AdminProyectos() {
       .catch(() => {});
   }
 
-  async function iniciarSesion(evento) {
-    evento.preventDefault();
-    setCargandoSesion(true);
-    setMensaje(null);
-    setErrorUsuario(false);
-    setErrorClave(false);
-    try {
-      await verificarClave(usuario.trim(), clave.trim());
-      guardarSesion(usuario.trim(), clave.trim());
-      setSesion(true);
-      setVista('portada');
-      cargarProyectos();
-      cargarPerfil();
-      cargarCantidadConversaciones();
-    } catch (error) {
-      //el servidor avisa cual de los dos campos no coincide para marcarlo en rojo
-      setErrorUsuario(error.campos?.usuario === false);
-      setErrorClave(error.campos?.clave === false);
-      mostrarMensaje(error.message, 'error');
-    } finally {
-      setCargandoSesion(false);
-    }
-  }
-
   function salir() {
-    borrarSesion();
     borrarSesionUsuario();
     setSesion(false);
-    setUsuario('');
-    setClave('');
     setProyectos([]);
     resetearFormulario();
     setVista('portada');
@@ -508,7 +459,7 @@ export default function AdminProyectos() {
         setGuardando(false);
         return;
       }
-      const creado = await crearServicio(nuevaNombre.trim(), nuevaDescripcion.trim(), clave);
+      const creado = await crearServicio(nuevaNombre.trim(), nuevaDescripcion.trim());
       const slugNuevo = creado.datos.slug;
       listaServicios = [...new Set([...serviciosSel, slugNuevo])];
       obtenerServicios()
@@ -528,10 +479,10 @@ export default function AdminProyectos() {
     };
     try {
       if (editandoId) {
-        await actualizarProyecto(editandoId, datos, clave);
+        await actualizarProyecto(editandoId, datos);
         mostrarMensaje('Proyecto actualizado');
       } else {
-        await crearProyecto(datos, clave);
+        await crearProyecto(datos);
         mostrarMensaje('Proyecto creado');
       }
       resetearFormulario();
@@ -565,7 +516,7 @@ export default function AdminProyectos() {
     setMensaje(null);
     try {
       const base64 = await comprimirImagen(archivo);
-      const respuesta = await actualizarPerfil({ foto: base64 }, clave);
+      const respuesta = await actualizarPerfil({ foto: base64 });
       const datos = respuesta.datos ?? { ...(perfil ?? {}), foto: base64 };
       setPerfil(datos);
       setPFoto(datos.foto ?? '');
@@ -597,7 +548,7 @@ export default function AdminProyectos() {
     setMensaje(null);
     try {
       const base64 = await comprimirImagen(archivo);
-      const respuesta = await actualizarPerfil({ portada: base64 }, clave);
+      const respuesta = await actualizarPerfil({ portada: base64 });
       const datos = respuesta.datos ?? { ...(perfil ?? {}), portada: base64 };
       setPerfil(datos);
       mostrarMensaje('Foto de portada actualizada');
@@ -666,7 +617,7 @@ export default function AdminProyectos() {
       },
     };
     try {
-      const respuesta = await actualizarPerfil(datos, clave);
+      const respuesta = await actualizarPerfil(datos);
       setPerfil(respuesta.datos ?? null);
       setPFoto(respuesta.datos?.foto ?? '');
       mostrarMensaje('Perfil actualizado');
@@ -692,7 +643,7 @@ export default function AdminProyectos() {
     setProyectoAEliminar(null);
     setMensaje(null);
     try {
-      await borrarProyecto(unProyecto._id, clave);
+      await borrarProyecto(unProyecto._id);
       if (editandoId === unProyecto._id) resetearFormulario();
       mostrarMensaje('Proyecto borrado');
       cargarProyectos();
@@ -708,9 +659,6 @@ export default function AdminProyectos() {
 
   const claseInput =
     'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-verde-app transition-all';
-  //igual que claseInput pero con el borde rojo para marcar el campo del login que fallo
-  const claseCampoLoginError =
-    'w-full px-4 py-2 bg-zinc-900 border border-red-500 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all';
   const claseBoton =
     'px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed';
   const claseBotonPrimario = `${claseBoton} bg-violeta-app hover:bg-violeta-app/90 text-black`;
@@ -723,57 +671,25 @@ export default function AdminProyectos() {
         : 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-verde-app/50'
     }`;
 
-  //entrada al panel: pide usuario y clave
-  if (!sesion) {
+  //entrada al panel: solo para la dueña del sitio (con su cuenta de "mi cuenta")
+  if (cargandoSesion || !sesion) {
     return (
       <div className="max-w-md mx-auto px-4 py-16">
-        <form onSubmit={iniciarSesion} className="space-y-4 p-6 rounded-2xl bg-zinc-900 border border-zinc-800">
+        <div className="space-y-4 p-6 rounded-2xl bg-zinc-900 border border-zinc-800 text-center">
           <h1 className="text-2xl font-bold text-white">Panel de administración</h1>
-          <p className="text-sm text-zinc-400">Ingresá tu usuario y contraseña para gestionar tus proyectos y tu perfil.</p>
-          <input
-            type="text"
-            value={usuario}
-            onChange={(e) => {
-              setUsuario(e.target.value);
-              setErrorUsuario(false);
-            }}
-            placeholder="Usuario"
-            aria-label="Usuario de administrador"
-            aria-invalid={errorUsuario}
-            autoComplete="username"
-            className={errorUsuario ? claseCampoLoginError : claseInput}
-          />
-          <input
-            type="password"
-            value={clave}
-            onChange={(e) => {
-              setClave(e.target.value);
-              setErrorClave(false);
-            }}
-            placeholder="Contraseña"
-            aria-label="Contraseña de administrador"
-            aria-invalid={errorClave}
-            autoComplete="current-password"
-            className={errorClave ? claseCampoLoginError : claseInput}
-          />
-          <button
-            type="submit"
-            disabled={cargandoSesion || !usuario.trim() || !clave.trim()}
-            className={`${claseBotonPrimario} w-full disabled:bg-zinc-800`}
-          >
-            {cargandoSesion ? 'Verificando...' : 'Entrar'}
-          </button>
-        </form>
-        <p className="mt-4 text-center text-sm text-zinc-400">
-          ¿Sos la dueña del sitio?{' '}
-          <a
-            href={linkPerfil()}
-            className="inline-block font-medium text-verde-app rounded-lg px-2 py-1 hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200"
-          >
-            Entrá con tu cuenta en "Perfil"
-          </a>{' '}
-          y el panel se abre solo.
-        </p>
+          {cargandoSesion ? (
+            <Loading claseContenedor="h-16" />
+          ) : (
+            <>
+              <p className="text-sm text-zinc-400">
+                Este panel es privado: entrá con la cuenta de la dueña del sitio.
+              </p>
+              <a href={linkPerfil()} className={`${claseBotonPrimario} inline-block w-full`}>
+                Entrar con mi cuenta
+              </a>
+            </>
+          )}
+        </div>
       </div>
     );
   }
@@ -1427,7 +1343,7 @@ export default function AdminProyectos() {
           )}
 
           {vista === 'mensajes' && (
-            <AdminMensajes clave={clave} nombre={perfil?.nombre} alCambiar={cargarCantidadConversaciones} />
+            <AdminMensajes nombre={perfil?.nombre} alCambiar={cargarCantidadConversaciones} />
           )}
         </div>
       </div>

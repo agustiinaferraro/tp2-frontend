@@ -72,7 +72,7 @@ yarn preview       # sirve localmente la versión generada
 - **`GrillaProyectos`**: carga los proyectos desde la API, muestra **chips de filtro por categoría** (interacción significativa, modifica qué proyectos se ven), maneja los estados de carga/error/ausencia y resuelve el detalle por `?id=` sincronizando el historial del navegador (botón "atrás").
 - **`ProyectoDetalle`**: vista tipo Behance de un proyecto (galería de imágenes con miniaturas, tags, categoría, link). Si entrás con la clave de admin, permite **editar** todo (incluida la categoría o crear una nueva) y cambiar imágenes.
 - **`SelectorImagenes`**: sube varias imágenes a la vez, las comprime en el navegador, controla el presupuesto de peso total y marca la primera como portada. Se usa tanto en el panel como en el detalle.
-- **`AdminProyectos`**: panel completo (login con clave, alta/edición/borrado de proyectos, categorías nuevas). Toda la lógica admin.
+- **`AdminProyectos`**: panel completo (acceso con la cuenta de la dueña, alta/edición/borrado de proyectos, categorías nuevas). Toda la lógica admin.
 - **`ServicioDetalle`**: página dinámica por servicio (slug) que trae de la API el servicio y lista los proyectos de esa categoría.
 - **`Contacto` / `AdminMensajes`**: formulario de contacto persistido en la base y bandeja de mensajes para el admin.
 
@@ -84,7 +84,7 @@ El frontend consume la **propia API REST** (`https://agustinaportfolio-api.verce
 - `GET /api/proyectos/:id` — detalle de un proyecto (galería completa).
 - `GET /api/servicios` — categorías/servicios (y `POST /api/servicios` para crear categorías desde admin).
 - `POST /api/mensajes` — mensajes del formulario de contacto.
-- `POST/PUT/DELETE /api/proyectos/:id`, `POST /api/admin/verificar` — operaciones admin protegidas por clave.
+- `POST/PUT/DELETE /api/proyectos/:id`, `GET /api/admin/soy-dueno` — operaciones admin protegidas por la sesión de la dueña (token de Firebase).
 
 Como **fuente externa**, el script `backend/scripts/importar-behance.js` consume el **feed RSS público de Behance** (`https://www.behance.net/agustiinaferraro.rss`) para poblar la base con títulos, descripciones, links y miniaturas de los proyectos publicados en Behance. El sitio no depende de Behance en runtime: solo se importa y la web siempre lee de MongoDB.
 

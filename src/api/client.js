@@ -1,5 +1,6 @@
 //capa de datos: client base para llamar a la api del backend
 //el frontend consulta la api desde aca, no desde los componentes
+import { tokenActual } from './firebase.js';
 
 //url base del backend. se configura con public_api_url o usa localhost en desarrollo
 export const API_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:4000';
@@ -80,25 +81,24 @@ export async function peticionDELETE(ruta, token) {
 }
 
 //funcion generica para modificar datos del panel de admin (post, put o delete)
-//manda la clave de administrador en el header x-admin-clave para que el backend valide
-//si no se pasa clave, la dueña entra con su cuenta de "mi cuenta" y se usa su token de firebase
-export async function peticionAdmin(metodo, ruta, datos, clave) {
+//manda el token de la sesion de la dueña en el header authorization
+//el backend valida con esAdmin que esa cuenta sea la dueña del sitio
+export async function peticionAdmin(metodo, ruta, datos) {
   const cabeceras = { 'Content-Type': 'application/json' };
-  if (clave) {
-    cabeceras['x-admin-clave'] = clave;
-  } else {
-    try {
-      const sesion = JSON.parse(localStorage.getItem('sesion-usuario') ?? 'null');
-      if (sesion?.token) cabeceras.Authorization = `Bearer ${sesion.token}`;
-    } catch {}
-  }
+  //el token se pide fresco: la sesion de firebase dura una hora y se renueva sola
+  const token = await tokenActual();
+  if (token) cabeceras.Authorization = `Bearer ${token}`;
+
   const respuesta = await fetch(`${API_BASE}${ruta}`, {
     method: metodo,
     headers: cabeceras,
     body: datos ? JSON.stringify(datos) : undefined,
   });
   if (!respuesta.ok) {
-    throw new Error(`Error en ${metodo} ${ruta}: ${respuesta.status}`);
+    const cuerpo = await respuesta.json().catch(() => null);
+    const error = new Error(cuerpo?.mensaje ?? `Error en ${metodo} ${ruta}: ${respuesta.status}`);
+    error.status = respuesta.status;
+    throw error;
   }
   return respuesta.json();
 }

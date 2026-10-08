@@ -16,7 +16,7 @@ import {
   pedirCodigoSmsFirebase,
   confirmarClaveConCodigoSmsFirebase,
 } from './firebase.js';
-import { peticionGET, peticionDELETE } from './client.js';
+import { peticionGET, peticionGETAutenticada, peticionDELETE } from './client.js';
 
 //se reexporta para que los componentes no tengan que entrar a la capa de firebase
 export { cerrarSesionFirebase };
@@ -41,10 +41,17 @@ export function linkPerfil(modo = 'login') {
 //true cuando la plataforma de cuentas esta configurada (variables public_firebase_*)
 export const cuentaConfigurada = firebaseConfigurado;
 
-//email de la cuenta de firebase de la dueña del sitio (para ofrecer el panel en "mi cuenta")
-export async function obtenerEmailDueno() {
-  const datos = await peticionGET('/api/admin/dueno');
-  return datos.email;
+//dice si la cuenta logueada es la dueña del sitio (para ofrecerle el panel)
+//el backend lo verifica con el token; no expone el email de la dueña
+export async function soyDueno() {
+  const sesion = await sesionConTokenFresco();
+  if (!sesion?.token) return false;
+  try {
+    const { esDueno } = await peticionGETAutenticada('/api/admin/soy-dueno', sesion.token);
+    return Boolean(esDueno);
+  } catch {
+    return false;
+  }
 }
 
 //crea la cuenta en firebase: nombre, email y contraseña. devuelve usuario y token

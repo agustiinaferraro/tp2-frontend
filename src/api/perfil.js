@@ -7,7 +7,7 @@ export function obtenerPerfil() {
   return peticionGET('/api/perfil');
 }
 
-//guarda los datos del perfil usando la clave de administrador
-export function actualizarPerfil(datos, clave) {
-  return peticionAdmin('PUT', '/api/perfil', datos, clave);
+//guarda los datos del perfil (solo la dueña del sitio)
+export function actualizarPerfil(datos) {
+  return peticionAdmin('PUT', '/api/perfil', datos);
 }

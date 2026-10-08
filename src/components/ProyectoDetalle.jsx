@@ -2,9 +2,9 @@
 //si sos administrador, hay un boton de editar que deja cambiar los datos y la categoria
 //al editar hay una opcion de crear una categoria nueva si ninguna coincide
 import { useEffect, useState } from 'react';
-import { obtenerProyectoPorId, actualizarProyecto, verificarClave } from '../api/proyectos.js';
+import { obtenerProyectoPorId, actualizarProyecto } from '../api/proyectos.js';
 import { obtenerServicios, crearServicio } from '../api/servicios.js';
-import { leerSesion, guardarSesion, borrarSesion } from '../api/sesionAdmin.js';
+import { soyDueno, borrarSesion as borrarSesionUsuario } from '../api/usuarios.js';
 import SelectorImagenes from './SelectorImagenes.jsx';
 import Loading from './Loading.jsx';
 import Comentarios from './Comentarios.jsx';
@@ -33,7 +33,6 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
   const [error, setError] = useState(null);
 
   const [admin, setAdmin] = useState(false);
-  const [clave, setClave] = useState('');
   const [editando, setEditando] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [mensaje, setMensaje] = useState(null);
@@ -54,25 +53,16 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
   const [imagenes, setImagenes] = useState([]);
   const [destacado, setDestacado] = useState(false);
 
-  //login inline si no hay sesion guardada
-  const [usuarioLogin, setUsuarioLogin] = useState('');
-  const [claveLogin, setClaveLogin] = useState('');
-  const [verificando, setVerificando] = useState(false);
-  //marcan en rojo el campo que no coincide (usuario y/o clave)
-  const [errorUsuarioLogin, setErrorUsuarioLogin] = useState(false);
-  const [errorClaveLogin, setErrorClaveLogin] = useState(false);
-
   function mostrarMensaje(texto, tipo = 'ok') {
     setMensaje({ texto, tipo });
   }
 
-  //al entrar: se trae el proyecto (si no vino) y la lista de servicios
+  //al entrar: se trae el proyecto (si no vino), la lista de servicios y si sos la dueña
   useEffect(() => {
-    const sesion = leerSesion();
-    if (sesion) {
-      setAdmin(true);
-      setClave(sesion.clave);
-    }
+    let activo = true;
+    soyDueno().then((es) => {
+      if (activo && es) setAdmin(true);
+    });
 
     obtenerServicios()
       .then((lista) => setServicios(lista))
@@ -84,6 +74,10 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         .catch((e) => setError(e.message))
         .finally(() => setCargando(false));
     }
+
+    return () => {
+      activo = false;
+    };
   }, [id]);
 
   //al ver otro proyecto la galeria vuelve a arrancar desde la primera imagen
@@ -109,34 +103,9 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function iniciarSesion(evento) {
-    evento.preventDefault();
-    setVerificando(true);
-    setMensaje(null);
-    setErrorUsuarioLogin(false);
-    setErrorClaveLogin(false);
-    try {
-      await verificarClave(usuarioLogin.trim(), claveLogin.trim());
-      guardarSesion(usuarioLogin.trim(), claveLogin.trim());
-      setAdmin(true);
-      setClave(claveLogin.trim());
-      setUsuarioLogin('');
-      setClaveLogin('');
-      abrirEditor();
-    } catch (e) {
-      //el servidor avisa cual de los dos campos no coincide para marcarlo en rojo
-      setErrorUsuarioLogin(e.campos?.usuario === false);
-      setErrorClaveLogin(e.campos?.clave === false);
-      mostrarMensaje(e.message, 'error');
-    } finally {
-      setVerificando(false);
-    }
-  }
-
   function cerrarSesion() {
-    borrarSesion();
+    borrarSesionUsuario();
     setAdmin(false);
-    setClave('');
     setEditando(false);
     setMensaje(null);
   }
@@ -158,7 +127,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
           setGuardando(false);
           return;
         }
-        const creado = await crearServicio(nuevaNombre.trim(), nuevaDescripcion.trim(), clave);
+        const creado = await crearServicio(nuevaNombre.trim(), nuevaDescripcion.trim());
         const slugNuevo = creado.datos.slug;
         listaServicios = [...new Set([...serviciosSel, slugNuevo])];
         obtenerServicios()
@@ -179,13 +148,13 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         destacado,
       };
 
-      const actualizado = await actualizarProyecto(id, datos, clave);
+      const actualizado = await actualizarProyecto(id, datos);
       setProyecto(actualizado.datos);
       setEditando(false);
       mostrarMensaje('Proyecto actualizado');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e) {
-      if (/401/.test(e.message)) {
+      if (e.status === 401) {
         mostrarMensaje('La sesión expiró. Entrá de nuevo para editar.', 'error');
         cerrarSesion();
       } else {
@@ -200,9 +169,6 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
     'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-verde-app transition-all';
   const claseBoton =
     'px-4 py-2 rounded-lg font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed';
-  //igual que claseInput pero con el borde rojo para marcar el campo del login que fallo
-  const claseCampoLoginError =
-    'w-full px-4 py-2 bg-zinc-900 border border-red-500 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all';
 
   // mismo boton flotante de volver que usan las demas paginas (ver BackButton.astro)
   const claseVolver =

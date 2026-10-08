@@ -2,7 +2,7 @@
 //primero se muestra la lista de conversaciones (una por persona), como en instagram:
 //nombre, cantidad y el ultimo mensaje. al tocar una se abre el hilo completo
 //dentro del hilo se puede responder: la respuesta queda como burbuja propia del chat
-//depende de una sesion ya iniciada (el componente principal le pasa la clave y el nombre)
+//depende de una sesion ya iniciada por la dueña del sitio (el componente principal le pasa el nombre)
 import { useCallback, useEffect, useState } from 'react';
 import {
   obtenerConversaciones,
@@ -11,9 +11,9 @@ import {
 } from '../api/mensajes.js';
 import Loading from './Loading.jsx';
 
-//mensaje de error para saber si el problema fue la clave (401) o algo mas
+//reconoce el error 401: la sesion vencio y hay que volver a entrar
 function claveIncorrecta(error) {
-  return /401/.test(error.message);
+  return error.status === 401;
 }
 
 //convierte la fecha de la base a un texto corto y legible (ej: 19/09/2026)
@@ -74,7 +74,7 @@ function FlechaAtras({ className }) {
   );
 }
 
-export default function AdminMensajes({ clave, nombre = 'Agustina Ferraro', alCambiar }) {
+export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }) {
   const [conversaciones, setConversaciones] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -86,11 +86,11 @@ export default function AdminMensajes({ clave, nombre = 'Agustina Ferraro', alCa
   const cargar = useCallback(() => {
     setCargando(true);
     setError(null);
-    obtenerConversaciones(clave)
+    obtenerConversaciones()
       .then(setConversaciones)
       .catch((e) => setError(e.message))
       .finally(() => setCargando(false));
-  }, [clave]);
+  }, []);
 
   useEffect(() => {
     cargar();
@@ -114,7 +114,7 @@ export default function AdminMensajes({ clave, nombre = 'Agustina Ferraro', alCa
     if (!window.confirm(`¿Borrar el mensaje de ${chat.nombre}?`)) return;
     setError(null);
     try {
-      await borrarMensaje(mensaje._id, clave);
+      await borrarMensaje(mensaje._id);
       const nuevos = chat.mensajes.filter((m) => m._id !== mensaje._id);
       if (nuevos.length === 0) {
         //si no queda ninguno, se cierra el chat y se recarga la lista
@@ -137,7 +137,7 @@ export default function AdminMensajes({ clave, nombre = 'Agustina Ferraro', alCa
     if (!texto) return;
     setError(null);
     try {
-      const cuerpo = await responderConversacion(chat._id, texto, nombre, clave);
+      const cuerpo = await responderConversacion(chat._id, texto, nombre);
       //el nuevo mensaje va primero porque el hilo esta ordenado de mas nuevo a mas viejo
       setChat({ ...chat, mensajes: [cuerpo.datos, ...chat.mensajes] });
       setRespuesta('');

@@ -6,10 +6,10 @@ export function obtenerServicios() {
   return peticionGET('/api/servicios');
 }
 
-//crea una categoria nueva desde el panel de admin (solo admin)
+//crea una categoria nueva desde el panel (solo la dueña del sitio)
 //si ya existe con ese nombre, la api devuelve la existente
-export function crearServicio(nombre, descripcion, clave) {
-  return peticionAdmin('POST', '/api/servicios', { nombre, descripcion }, clave);
+export function crearServicio(nombre, descripcion) {
+  return peticionAdmin('POST', '/api/servicios', { nombre, descripcion });
 }
 
 //devuelve un solo servicio segun su slug (ej. diseno-ux-ui)
