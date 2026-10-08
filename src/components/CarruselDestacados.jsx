@@ -34,7 +34,10 @@ export default function CarruselDestacados() {
       <h2 className="px-10 text-3xl font-bold mb-10 relative z-10 text-left">
         Proyectos destacados
       </h2>
-      <div className="flex gap-6 w-max animate-carousel hover:[animation-play-state:paused]">
+      <div
+        className="flex gap-6 w-max will-change-transform animate-carrusel-loop hover:[animation-play-state:paused] focus-within:[animation-play-state:paused]"
+        style={{ '--carrusel-duracion': '30s' }}
+      >
         {loopProyectos.map((proyecto, index) => (
           <div
             key={`${proyecto._id || index}-${index}`}
@@ -44,22 +47,6 @@ export default function CarruselDestacados() {
           </div>
         ))}
       </div>
-
-      <style jsx>{`
-        @keyframes carousel {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        .animate-carousel {
-          display: flex;
-          width: max-content;
-          animation: carousel 30s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }
