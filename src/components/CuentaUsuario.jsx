@@ -193,6 +193,9 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     try {
       const foto = await comprimirImagen(archivo);
       setFotoNueva(foto);
+      //si recien arranca la edicion por la foto, se completa el nombre actual
+      //asi cambiar solo la foto no obliga a volver a escribir el nombre
+      setNombreEditado((previo) => previo || sesion?.nombre || '');
       setEditando(true);
     } catch (err) {
       setError(err.message);
