@@ -128,12 +128,13 @@ function agruparProyectos(lista, listaServicios) {
   return grupos;
 }
 
-//silueta de persona para cuando el perfil no tiene foto cargada
-function SiluetaPersona({ className }) {
+//inicial del nombre para cuando el perfil no tiene foto cargada
+function InicialAvatar({ nombre, className }) {
+  const inicial = (nombre ?? '').trim().charAt(0).toUpperCase() || '?';
   return (
-    <svg aria-hidden="true" className={className} fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4.4 0-8 2-8 4v2h16v-2c0-2-3.6-4-8-4z" />
-    </svg>
+    <span aria-hidden="true" className={`font-bold text-verde-app ${className}`}>
+      {inicial}
+    </span>
   );
 }
 
@@ -928,7 +929,7 @@ export default function AdminProyectos() {
                         {fotoPerfil ? (
                           <img src={fotoPerfil} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <SiluetaPersona className="w-10 h-10 sm:w-12 sm:h-12" />
+                          <InicialAvatar nombre={perfil?.nombre || 'Agustina Ferraro'} className="text-3xl sm:text-4xl" />
                         )}
                       </div>
                       {/*lapiz sobre el avatar: cambia la foto de perfil al instante*/}
@@ -1236,7 +1237,7 @@ export default function AdminProyectos() {
                     {pFoto ? (
                       <img src={pFoto} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <SiluetaPersona className="w-10 h-10" />
+                      <InicialAvatar nombre={pNombre} className="text-3xl" />
                     )}
                   </div>
                   <button
