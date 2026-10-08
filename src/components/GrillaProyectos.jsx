@@ -11,18 +11,9 @@ import ProyectoDetalle from './ProyectoDetalle.jsx';
 import ProyectoCard from './ProyectoCard.jsx';
 import Carrusel, { ALTO_PROYECTO, TARJETA_CARRUSEL } from './Carrusel.jsx';
 import Loading from './Loading.jsx';
-import { servicios as serviciosEstaticos } from '../data/servicios.js';
 
 //marca interna para el chip "sin categoria"
 const SIN_CATEGORIA = '__sin_categoria__';
-
-//junta los servicios de la base con la lista estatica para tener siempre los nombres
-function juntarServicios(listaApi) {
-  const porSlug = new Map();
-  for (const servicio of serviciosEstaticos) porSlug.set(servicio.slug, servicio);
-  for (const servicio of listaApi) porSlug.set(servicio.slug, servicio);
-  return [...porSlug.values()];
-}
 
 //categorias de un proyecto: la lista nueva ("servicios") o la vieja ("servicio")
 function categoriasDeProyecto(proyecto) {
@@ -80,7 +71,7 @@ function SeccionGrilla({ nombre, items }) {
 
 export default function GrillaProyectos({ vista = 'carrusel' }) {
   const [proyectos, setProyectos] = useState([]);
-  const [servicios, setServicios] = useState(serviciosEstaticos);
+  const [servicios, setServicios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [detalleId, setDetalleId] = useState(null);
@@ -103,7 +94,7 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
       .catch((e) => setError(e.message))
       .finally(() => setCargando(false));
     obtenerServicios()
-      .then((lista) => setServicios(juntarServicios(lista)))
+      .then((lista) => setServicios(lista))
       .catch(() => {});
   }, []);
 

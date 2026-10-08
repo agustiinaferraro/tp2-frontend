@@ -8,22 +8,12 @@ import { leerSesion, guardarSesion, borrarSesion } from '../api/sesionAdmin.js';
 import SelectorImagenes from './SelectorImagenes.jsx';
 import Loading from './Loading.jsx';
 import Comentarios from './Comentarios.jsx';
-import { servicios as serviciosEstaticos } from '../data/servicios.js';
 import { galeriaProyecto, textoVisitar, esDespliegue } from '../utils/proyectos.js';
-
-//junta los servicios de la base con la lista estatica para que nunca quede vacia
-//si hay repetidos, gana el de la base (puede tener nombre actualizado)
-function juntarServicios(listaApi) {
-  const porSlug = new Map();
-  for (const servicio of serviciosEstaticos) porSlug.set(servicio.slug, servicio);
-  for (const servicio of listaApi) porSlug.set(servicio.slug, servicio);
-  return [...porSlug.values()];
-}
 
 //categorias conocidas (las que tienen paginas generadas en el build)
 //las nuevas no tienen pagina pero si se muestran como chip
-function esCategoriaConocida(slug) {
-  return serviciosEstaticos.some((s) => s.slug === slug);
+function esCategoriaConocida(listaServicios, slug) {
+  return listaServicios.some((s) => s.slug === slug);
 }
 
 //categorias de un proyecto: la lista nueva ("servicios") o la vieja ("servicio")
@@ -38,7 +28,7 @@ function categoriasDeProyecto(proyecto) {
 
 export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver = null }) {
   const [proyecto, setProyecto] = useState(proyectoInicial);
-  const [servicios, setServicios] = useState(serviciosEstaticos);
+  const [servicios, setServicios] = useState([]);
   const [cargando, setCargando] = useState(!proyectoInicial);
   const [error, setError] = useState(null);
 
@@ -85,7 +75,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
     }
 
     obtenerServicios()
-      .then((lista) => setServicios(juntarServicios(lista)))
+      .then((lista) => setServicios(lista))
       .catch(() => {});
 
     if (!proyectoInicial) {
@@ -172,7 +162,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         const slugNuevo = creado.datos.slug;
         listaServicios = [...new Set([...serviciosSel, slugNuevo])];
         obtenerServicios()
-          .then((lista) => setServicios(juntarServicios(lista)))
+          .then((lista) => setServicios(lista))
           .catch(() => {});
       }
 
@@ -283,7 +273,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
               const nombre = servicios.find((s) => s.slug === slug)?.nombre ?? slug;
               return (
                 <li key={slug}>
-                  {esCategoriaConocida(slug) ? (
+                  {esCategoriaConocida(servicios, slug) ? (
                     <a
                       href={`/servicios/${slug}`}
                       className="text-xs px-3 py-1 rounded-full bg-verde-app/10 text-verde-app border border-verde-app/20 hover:bg-verde-app/20 transition-colors"

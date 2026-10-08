@@ -1,7 +1,7 @@
-//lista estatica de los servicios ofrecidos (slug + nombre)
-//se usa para la navegacion (navbar) y para generar las paginas en el build
-//el contenido real de cada servicio siempre llega desde la api
-export const servicios = [
+//respaldo de la lista de servicios (slug + nombre)
+//la fuente real es el backend (GET /api/servicios). esto se usa solo como
+//red de seguridad al generar las paginas /servicios/[slug] en el build.
+export const serviciosRespaldo = [
   { slug: 'desarrollo-full-stack', nombre: 'Desarrollo Full Stack' },
   { slug: 'diseno-ux-ui', nombre: 'Diseño UX/UI' },
   { slug: 'diseno-grafico-identidad', nombre: 'Diseño Gráfico e Identidad' },

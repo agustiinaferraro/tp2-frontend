@@ -1,20 +1,22 @@
 ---
 //pagina dinamica de un servicio: /servicios/[slug]
-//getstaticpaths genera una pagina por cada servicio (usando la lista estatica)
+//la lista de slugs (las rutas) se trae del backend en el build; si la api no responde, se usa el respaldo
 //el contenido en si lo trae la api del lado del cliente (serviciodetalle)
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import BackButton from '../../components/BackButton.astro';
 import ServicioDetalle from '../../components/ServicioDetalle.jsx';
-import { servicios } from '../../data/servicios.js';
+import { obtenerServiciosParaBuild } from '../../utils/serviciosBuild.js';
 
-export function getStaticPaths() {
+export async function getStaticPaths() {
+  const servicios = await obtenerServiciosParaBuild();
   return servicios.map((servicio) => ({
     params: { slug: servicio.slug },
   }));
 }
 
+const servicios = await obtenerServiciosParaBuild();
 const { slug } = Astro.params;
 const servicioInfo = servicios.find((servicio) => servicio.slug === slug);
 const titulo = servicioInfo?.nombre ?? 'Servicio';

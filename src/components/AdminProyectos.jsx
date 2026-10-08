@@ -26,7 +26,6 @@ import AdminMensajes from './AdminMensajes.jsx';
 import AdminProyectoCard from './AdminProyectoCard.jsx';
 import Loading from './Loading.jsx';
 import SelectorImagenes from './SelectorImagenes.jsx';
-import { servicios as serviciosEstaticos } from '../data/servicios.js';
 
 //mensaje de error para saber si el problema fue la clave (401) o algo mas
 function claveIncorrecta(error) {
@@ -91,15 +90,6 @@ function ModalEliminar({ proyecto, alConfirmar, alCancelar }) {
       </div>
     </div>
   );
-}
-
-//junta los servicios de la base con la lista estatica para que nunca quede vacia
-//si hay repetidos, gana el de la base (puede tener nombre actualizado)
-function juntarServicios(listaApi) {
-  const porSlug = new Map();
-  for (const servicio of serviciosEstaticos) porSlug.set(servicio.slug, servicio);
-  for (const servicio of listaApi) porSlug.set(servicio.slug, servicio);
-  return [...porSlug.values()];
 }
 
 //nombre del servicio a partir de su slug, para mostrar la categoría del proyecto
@@ -327,7 +317,7 @@ export default function AdminProyectos() {
   const fotoInputRef = useRef(null);
   const portadaInputRef = useRef(null);
 
-  const [listaServicios, setListaServicios] = useState(serviciosEstaticos);
+  const [listaServicios, setListaServicios] = useState([]);
   const [mensaje, setMensaje] = useState(null);
 
   //al entrar: si ya hay sesion guardada (por ejemplo desde el detalle de un proyecto) se reusa.
@@ -360,7 +350,7 @@ export default function AdminProyectos() {
         .catch(() => {});
     }
     obtenerServicios()
-      .then((lista) => setListaServicios(juntarServicios(lista)))
+      .then((lista) => setListaServicios(lista))
       .catch(() => {});
   }, []);
 
@@ -506,7 +496,7 @@ export default function AdminProyectos() {
       const slugNuevo = creado.datos.slug;
       listaServicios = [...new Set([...serviciosSel, slugNuevo])];
       obtenerServicios()
-        .then((lista) => setListaServicios(juntarServicios(lista)))
+        .then((lista) => setListaServicios(lista))
         .catch(() => {});
     }
     //la primera imagen del formulario es la portada y el resto la galeria del detalle

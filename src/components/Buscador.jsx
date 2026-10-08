@@ -1,6 +1,7 @@
 ﻿import { useEffect, useRef, useState } from "react";
-import { indiceBusqueda } from "../data/busqueda.js";
+import { paginasBusqueda } from "../data/busqueda.js";
 import { obtenerProyectosLigeros } from "../api/proyectos.js";
+import { obtenerServicios } from "../api/servicios.js";
 
 //normaliza el texto para buscar sin acentos ni mayusculas
 function normalizar(texto) {
@@ -12,24 +13,35 @@ export default function Buscador() {
   const [consulta, setConsulta] = useState("");
   const [abierto, setAbierto] = useState(false);
   const [proyectos, setProyectos] = useState([]);
+  const [servicios, setServicios] = useState([]);
   const contenedor = useRef(null);
-  const proyectosCargados = useRef(false);
+  const datosCargados = useRef(false);
 
-  //pide los proyectos recien cuando se abre el buscador por primera vez
+  //pide los proyectos y servicios recien cuando se abre el buscador por primera vez
   //asi la pagina no hace la peticion salvo que la persona use la busqueda
-  function cargarProyectosSiFalta() {
-    if (proyectosCargados.current) return;
-    proyectosCargados.current = true;
+  function cargarDatosSiFalta() {
+    if (datosCargados.current) return;
+    datosCargados.current = true;
     obtenerProyectosLigeros()
       .then((datos) => {
         if (Array.isArray(datos)) setProyectos(datos);
       })
       .catch(() => {});
+    obtenerServicios()
+      .then((datos) => {
+        if (Array.isArray(datos)) setServicios(datos);
+      })
+      .catch(() => {});
   }
 
-  //paginas + servicios (indice estatico) + proyectos (desde la api)
+  //paginas (estructura) + servicios y proyectos (los dos desde la api)
   const indice = [
-    ...indiceBusqueda,
+    ...paginasBusqueda,
+    ...servicios.map((servicio) => ({
+      titulo: servicio.nombre,
+      tipo: "servicio",
+      href: `/servicios/${servicio.slug}`,
+    })),
     ...proyectos.map((proyecto) => ({
       titulo: proyecto.titulo ?? "",
       tipo: "proyecto",
@@ -73,7 +85,7 @@ export default function Buscador() {
           type="search"
           value={consulta}
           onChange={(e) => { setConsulta(e.target.value); setAbierto(true); }}
-          onFocus={() => { setAbierto(true); cargarProyectosSiFalta(); }}
+          onFocus={() => { setAbierto(true); cargarDatosSiFalta(); }}
           placeholder="Buscar..."
           aria-label="Buscar en el sitio"
           className="w-32 lg:w-40 bg-transparent text-sm text-white placeholder:text-zinc-600 focus:outline-none"
