@@ -4,8 +4,8 @@
 // el link externo nunca va dentro del principal (html no anida links), va aparte al pie de la card
 // se reusa en los carruseles y en la grilla de proyectos
 // titulo y resumen se acotan con line-clamp (2 y 2 lineas): el recorte se adapta al ancho de
-// la tarjeta y el texto completo se ve en el detalle. la card mide su contenido, asi el
-// link de "ver proyecto" queda pegado al resumen y no queda aire de mas
+// la tarjeta. la card tiene un alto fijo (TARJETA_PROYECTO) igual para todas y el link de "ver
+// proyecto" queda pegado al resumen. los tags se acotan a una fila asi no estiran la tarjeta
 import ImagenProyecto from './ImagenProyecto.jsx';
 import { textoVisitar } from '../utils/proyectos.js';
 
@@ -18,7 +18,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
 
   return (
     <article
-      className={`group relative z-0 hover:z-10 focus-within:z-10 flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
+      className={`group relative z-0 hover:z-10 focus-within:z-10 h-full flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border hover:scale-105 active:scale-95 transition-all duration-200 ${claseBorde}`}
     >
       {/* etiqueta de destacado: va encima de la portada para no agrandar la tarjeta */}
       {destacado && (
@@ -55,9 +55,10 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
           >
             {proyecto.titulo}
           </h3>
-          {/* tags / roles aplicados */}
+          {/* tags / roles aplicados. se acotan a una fila (max-h + overflow) para que las
+              tarjetas con muchos tags no crezcan mas que el resto */}
           {proyecto.tags?.length > 0 && (
-            <ul className="flex flex-wrap gap-2" aria-label="Etiquetas del proyecto">
+            <ul className="flex flex-wrap gap-2 max-h-6 overflow-hidden" aria-label="Etiquetas del proyecto">
               {proyecto.tags.map((tag) => (
                 <li
                   key={tag}

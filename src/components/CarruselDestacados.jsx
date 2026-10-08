@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { obtenerProyectosDestacados } from '../api/proyectos.js';
 import ProyectoCard from './ProyectoCard.jsx';
+import { TARJETA_PROYECTO } from './Carrusel.jsx';
 import Loading from './Loading.jsx';
 
 //tarjetas mas chicas que las del carrusel de proyectos: son las primeras de la home y no
@@ -41,7 +42,7 @@ export default function CarruselDestacados() {
         {loopProyectos.map((proyecto, index) => (
           <div
             key={`${proyecto._id || index}-${index}`}
-            className={`relative inline-block ${TARJETA_DESTACADA} shrink-0 cursor-pointer overflow-visible rounded-lg transition-transform duration-300 hover:scale-105`}
+            className={`relative inline-block ${TARJETA_DESTACADA} ${TARJETA_PROYECTO} shrink-0 cursor-pointer overflow-visible rounded-lg transition-transform duration-300 hover:scale-105`}
           >
             <ProyectoCard proyecto={proyecto} destacado />
           </div>
