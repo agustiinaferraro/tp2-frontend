@@ -48,6 +48,8 @@ export default function Comentarios({ proyectoId }) {
   const [sesion, setSesion] = useState(null);
   const [texto, setTexto] = useState('');
   const [enviando, setEnviando] = useState(false);
+  //si la foto de la sesion no carga, se cae a la inicial
+  const [fotoFalla, setFotoFalla] = useState(false);
 
   //al abrir se cargan los comentarios del proyecto y la sesion guardada
   useEffect(() => {
@@ -70,6 +72,11 @@ export default function Comentarios({ proyectoId }) {
       activo = false;
     };
   }, [proyectoId]);
+
+  //al cambiar la foto (o la cuenta) se reintenta cargarla
+  useEffect(() => {
+    setFotoFalla(false);
+  }, [sesion?.foto]);
 
   //publica el comentario escrito
   async function manejarComentar(e) {
@@ -152,8 +159,13 @@ export default function Comentarios({ proyectoId }) {
           /*logueado: caja para escribir el comentario*/
           <form onSubmit={manejarComentar} className="pt-4 border-t border-zinc-800 space-y-3">
             <p className="text-sm text-zinc-400 flex items-center gap-2 flex-wrap">
-              {sesion.foto ? (
-                <img src={sesion.foto} alt="" className="w-6 h-6 rounded-full object-cover border border-zinc-700" />
+              {sesion.foto && !fotoFalla ? (
+                <img
+                  src={sesion.foto}
+                  alt=""
+                  className="w-6 h-6 rounded-full object-cover border border-zinc-700"
+                  onError={() => setFotoFalla(true)}
+                />
               ) : (
                 <span className={`shrink-0 flex items-center justify-center w-6 h-6 rounded-full border font-bold text-xs ${colorAvatar(sesion.nombre)}`}>
                   {inicialAvatar(sesion.nombre)}

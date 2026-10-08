@@ -12,6 +12,8 @@ export default function AvatarAdmin() {
   //(si se leyera antes, el html que genera el build no coincidiria con la pagina y react se queja)
   const [sesion, setSesion] = useState(null);
   const [listo, setListo] = useState(false);
+  //si la foto no carga (por ejemplo una url vencida), se cae a la inicial del nombre
+  const [fotoFalla, setFotoFalla] = useState(false);
 
   useEffect(() => {
     const actualizar = () => {
@@ -31,14 +33,24 @@ export default function AvatarAdmin() {
     };
   }, []);
 
+  //cuando cambia la foto (o la cuenta) se vuelve a intentar cargarla
+  useEffect(() => {
+    setFotoFalla(false);
+  }, [sesion?.foto]);
+
   const nombre = sesion?.nombre ?? '';
   //sin sesion el perfil se ve igual, como "Anonimo"
   const nombreMostrado = sesion ? nombre : 'Anónimo';
   const nombreAccesible = sesion ? `Mi perfil (${nombre})` : 'Mi perfil (Anónimo)';
 
   //hasta que no se lee la sesion se dibuja el circulo vacio, igual en el build y en el navegador
-  const contenido = sesion?.foto ? (
-    <img src={sesion.foto} alt="" className="w-full h-full object-cover" />
+  const contenido = sesion?.foto && !fotoFalla ? (
+    <img
+      src={sesion.foto}
+      alt=""
+      className="w-full h-full object-cover"
+      onError={() => setFotoFalla(true)}
+    />
   ) : (
     <span aria-hidden="true" className="text-verde-app font-bold text-sm">
       {listo ? (sesion ? inicial(nombre) : 'A') : ''}

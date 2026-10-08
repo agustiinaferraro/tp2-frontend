@@ -138,6 +138,21 @@ function InicialAvatar({ nombre, className }) {
   );
 }
 
+//foto del perfil con respaldo: si no hay o no carga, muestra la inicial del nombre
+function AvatarPerfil({ foto, nombre, classNameInicial }) {
+  const [falla, setFalla] = useState(false);
+  useEffect(() => {
+    setFalla(false);
+  }, [foto]);
+
+  if (foto && !falla) {
+    return (
+      <img src={foto} alt="" className="w-full h-full object-cover" onError={() => setFalla(true)} />
+    );
+  }
+  return <InicialAvatar nombre={nombre} className={classNameInicial} />;
+}
+
 //icono de lapiz para editar (la foto del perfil o un proyecto)
 function IconoLapiz({ className }) {
   return (
@@ -926,11 +941,11 @@ export default function AdminProyectos() {
                   <div className="flex items-end gap-3 sm:gap-4 min-w-0">
                     <div className="relative shrink-0">
                       <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-full overflow-hidden bg-zinc-800 border-4 border-black flex items-center justify-center text-zinc-500">
-                        {fotoPerfil ? (
-                          <img src={fotoPerfil} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <InicialAvatar nombre={perfil?.nombre || 'Agustina Ferraro'} className="text-3xl sm:text-4xl" />
-                        )}
+                        <AvatarPerfil
+                          foto={fotoPerfil}
+                          nombre={perfil?.nombre || 'Agustina Ferraro'}
+                          classNameInicial="text-3xl sm:text-4xl"
+                        />
                       </div>
                       {/*lapiz sobre el avatar: cambia la foto de perfil al instante*/}
                       <button
@@ -1234,11 +1249,7 @@ export default function AdminProyectos() {
                 </div>
                 <div className="relative shrink-0">
                   <div className="w-20 h-20 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-500">
-                    {pFoto ? (
-                      <img src={pFoto} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <InicialAvatar nombre={pNombre} className="text-3xl" />
-                    )}
+                    <AvatarPerfil foto={pFoto} nombre={pNombre} classNameInicial="text-3xl" />
                   </div>
                   <button
                     type="button"

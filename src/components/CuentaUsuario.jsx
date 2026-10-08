@@ -67,6 +67,24 @@ function IconoLapiz({ className }) {
   );
 }
 
+//muestra la foto del perfil y, si no hay o no carga, la inicial del nombre
+function AvatarPerfil({ foto, nombre, className, classNameInicial }) {
+  //si la imagen falla (por ejemplo una url vencida) se cae a la inicial
+  const [falla, setFalla] = useState(false);
+  useEffect(() => {
+    setFalla(false);
+  }, [foto]);
+
+  if (foto && !falla) {
+    return <img src={foto} alt="" className={className} onError={() => setFalla(true)} />;
+  }
+  return (
+    <span aria-hidden="true" className={classNameInicial}>
+      {(nombre ?? '?').charAt(0).toUpperCase() || '?'}
+    </span>
+  );
+}
+
 //solo se vuelve a rutas del propio sitio (ej: /proyectos), nunca a direcciones externas
 function esRutaInterna(ruta) {
   return typeof ruta === 'string' && ruta.startsWith('/') && !ruta.startsWith('//');
@@ -461,15 +479,12 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               className="group relative shrink-0 cursor-pointer"
             >
               <span className="flex items-center justify-center w-20 h-20 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 transition-colors group-hover:border-verde-app">
-                {fotoNueva ? (
-                  <img src={fotoNueva} alt="Foto nueva" className="w-full h-full object-cover" />
-                ) : sesion.foto ? (
-                  <img src={sesion.foto} alt="Foto de perfil" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-verde-app font-extrabold text-3xl">
-                    {(sesion.nombre ?? '?').charAt(0).toUpperCase()}
-                  </span>
-                )}
+                <AvatarPerfil
+                  foto={fotoNueva || sesion.foto}
+                  nombre={sesion.nombre}
+                  className="w-full h-full object-cover"
+                  classNameInicial="text-verde-app font-extrabold text-3xl"
+                />
               </span>
               <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/55 text-white opacity-0 group-hover:opacity-100 transition-opacity">
                 <IconoLapiz className="w-4 h-4" />
@@ -756,11 +771,12 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                   {/*cuenta actual, arriba y marcada (como el selector de gmail)*/}
                   <li className="flex items-center gap-3 py-3">
                     <span className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700">
-                      {sesion.foto ? (
-                        <img src={sesion.foto} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-verde-app font-bold">{sesion.nombre?.charAt(0).toUpperCase() ?? '?'}</span>
-                      )}
+                      <AvatarPerfil
+                        foto={sesion.foto}
+                        nombre={sesion.nombre}
+                        className="w-full h-full object-cover"
+                        classNameInicial="text-verde-app font-bold"
+                      />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium text-zinc-100 truncate">{sesion.nombre}</span>
@@ -781,11 +797,12 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                         className="flex items-center gap-3 min-w-0 flex-1 text-left cursor-pointer group"
                       >
                         <span className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700">
-                          {cuenta.foto ? (
-                            <img src={cuenta.foto} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-verde-app font-bold">{cuenta.nombre?.charAt(0).toUpperCase() ?? '?'}</span>
-                          )}
+                          <AvatarPerfil
+                            foto={cuenta.foto}
+                            nombre={cuenta.nombre}
+                            className="w-full h-full object-cover"
+                            classNameInicial="text-verde-app font-bold"
+                          />
                         </span>
                         <span className="min-w-0">
                           <span className="block font-medium text-zinc-100 truncate">{cuenta.nombre}</span>
