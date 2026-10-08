@@ -53,13 +53,17 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
           </figure>
         )}
         <div className="p-3 flex flex-col gap-1.5 flex-1 min-h-0">
-          <h3
-            className={`text-base font-bold text-white line-clamp-2 shrink-0 transition-colors ${
-              destacado ? 'group-hover:text-orange-300' : 'group-hover:text-verde-app/80'
-            }`}
-          >
-            {proyecto.titulo}
-          </h3>
+          {/* el titulo va envuelto: si el h3 fuera hijo directo del flex-column, el navegador
+              blockifica su display (flow-root) y line-clamp-2 dejaria de recortar */}
+          <div className="shrink-0">
+            <h3
+              className={`text-base font-bold text-white line-clamp-2 transition-colors ${
+                destacado ? 'group-hover:text-orange-300' : 'group-hover:text-verde-app/80'
+              }`}
+            >
+              {proyecto.titulo}
+            </h3>
+          </div>
           {/* tags / roles aplicados. se acotan a una fila (max-h + overflow) para que las
               tarjetas con muchos tags no crezcan mas que el resto */}
           {proyecto.tags?.length > 0 && (
@@ -74,11 +78,11 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
               ))}
             </ul>
           )}
-          {/* el resumen ocupa el espacio que sobra (flex-1) cuando el titulo usa 2 lineas, asi
-              la tarjeta mantiene el mismo alto. se recorta a 2 lineas con line-clamp */}
-          <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2 flex-1 min-h-0 overflow-hidden">
-            {proyecto.resumen}
-          </p>
+          {/* el resumen ocupa el espacio que sobra (flex-1) pero se envuelve igual que el titulo:
+              el <p> recorta a 2 lineas con line-clamp y el wrapper se encarga de bajar el alto */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <p className="text-zinc-400 text-sm leading-relaxed line-clamp-2">{proyecto.resumen}</p>
+          </div>
         </div>
       </a>
       {/* link externo del proyecto: va al sitio publicado (behance, vercel, etc) */}
