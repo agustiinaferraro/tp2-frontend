@@ -36,8 +36,18 @@ try {
 
 <Layout title="Sobre mí | Agustina Ferraro">
   <Navbar seccionActiva="sobre-mi" />
-  <main id="contenido" class="pt-16">
-    <div class="max-w-6xl mx-auto px-4 pt-8">
+  <main id="contenido" class="pt-16 relative overflow-hidden">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 z-0">
+      <div class="absolute inset-0">
+        <img
+          src="/img/bg-sobre-mi.gif"
+          alt=""
+          class="w-full h-full object-cover object-center opacity-20"
+        />
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90"></div>
+    </div>
+    <div class="max-w-6xl mx-auto px-4 pt-8 relative z-10">
       <BackButton href="/" />
     </div>
     <RecorridoSobreMi {...contenido} />
