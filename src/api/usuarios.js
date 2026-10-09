@@ -9,6 +9,7 @@ import {
   traducirErrorFirebase,
   firebaseConfigurado,
   tokenActual,
+  usuarioFirebaseActual,
   cerrarSesionFirebase,
   pedirRecuperacionFirebase,
   verificarLinkRecuperacionFirebase,
@@ -42,12 +43,13 @@ export function linkPerfil(modo = 'login') {
 export const cuentaConfigurada = firebaseConfigurado;
 
 //dice si la cuenta logueada es la dueña del sitio (para ofrecerle el panel)
-//el backend lo verifica con el token; no expone el email de la dueña
+//pregunta con el token real de firebase: asi manda la cuenta que esta conectada de verdad
+//(y no una sesion guardada que pudo haber quedado desfasada); no expone el email de la dueña
 export async function soyDueno() {
-  const sesion = await sesionConTokenFresco();
-  if (!sesion?.token) return false;
+  const token = await tokenActual();
+  if (!token) return false;
   try {
-    const { esDueno } = await peticionGETAutenticada('/api/admin/soy-dueno', sesion.token);
+    const { esDueno } = await peticionGETAutenticada('/api/admin/soy-dueno', token);
     return Boolean(esDueno);
   } catch {
     return false;
@@ -189,14 +191,24 @@ export async function sesionConTokenFresco() {
   const sesion = leerSesion();
   if (!sesion?.email) return null;
 
-  const token = await tokenActual();
+  const usuario = await usuarioFirebaseActual();
   //si firebase ya no tiene sesion, la del navegador esta vencida: se limpia
-  if (!token) {
+  if (!usuario) {
     if (sesion.token) borrarSesion();
     return null;
   }
+  const token = await usuario.getIdToken().catch(() => null);
+  if (!token) return null;
 
-  const nueva = { ...sesion, token };
+  //la cuenta real es la de firebase: se corrige la sesion guardada si quedo desfasada
+  //(por ejemplo si se "cambio de cuenta" sin que firebase cambie de usuario)
+  const nueva = {
+    ...sesion,
+    token,
+    nombre: usuario.displayName || sesion.nombre,
+    email: usuario.email || sesion.email,
+    foto: usuario.photoURL || sesion.foto,
+  };
   guardarSesion(nueva);
   guardarCuenta(nueva);
   return nueva;
