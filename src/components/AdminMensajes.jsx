@@ -1,8 +1,9 @@
-//seccion del panel admin para ver los mensajes del formulario de contacto como chats
-//primero se muestra la lista de conversaciones (una por persona), como en instagram:
-//nombre, cantidad y el ultimo mensaje. al tocar una se abre el hilo completo
-//dentro del hilo se puede responder: la respuesta queda como burbuja propia del chat
-//depende de una sesion ya iniciada por la dueña del sitio (el componente principal le pasa el nombre)
+//seccion de la dueña para ver los mensajes del formulario de contacto como chats
+//primero se muestra la lista de conversaciones (una por cuenta/persona), como en whatsapp:
+//nombre de la persona, el ultimo mensaje, la hora y la cantidad de mensajes que mando
+//al tocar una se abre el hilo completo (burbujas) y se puede responder
+//la lista se refresca sola cada pocos segundos (no hace falta boton de refrescar)
+//depende de una sesion ya iniciada por la dueña del sitio
 import { useCallback, useEffect, useState } from 'react';
 import {
   obtenerConversaciones,
@@ -10,6 +11,9 @@ import {
   responderConversacion,
 } from '../api/mensajes.js';
 import Loading from './Loading.jsx';
+
+//cada cuanto se vuelve a pedir la lista para ver si llego algo nuevo (en milisegundos)
+const INTERVALO_REFRESCO = 5000;
 
 //reconoce el error 401: la sesion vencio y hay que volver a entrar
 function claveIncorrecta(error) {
@@ -23,7 +27,7 @@ function formatearFecha(fechaISO) {
   return fecha.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-//para la lista de chats: "Hoy", "Ayer" o la fecha corta segun corresponda
+//para la lista de chats: "Hoy", "Ayer" o la fecha corta segun corresponda (como whatsapp)
 function formatearChat(fechaISO) {
   const fecha = new Date(fechaISO);
   if (Number.isNaN(fecha.getTime())) return '';
@@ -37,17 +41,11 @@ function formatearChat(fechaISO) {
   return formatearFecha(fechaISO);
 }
 
-//fecha y hora para un mensaje dentro del hilo (ej: 19/09/2026 14:32)
+//hora corta para un mensaje dentro del hilo (ej: 14:32)
 function formatearHora(fechaISO) {
   const fecha = new Date(fechaISO);
   if (Number.isNaN(fecha.getTime())) return '';
-  return fecha.toLocaleString('es-AR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
 }
 
 //avatar circular con la inicial de la persona (como las fotos de los chats)
@@ -57,7 +55,7 @@ function AvatarInicial({ nombre, className }) {
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex items-center justify-center rounded-full bg-violeta-app text-black font-bold ${className}`}
+      className={`inline-flex items-center justify-center rounded-full bg-violeta-app text-black font-bold shrink-0 ${className}`}
     >
       {inicial}
     </span>
@@ -74,7 +72,17 @@ function FlechaAtras({ className }) {
   );
 }
 
-export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }) {
+//icono de enviar (avioncito), como el boton de mandar de whatsapp
+function IconoEnviar({ className }) {
+  return (
+    <svg aria-hidden="true" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <path d="m22 2-7 20-4-9-9-4Z" />
+      <path d="M22 2 11 13" />
+    </svg>
+  );
+}
+
+export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, sinEncabezado = false }) {
   const [conversaciones, setConversaciones] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -82,19 +90,38 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }
   const [chat, setChat] = useState(null);
   //texto de la respuesta del hilo abierto
   const [respuesta, setRespuesta] = useState('');
+  //true mientras se envia la respuesta (deshabilita el boton)
+  const [enviando, setEnviando] = useState(false);
 
-  const cargar = useCallback(() => {
-    setCargando(true);
+  //trae las conversaciones. silencioso=true para el refresco automatico
+  //(no muestra el spinner ni pisa la pantalla mientras el usuario lee)
+  const cargar = useCallback((silencioso = false) => {
+    if (!silencioso) setCargando(true);
     setError(null);
     obtenerConversaciones()
       .then(setConversaciones)
       .catch((e) => setError(e.message))
-      .finally(() => setCargando(false));
+      .finally(() => {
+        if (!silencioso) setCargando(false);
+      });
   }, []);
 
+  //carga inicial + refresco automatico cada pocos segundos
   useEffect(() => {
     cargar();
+    const id = setInterval(() => cargar(true), INTERVALO_REFRESCO);
+    return () => clearInterval(id);
   }, [cargar]);
+
+  //mantiene el chat abierto al dia: si entra un mensaje nuevo se actualiza solo
+  useEffect(() => {
+    if (!chat) return;
+    const fresco = conversaciones.find((c) => c._id === chat._id);
+    if (!fresco) return;
+    if (fresco.mensajes.length !== chat.mensajes.length || fresco.ultimaFecha !== chat.ultimaFecha) {
+      setChat(fresco);
+    }
+  }, [conversaciones, chat]);
 
   function abrirChat(conversacion) {
     setChat(conversacion);
@@ -105,8 +132,8 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }
   function volverAlista() {
     setChat(null);
     setRespuesta('');
-    //se recarga para que el ultimo mensaje muestre la respuesta si se envio una
-    cargar();
+    //se recarga para que la lista muestre la respuesta recien enviada
+    cargar(true);
     if (alCambiar) alCambiar();
   }
 
@@ -119,7 +146,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }
       if (nuevos.length === 0) {
         //si no queda ninguno, se cierra el chat y se recarga la lista
         setChat(null);
-        cargar();
+        cargar(true);
         if (alCambiar) alCambiar();
       } else {
         //la cantidad cuenta solo los mensajes de la persona, no las respuestas
@@ -130,11 +157,12 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }
     }
   }
 
-  //guarda la respuesta del admin dentro del chat y la muestra como burbuja propia
+  //guarda la respuesta de la dueña dentro del chat y la muestra como burbuja propia
   async function enviarRespuesta(evento) {
     evento.preventDefault();
     const texto = respuesta.trim();
-    if (!texto) return;
+    if (enviando || !texto) return;
+    setEnviando(true);
     setError(null);
     try {
       const cuerpo = await responderConversacion(chat._id, texto, nombre);
@@ -143,6 +171,8 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }
       setRespuesta('');
     } catch (e) {
       setError(claveIncorrecta(e) ? 'La sesión expiró. Volvé a entrar.' : e.message);
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -157,131 +187,119 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }
     );
   }
 
-  //hilo con los mensajes de una persona (burbujas de chat) y caja para responder
+  //hilo con los mensajes de una persona (burbujas estilo whatsapp) y caja para responder
   if (chat) {
     const respuestas = chat.mensajes.filter((m) => m.esRespuesta).length;
-    const claseRespuesta =
-      'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-verde-app transition-all resize-y';
     return (
-      <section aria-label={`Chat con ${chat.nombre}`} className="space-y-4">
-        <div className="flex items-center gap-3">
-          {/*boton distinto al de la web: un chip verde con el texto "Chats"*/}
+      <section aria-label={`Chat con ${chat.nombre}`} className="space-y-3 text-left">
+        {/*cabecera del chat: volver, avatar, nombre y email*/}
+        <div className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-900 border border-zinc-800">
           <button
             type="button"
             onClick={volverAlista}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-verde-app text-verde-app hover:bg-verde-app hover:text-black transition-all duration-200 cursor-pointer"
+            aria-label="Volver a la lista de chats"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-full text-zinc-300 hover:bg-zinc-800 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
           >
-            <FlechaAtras className="w-4 h-4" />
-            Chats
+            <FlechaAtras className="w-5 h-5" />
           </button>
-          <AvatarInicial nombre={chat.nombre} className="w-11 h-11 text-lg shrink-0" />
-          <div className="min-w-0">
-            <p className="font-medium text-white truncate">{chat.nombre}</p>
+          <AvatarInicial nombre={chat.nombre} className="w-10 h-10 text-base" />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-white truncate leading-tight">{chat.nombre}</p>
             <a
               href={`mailto:${chat.email}`}
-              className="text-sm text-verde-app hover:text-verde-app/80 transition-colors break-all"
+              className="text-xs text-zinc-400 hover:text-verde-app transition-colors break-all"
             >
               {chat.email}
             </a>
           </div>
-          <span className="ml-auto shrink-0 text-xs px-2 py-1 rounded-full bg-verde-app/10 text-verde-app border border-verde-app/20">
-            {chat.cantidad} mensaje{chat.cantidad === 1 ? '' : 's'}
-            {respuestas > 0 && (
-              <>
-                {' · '}
-                {respuestas} respuesta{respuestas === 1 ? '' : 's'}
-              </>
-            )}
+          <span className="shrink-0 text-xs px-2 py-1 rounded-full bg-whatsapp/15 text-whatsapp border border-whatsapp/25">
+            {chat.cantidad} enviado{chat.cantidad === 1 ? '' : 's'}
+            {respuestas > 0 && <> · {respuestas} tuyo{respuestas === 1 ? '' : 's'}</>}
           </span>
         </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-400">
+          <p role="alert" className="text-sm text-red-400 px-1">
             {error}
           </p>
         )}
 
-        <ul className="space-y-2">
+        {/*hilo de mensajes: lo que manda la persona a la izquierda (gris)
+            y lo que responde la dueña a la derecha (verde, como whatsapp)*/}
+        <ul className="space-y-2 max-h-[60vh] overflow-y-auto p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800">
           {chat.mensajes.map((mensaje) => (
-            <li key={mensaje._id} className={mensaje.esRespuesta ? 'flex justify-end' : ''}>
+            <li key={mensaje._id} className={mensaje.esRespuesta ? 'flex justify-end' : 'flex justify-start'}>
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                className={`group max-w-[80%] rounded-2xl px-3.5 py-2 shadow-sm ${
                   mensaje.esRespuesta
-                    ? 'bg-violeta-app/15 border border-violeta-app/30'
-                    : 'bg-zinc-900 border border-zinc-800'
+                    ? 'bg-whatsapp text-black rounded-br-sm'
+                    : 'bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-bl-sm'
                 }`}
               >
-                <div className="flex items-center justify-between gap-4">
-                  {mensaje.esRespuesta ? (
-                    <span className="text-xs text-violeta-app">Tu respuesta</span>
-                  ) : (
-                    <span className="text-xs text-zinc-500">{formatearHora(mensaje.createdAt)}</span>
-                  )}
-                  {mensaje.esRespuesta ? (
-                    <span className="text-xs text-zinc-500">{formatearHora(mensaje.createdAt)}</span>
-                  ) : (
+                <p className="text-sm leading-relaxed whitespace-pre-line break-words m-0">{mensaje.mensaje}</p>
+                <div className={`flex items-center gap-2 mt-0.5 ${mensaje.esRespuesta ? 'justify-end' : 'justify-between'}`}>
+                  <span className={`text-[10px] ${mensaje.esRespuesta ? 'text-black/60' : 'text-zinc-500'}`}>
+                    {formatearHora(mensaje.createdAt)}
+                  </span>
+                  {!mensaje.esRespuesta && (
                     <button
                       type="button"
                       onClick={() => borrarUnMensaje(mensaje)}
-                      className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                      className="text-[10px] text-red-400 hover:text-red-300 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                     >
                       Borrar
                     </button>
                   )}
                 </div>
-                <p className="text-zinc-200 text-sm mt-1 leading-relaxed whitespace-pre-line">{mensaje.mensaje}</p>
               </div>
             </li>
           ))}
         </ul>
 
-        <form onSubmit={enviarRespuesta} className="space-y-2 pt-2 border-t border-zinc-800">
-          <label htmlFor="admin-respuesta" className="block text-sm text-zinc-300">
+        {/*caja para responder (como la barra de escritura de whatsapp)*/}
+        <form onSubmit={enviarRespuesta} className="flex items-center gap-2">
+          <label htmlFor="admin-respuesta" className="sr-only">
             Responder en este chat
           </label>
-          <textarea
+          <input
             id="admin-respuesta"
+            type="text"
             value={respuesta}
             onChange={(e) => setRespuesta(e.target.value)}
-            placeholder="Escribí tu respuesta..."
-            rows={3}
-            className={claseRespuesta}
+            placeholder="Escribí un mensaje..."
+            className="flex-1 px-4 py-2.5 rounded-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 focus:outline-none focus:border-whatsapp transition-all"
           />
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={responderPorMail}
-              className="px-4 py-2 rounded-lg text-sm text-zinc-400 hover:bg-zinc-800 hover:text-white active:scale-95 hover:scale-105 transition-all duration-200"
-            >
-              Responder por mail
-            </button>
-            <button
-              type="submit"
-              disabled={!respuesta.trim()}
-              className="px-4 py-2 rounded-lg font-medium bg-violeta-app hover:bg-violeta-app/90 text-black transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Enviar respuesta
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={enviando || !respuesta.trim()}
+            aria-label="Enviar respuesta"
+            className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-whatsapp hover:bg-whatsapp-claro text-black transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer shrink-0"
+          >
+            <IconoEnviar className="w-5 h-5 -ml-0.5" />
+          </button>
         </form>
+        <button
+          type="button"
+          onClick={responderPorMail}
+          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-1"
+        >
+          Responder por mail
+        </button>
       </section>
     );
   }
 
-  //lista de conversaciones (como la bandeja de un chat)
+  //lista de conversaciones (la bandeja de chats)
   return (
-    <section aria-label="Mensajes recibidos" className="space-y-4">
-      <div className="flex items-center justify-between">
+    <section aria-label="Chats" className="space-y-3 text-left">
+      {!sinEncabezado && (
         <h2 className="text-lg font-semibold text-white">
-          Mensajes{' '}
+          Chats{' '}
           {conversaciones.length > 0 && (
             <span className="ml-1 text-sm font-normal text-zinc-500">({conversaciones.length})</span>
           )}
         </h2>
-        <button type="button" onClick={cargar} className="inline-block rounded-lg px-2 py-1 text-sm text-zinc-400 hover:bg-zinc-800 hover:text-white active:scale-95 hover:scale-105 transition-all duration-200">
-          Refrescar
-        </button>
-      </div>
+      )}
 
       {error && (
         <p role="alert" className="text-sm text-red-400">
@@ -296,7 +314,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }
           <p className="text-zinc-400">Todavía no recibiste ningún mensaje.</p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-1.5">
           {conversaciones.map((conversacion) => {
             const ultimo = conversacion.mensajes[0];
             const textoUltimo = ultimo?.esRespuesta ? `Tú: ${ultimo.mensaje}` : ultimo?.mensaje ?? '';
@@ -305,19 +323,21 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar }
                 <button
                   type="button"
                   onClick={() => abrirChat(conversacion)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-verde-app/50 hover:scale-[1.01] active:scale-100 transition-all cursor-pointer text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-whatsapp/40 hover:bg-zinc-800/60 active:scale-[0.99] transition-all cursor-pointer text-left"
                 >
-                  <AvatarInicial nombre={conversacion.nombre} className="w-11 h-11 text-lg shrink-0" />
+                  <AvatarInicial nombre={conversacion.nombre} className="w-12 h-12 text-lg" />
                   <span className="flex-1 min-w-0">
                     <span className="flex items-baseline justify-between gap-3">
-                      <span className="font-medium text-white truncate">{conversacion.nombre}</span>
-                      <span className="text-xs text-zinc-500 shrink-0">{formatearChat(conversacion.ultimaFecha)}</span>
+                      <span className="font-semibold text-white truncate">{conversacion.nombre}</span>
+                      <span className="text-[11px] text-zinc-500 shrink-0">{formatearChat(conversacion.ultimaFecha)}</span>
                     </span>
-                    <span className="flex items-center justify-between gap-3">
+                    <span className="flex items-center justify-between gap-3 mt-0.5">
                       <span className="text-sm text-zinc-400 truncate">{textoUltimo}</span>
-                      <span className="shrink-0 text-xs px-2 py-0.5 rounded-full bg-violeta-app text-black font-medium">
-                        {conversacion.cantidad}
-                      </span>
+                      {conversacion.cantidad > 0 && (
+                        <span className="shrink-0 min-w-[20px] text-center text-xs px-1.5 py-0.5 rounded-full bg-whatsapp text-black font-semibold">
+                          {conversacion.cantidad}
+                        </span>
+                      )}
                     </span>
                   </span>
                 </button>

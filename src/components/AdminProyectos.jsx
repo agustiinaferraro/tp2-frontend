@@ -778,7 +778,7 @@ export default function AdminProyectos() {
                 ),
               },
               {
-                etiqueta: 'Mensajes',
+                etiqueta: 'Chats',
                 accion: irAMensajes,
                 activo: vista === 'mensajes',
                 cantidad: cantidadConversaciones,
