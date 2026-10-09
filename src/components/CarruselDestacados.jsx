@@ -35,18 +35,32 @@ export default function CarruselDestacados() {
         Proyectos destacados
       </h2>
       <div
-        className="flex items-start gap-6 w-max will-change-transform animate-carrusel-loop hover:[animation-play-state:paused] focus-within:[animation-play-state:paused]"
-        style={{ '--carrusel-duracion': '30s' }}
+        className="flex gap-6 whitespace-nowrap animate-carousel hover:[animation-play-state:paused] focus-within:[animation-play-state:paused]"
       >
         {loopProyectos.map((proyecto, index) => (
           <div
             key={`${proyecto._id || index}-${index}`}
-            className={`relative inline-block ${TARJETA_DESTACADA} shrink-0 cursor-pointer overflow-visible rounded-lg transition-transform duration-300 hover:scale-105`}
+            className={`relative inline-block ${TARJETA_DESTACADA} shrink-0 cursor-pointer overflow-hidden rounded-lg transition-transform duration-300 hover:scale-105`}
           >
             <ProyectoCard proyecto={proyecto} destacado />
           </div>
         ))}
       </div>
+
+      <style jsx>{`
+        @keyframes carousel {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-carousel {
+          display: inline-flex;
+          animation: carousel 30s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }
