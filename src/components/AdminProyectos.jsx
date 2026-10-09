@@ -1,6 +1,7 @@
 //panel de administracion: sirve para cargar, editar y borrar proyectos
 //y para editar el perfil publico (foto, nombre, contacto y redes)
-//tiene tres vistas: portada (tipo behance), proyecto (cargar/editar) y perfil
+//tiene cinco vistas: portada (tipo behance), proyecto (cargar/editar), perfil, chats y mi cuenta
+//"mi cuenta" (dentro del panel) maneja la sesion: agregar/cambiar cuenta, cerrar sesion y eliminar cuenta
 //solo entra la dueña: el panel se abre cuando la cuenta logueada es la suya
 //la imagen se convierte a base64 y se guarda en la base junto al resto de los datos
 import { useEffect, useState, useRef } from 'react';
@@ -15,8 +16,10 @@ import { obtenerPerfil, actualizarPerfil } from '../api/perfil.js';
 import { obtenerConversaciones } from '../api/mensajes.js';
 import { soyDueno, borrarSesion as borrarSesionUsuario, linkPerfil } from '../api/usuarios.js';
 import { comprimirImagen } from '../utils/imagen.js';
+import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 import AdminMensajes from './AdminMensajes.jsx';
 import AdminProyectoCard from './AdminProyectoCard.jsx';
+import CuentaUsuario from './CuentaUsuario.jsx';
 import Loading from './Loading.jsx';
 import SelectorImagenes from './SelectorImagenes.jsx';
 
@@ -117,8 +120,10 @@ function agruparProyectos(lista, listaServicios) {
       grupos[indices.get(clave)].proyectos.push(proyecto);
     }
   }
+  //orden alfabetico; motion graphics siempre al final: comparte los mismos proyectos
+  //que edicion de video y asi los dos carruseles no quedan pegados uno al lado del otro
   grupos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-  return grupos;
+  return ordenarMotionAlFinal(grupos, (g) => g.slug);
 }
 
 //inicial del nombre para cuando el perfil no tiene foto cargada
@@ -205,24 +210,27 @@ function CarruselAdmin({ grupo, numero, alEditar, alEliminar }) {
     if (!contenedor) return;
     const actualizar = () => {
       const tolerancia = 8;
-      const fin = contenedor.scrollWidth - contenedor.clientWidth;
+      const fin = Math.max(0, contenedor.scrollWidth - contenedor.clientWidth);
       setAlInicio(contenedor.scrollLeft <= tolerancia);
       setAlFinal(contenedor.scrollLeft >= fin - tolerancia);
     };
     actualizar();
-    contenedor.addEventListener('scroll', actualizar);
+    contenedor.addEventListener('scroll', actualizar, { passive: true });
     window.addEventListener('resize', actualizar);
+    const obs = new ResizeObserver(actualizar);
+    obs.observe(contenedor);
     return () => {
       contenedor.removeEventListener('scroll', actualizar);
       window.removeEventListener('resize', actualizar);
+      obs.disconnect();
     };
   }, [grupo.proyectos.length]);
 
   const claseFlecha = (desactivado) =>
-    `shrink-0 self-center w-11 h-11 rounded-full bg-black/80 border border-zinc-700 text-zinc-200 transition-all duration-200 cursor-pointer ${
+    `shrink-0 self-center w-11 h-11 rounded-full bg-black/80 border border-zinc-700 text-zinc-200 transition-all duration-200 ${
       desactivado
         ? 'opacity-40 cursor-not-allowed'
-        : 'hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90 active:bg-violeta-app active:text-black active:border-violeta-app'
+        : 'hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90 active:bg-violeta-app active:text-black active:border-violeta-app cursor-pointer'
     }`;
 
   return (
@@ -278,12 +286,14 @@ export default function AdminProyectos() {
   //mientras se comprueba si la cuenta logueada es la dueña no se muestra el panel
   const [cargandoSesion, setCargandoSesion] = useState(true);
 
-  //vista actual del panel: portada (tipo behance) | proyecto (cargar/editar) | perfil
+  //vista seleccionada del panel (portada | proyecto | perfil | mensajes | cuenta)
   const [vista, setVista] = useState('portada');
   //categoria elegida en el menu superior (clave del grupo); vacio = mostrar todas
   const [categoriaActiva, setCategoriaActiva] = useState('');
   //cantidad de personas que escribieron, para el contador del icono de mensajes
   const [cantidadConversaciones, setCantidadConversaciones] = useState(0);
+  //accion pedida desde el menu lateral al abrir "mi cuenta" (foto | nombre | cuenta | eliminar)
+  const [accionCuenta, setAccionCuenta] = useState(null);
 
   const [proyectos, setProyectos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -341,11 +351,34 @@ export default function AdminProyectos() {
         if (activo) setCargandoSesion(false);
       });
     obtenerServicios()
-      .then((lista) => setListaServicios(lista))
+      .then((lista) => setListaServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
       .catch(() => {});
     return () => {
       activo = false;
     };
+  }, []);
+
+  //si desde "Mi cuenta" se cierra sesión, se cambia de cuenta o se elimina la cuenta,
+  //el panel se revalida solo: si la cuenta deja de ser la dueña, vuelve a la pantalla de acceso
+  useEffect(() => {
+    const revalidar = () => {
+      soyDueno()
+        .then((es) => {
+          if (es) {
+            setSesion(true);
+            return;
+          }
+          setSesion(false);
+          setVista('portada');
+          setMensaje(null);
+        })
+        .catch(() => {
+          setSesion(false);
+          setVista('portada');
+        });
+    };
+    window.addEventListener('sesion-usuario', revalidar);
+    return () => window.removeEventListener('sesion-usuario', revalidar);
   }, []);
 
   function mostrarMensaje(texto, tipo = 'ok') {
@@ -463,7 +496,7 @@ export default function AdminProyectos() {
       const slugNuevo = creado.datos.slug;
       listaServicios = [...new Set([...serviciosSel, slugNuevo])];
       obtenerServicios()
-        .then((lista) => setListaServicios(lista))
+        .then((lista) => setListaServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
         .catch(() => {});
     }
     //la primera imagen del formulario es la portada y el resto la galeria del detalle
@@ -577,8 +610,19 @@ export default function AdminProyectos() {
   function irAMensajes() {
     setMensaje(null);
     setVista('mensajes');
-    cargarCantidadConversaciones();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  //entrar a la gestion de la cuenta y disparar la accion pedida
+  //(cuenta = agregar/cambiar cuenta, foto, nombre o eliminar)
+  function irACuenta(tipo) {
+    setMensaje(null);
+    //"cuenta" es solo el modal de agregar/cambiar cuenta: no hace falta cambiar de vista
+    if (tipo !== 'cuenta') {
+      setVista('cuenta');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setAccionCuenta({ tipo, n: Date.now() });
   }
 
   //filtra el menu superior: muestra solo los carruseles de esa categoria
@@ -809,7 +853,73 @@ export default function AdminProyectos() {
                 )}
               </button>
             ))}
-            <div className="pt-3 mt-3 border-t border-zinc-800">
+
+            {/*acciones de la cuenta: viven dentro del panel para no salir de /admin*/}
+            <div className="pt-3 mt-3 border-t border-zinc-800 space-y-1">
+              {[
+                {
+                  etiqueta: 'Agregar otra cuenta',
+                  accion: () => irACuenta('cuenta'),
+                  icono: (
+                    <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <path d="M15 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="8.5" cy="7" r="4" />
+                      <path d="M20 8v6" />
+                      <path d="M23 11h-6" />
+                    </svg>
+                  ),
+                },
+                {
+                  etiqueta: 'Cambiar foto',
+                  accion: () => irACuenta('foto'),
+                  icono: (
+                    <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <path d="M20 19V7a2 2 0 0 0-2-2h-3.5l-1.5-2h-6L8 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2Z" />
+                      <circle cx="12" cy="13" r="3.5" />
+                    </svg>
+                  ),
+                },
+                {
+                  etiqueta: 'Cambiar nombre',
+                  accion: () => irACuenta('nombre'),
+                  icono: (
+                    <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <path d="M4 7V5h16v2" />
+                      <path d="M12 5v14" />
+                      <path d="M9 19h6" />
+                    </svg>
+                  ),
+                },
+                {
+                  etiqueta: 'Eliminar cuenta',
+                  accion: () => irACuenta('eliminar'),
+                  peligro: true,
+                  icono: (
+                    <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      <line x1="10" y1="11" x2="10" y2="17" />
+                      <line x1="14" y1="11" x2="14" y2="17" />
+                    </svg>
+                  ),
+                },
+              ].map((item) => (
+                <button
+                  key={item.etiqueta}
+                  type="button"
+                  onClick={item.accion}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
+                    item.peligro
+                      ? 'text-red-400 hover:bg-red-500/10 hover:text-red-300'
+                      : 'text-zinc-300 hover:bg-zinc-800 hover:text-white'
+                  }`}
+                >
+                  {item.icono}
+                  <span className="flex-1 text-left">{item.etiqueta}</span>
+                </button>
+              ))}
+
               <button
                 type="button"
                 onClick={salir}
@@ -820,7 +930,7 @@ export default function AdminProyectos() {
                   <polyline points="16 17 21 12 16 7" />
                   <line x1="21" x2="9" y1="12" y2="12" />
                 </svg>
-                Salir
+                Cerrar sesión
               </button>
             </div>
           </nav>
@@ -1345,6 +1455,15 @@ export default function AdminProyectos() {
           {vista === 'mensajes' && (
             <AdminMensajes nombre={perfil?.nombre} alCambiar={cargarCantidadConversaciones} />
           )}
+
+          {/*mi cuenta: se monta siempre para que el menu pueda abrir el dialogo de agregar/cambiar
+              cuenta sin salir de la vista actual; el perfil solo se muestra en la vista "cuenta"*/}
+          <CuentaUsuario
+            sinEncabezado
+            ocultarAccesoAdmin
+            ocultarPerfil={vista !== 'cuenta'}
+            accionInicial={accionCuenta}
+          />
         </div>
       </div>
 

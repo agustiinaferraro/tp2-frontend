@@ -68,9 +68,13 @@ export default function Carrusel({
     actualizar();
     lista.addEventListener('scroll', actualizar, { passive: true });
     window.addEventListener('resize', actualizar);
+    //tambien cuando cambia el scrollWidth (contenido cambia, items renderizan) hay que recalcular
+    const obs = new ResizeObserver(actualizar);
+    obs.observe(lista);
     return () => {
       lista.removeEventListener('scroll', actualizar);
       window.removeEventListener('resize', actualizar);
+      obs.disconnect();
     };
   }, [cantidad, clave]);
 
@@ -108,10 +112,10 @@ export default function Carrusel({
   const claseDesborde = auto ? 'overflow-hidden' : 'overflow-x-auto snap-x';
 
   const claseFlecha = (desactivado) =>
-    `shrink-0 self-center w-11 h-11 rounded-full bg-black/80 border border-zinc-700 text-zinc-200 transition-all duration-200 cursor-pointer ${
+    `shrink-0 self-center w-11 h-11 rounded-full bg-black/80 border border-zinc-700 text-zinc-200 transition-all duration-200 ${
       desactivado
         ? 'opacity-40 cursor-not-allowed'
-        : 'hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90 active:bg-violeta-app active:text-black active:border-violeta-app'
+        : 'hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90 active:bg-violeta-app active:text-black active:border-violeta-app cursor-pointer'
     }`;
 
   return (

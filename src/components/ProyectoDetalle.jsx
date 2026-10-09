@@ -9,6 +9,7 @@ import SelectorImagenes from './SelectorImagenes.jsx';
 import Loading from './Loading.jsx';
 import Comentarios from './Comentarios.jsx';
 import { galeriaProyecto, textoVisitar, esDespliegue } from '../utils/proyectos.js';
+import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 
 //categorias conocidas (las que tienen paginas generadas en el build)
 //las nuevas no tienen pagina pero si se muestran como chip
@@ -65,7 +66,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
     });
 
     obtenerServicios()
-      .then((lista) => setServicios(lista))
+      .then((lista) => setServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
       .catch(() => {});
 
     if (!proyectoInicial) {
@@ -131,7 +132,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         const slugNuevo = creado.datos.slug;
         listaServicios = [...new Set([...serviciosSel, slugNuevo])];
         obtenerServicios()
-          .then((lista) => setServicios(lista))
+          .then((lista) => setServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
           .catch(() => {});
       }
 

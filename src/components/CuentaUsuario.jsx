@@ -91,7 +91,16 @@ function esRutaInterna(ruta) {
   return typeof ruta === 'string' && ruta.startsWith('/') && !ruta.startsWith('//');
 }
 
-export default function CuentaUsuario() {
+//sinEncabezado: se usa cuando la cuenta se embebe dentro del panel admin, para no repetir el titulo
+//ocultarAccesoAdmin: esconde el boton "Gestionar mis proyectos" cuando ya se esta en el panel
+//accionInicial: { tipo, n } que dispara el panel (foto | nombre | cuenta | eliminar) al tocar una opcion del menu
+//ocultarPerfil: deja montado solo el dialogo de cuentas (se usa en el panel cuando solo se pide "Agregar otra cuenta")
+export default function CuentaUsuario({
+  sinEncabezado = false,
+  ocultarAccesoAdmin = false,
+  accionInicial = null,
+  ocultarPerfil = false,
+}) {
   //la sesion se lee recien en el navegador (no existe en el servidor):
   //hasta que no este "montado" se dibuja el estado neutro para que el html del build y el del
   //navegador sean iguales (si no, react avisa del error de hidratacion en la consola)
@@ -116,6 +125,8 @@ export default function CuentaUsuario() {
   const [esDueno, setEsDueno] = useState(false);
   //input oculto para elegir la foto de perfil
   const fotoInputRef = useRef(null);
+  //input del nombre, para enfocarlo cuando se entra desde "Cambiar nombre" del panel
+  const nombreInputRef = useRef(null);
   //edicion del perfil: nombre y foto se editan y se confirman con un solo boton
   const [nombreEditado, setNombreEditado] = useState('');
   const [fotoNueva, setFotoNueva] = useState(null);
@@ -166,6 +177,25 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
       activo = false;
     };
   }, [sesion?.email]);
+
+  //cuando desde el menu del panel admin se pide "cambiar foto", "cambiar nombre",
+  //"agregar otra cuenta" o "eliminar cuenta", se abre directamente esa accion
+  useEffect(() => {
+    if (!sesion || !accionInicial?.tipo) return;
+    const tipo = accionInicial.tipo;
+    if (tipo === 'foto') {
+      fotoInputRef.current?.click();
+    } else if (tipo === 'nombre') {
+      nombreInputRef.current?.focus();
+    } else if (tipo === 'cuenta') {
+      setError('');
+      setVentana('cambiar');
+    } else if (tipo === 'eliminar') {
+      setError('');
+      setConfirmandoBorrado(true);
+    }
+    //cada toque del menu manda un objeto nuevo (con su marca "n"); por eso reacciona
+  }, [accionInicial, sesion]);
 
   //guarda la sesion devuelta por firebase, la suma a las cuentas guardadas y actualiza la pantalla
   //si viene del dialogo "agregar cuenta", al final lo cierra
@@ -443,20 +473,25 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   }
 
   return (
-    <section className="max-w-md mx-auto px-4 py-16" aria-label="Perfil">
-      <div className="text-center space-y-2 mb-8">
-        <h1 className="text-3xl font-extrabold text-white">Perfil</h1>
-        <p className="text-zinc-400">
-          {!montado
-            ? 'Cargando tu perfil...'
-            : sesion
-              ? `${sesion.nombre}, este es tu perfil`
-              : 'No estás registrado: sos Anónimo'}
-        </p>
-      </div>
+    <section
+      className={sinEncabezado ? '' : 'max-w-md mx-auto px-4 py-16'}
+      aria-label="Perfil"
+    >
+      {!ocultarPerfil && !sinEncabezado && (
+        <div className="text-center space-y-2 mb-8">
+          <h1 className="text-3xl font-extrabold text-white">Perfil</h1>
+          <p className="text-zinc-400">
+            {!montado
+              ? 'Cargando tu perfil...'
+              : sesion
+                ? `${sesion.nombre}, este es tu perfil`
+                : 'No estás registrado: sos Anónimo'}
+          </p>
+        </div>
+      )}
 
       {/*avisos de confirmacion: cambios guardados o cuenta eliminada*/}
-      {(guardado || aviso) && (
+      {!ocultarPerfil && (guardado || aviso) && (
         <p
           role="status"
           className="mb-4 text-sm text-center px-4 py-2 rounded-xl bg-verde-app/10 border border-verde-app/30 text-verde-app"
@@ -467,7 +502,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
 
       {/*antes de que se lea la sesion del navegador se ve un contenedor vacio,
           para que el html del build y el de la pagina coincidan*/}
-      {!montado ? (
+      {!ocultarPerfil && (!montado ? (
         <div className="rounded-2xl bg-zinc-900 border border-zinc-800 h-64" aria-hidden="true" />
       ) : sesion ? (
         <div className="rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden">
@@ -528,6 +563,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
             <div className="px-6 py-4">
               <p className="text-xs text-zinc-500 mb-1 uppercase tracking-wide">Nombre de usuario</p>
               <input
+                ref={nombreInputRef}
                 type="text"
                 maxLength={30}
                 value={nombreEditado}
@@ -563,7 +599,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                 Entrá a los proyectos y comentá los que más te gusten.
               </p>
               {error && <p role="alert" className="text-red-400 text-sm text-center">{error}</p>}
-              {esDueno && (
+              {esDueno && !ocultarAccesoAdmin && (
                 <a
                   href="/admin"
                   className="block w-full px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 text-black text-sm font-medium text-center transition-all duration-200 hover:scale-105 active:scale-95"
@@ -707,7 +743,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
             </div>
           )}
         </div>
-      )}
+      ))}
 
       {/*dialogo para cambiar o agregar cuentas (como en ig)*/}
       {ventana && (

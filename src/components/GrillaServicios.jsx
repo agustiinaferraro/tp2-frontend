@@ -10,6 +10,7 @@ import { obtenerProyectos } from '../api/proyectos.js';
 import ServicioCard from './ServicioCard.jsx';
 import Carrusel from './Carrusel.jsx';
 import Loading from './Loading.jsx';
+import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 
 //categorias de un proyecto: la lista nueva ("servicios") o la vieja ("servicio")
 function categoriasDeProyecto(proyecto) {
@@ -68,7 +69,7 @@ export default function GrillaServicios({ vista = 'carrusel' }) {
   //se ejecuta una vez al montar el componente: pide los servicios al backend
   useEffect(() => {
     obtenerServicios()
-      .then((datos) => setServicios(datos))
+      .then((datos) => setServicios(ordenarMotionAlFinal(datos, (s) => s.slug ?? s._id)))
       .catch((e) => setError(e.message))
       .finally(() => setCargando(false));
     //en paralelo trae los proyectos, que son la portada de cada rubro

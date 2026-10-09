@@ -263,16 +263,6 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
             {chat.cantidad} enviado{chat.cantidad === 1 ? '' : 's'}
             {respuestas > 0 && <> · {respuestas} tuyo{respuestas === 1 ? '' : 's'}</>}
           </span>
-          {/*elimina todo el chat con esta persona*/}
-          <button
-            type="button"
-            onClick={() => borrarChat(chat)}
-            aria-label="Eliminar chat"
-            title="Eliminar chat"
-            className="inline-flex items-center justify-center w-9 h-9 rounded-full text-zinc-400 hover:bg-red-500/15 hover:text-red-400 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
-          >
-            <IconoBasura className="w-5 h-5" />
-          </button>
         </div>
 
         {error && (
@@ -373,7 +363,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
             const textoUltimo = ultimo?.esRespuesta ? `Tú: ${ultimo.mensaje}` : ultimo?.mensaje ?? '';
             return (
               <li key={conversacion._id}>
-                <div className="group flex items-center gap-1 p-1.5 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-whatsapp/40 hover:bg-zinc-800/60 transition-all">
+                <div className="flex items-center gap-1 p-1.5 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-whatsapp/40 hover:bg-zinc-800/60 transition-all">
                   <button
                     type="button"
                     onClick={() => abrirChat(conversacion)}
@@ -395,13 +385,13 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
                       </span>
                     </span>
                   </button>
-                  {/*elimina el chat entero (aparece al pasar el mouse por la fila)*/}
+                  {/*elimina el chat entero (esta en la lista, no dentro del chat)*/}
                   <button
                     type="button"
                     onClick={() => borrarChat(conversacion)}
                     aria-label={`Eliminar el chat con ${conversacion.nombre}`}
                     title="Eliminar chat"
-                    className="self-stretch inline-flex items-center justify-center w-9 rounded-xl text-zinc-500 hover:bg-red-500/15 hover:text-red-400 active:scale-95 transition-all cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0"
+                    className="self-stretch inline-flex items-center justify-center w-9 rounded-xl text-zinc-500 hover:bg-red-500/15 hover:text-red-400 active:scale-95 transition-all cursor-pointer shrink-0"
                   >
                     <IconoBasura className="w-5 h-5" />
                   </button>

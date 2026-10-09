@@ -2,6 +2,7 @@
 import { paginasBusqueda } from "../data/busqueda.js";
 import { obtenerProyectosLigeros } from "../api/proyectos.js";
 import { obtenerServicios } from "../api/servicios.js";
+import { ordenarMotionAlFinal } from "../utils/ordenCategorias.js";
 
 //normaliza el texto para buscar sin acentos ni mayusculas
 function normalizar(texto) {
@@ -29,7 +30,7 @@ export default function Buscador() {
       .catch(() => {});
     obtenerServicios()
       .then((datos) => {
-        if (Array.isArray(datos)) setServicios(datos);
+        if (Array.isArray(datos)) setServicios(ordenarMotionAlFinal(datos, (s) => s.slug));
       })
       .catch(() => {});
   }

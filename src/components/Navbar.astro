@@ -21,7 +21,7 @@ const enlaces = [
 
 <header class="fixed top-0 inset-x-0 z-50 bg-black/80 backdrop-blur-md border-b border-zinc-800" data-activo={seccionActiva}>
   <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4" aria-label="Principal">
-   <a href="/#inicio" class="flex items-center gap-2 rounded-lg px-2 py-1 font-bold text-verde-app hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200">
+   <a href="/#inicio" class="flex items-center gap-2 rounded-lg px-2 py-1 font-bold text-verde-app">
       <img src="/img/logo.png" alt="Logo" class="w-15 h-15 object-cover rounded-full"/>
     </a>
 
@@ -40,12 +40,7 @@ const enlaces = [
         ))
       }
       <li>
-        <a href="/perfil" data-link="perfil" class="nav-link text-sm text-zinc-300 hover:text-white transition-colors">
-          Perfil
-        </a>
-      </li>
-      <li>
-        <AvatarAdmin client:idle />
+        <AvatarAdmin client:idle seccionActiva={seccionActiva} />
       </li>
     </ul>
 
@@ -80,7 +75,7 @@ const enlaces = [
       }
       {/*el avatar ya es el acceso al perfil: no se repite el link de texto*/}
       <li>
-        <AvatarAdmin client:idle />
+        <AvatarAdmin client:idle seccionActiva={seccionActiva} />
       </li>
     </ul>
   </div>

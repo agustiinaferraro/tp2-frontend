@@ -1,9 +1,9 @@
-//grilla de proyectos (parte dinamica de la seccion)
+//listado de proyectos (parte dinamica de la seccion)
 //se apoya en la capa de datos (api/proyectos.js) para obtener la informacion
 //maneja los estados: "cargando", "con datos", "sin datos" y "error"
-//los chips de arriba filtran la grilla por categoria (interaccion significativa)
+//los chips de arriba filtran por categoria (interaccion significativa)
 //un proyecto puede estar en varias categorias (campo "servicios") y aparece en todas
-//si la url trae ?id=, en lugar de la grilla muestra el detalle de ese proyecto
+//si la url trae ?id=, en lugar del listado muestra el detalle de ese proyecto
 import { useEffect, useState } from 'react';
 import { obtenerProyectos } from '../api/proyectos.js';
 import { obtenerServicios } from '../api/servicios.js';
@@ -11,6 +11,7 @@ import ProyectoDetalle from './ProyectoDetalle.jsx';
 import ProyectoCard from './ProyectoCard.jsx';
 import Carrusel, { TARJETA_CARRUSEL } from './Carrusel.jsx';
 import Loading from './Loading.jsx';
+import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 
 //marca interna para el chip "sin categoria"
 const SIN_CATEGORIA = '__sin_categoria__';
@@ -49,7 +50,7 @@ function SeccionCarrusel({ clave, nombre, items }) {
   );
 }
 
-//version grilla (pagina de proyectos): todas las tarjetas a la vista, sin flechas
+//version grilla: todas las tarjetas de una seccion a la vista (se usa al tocar un filtro)
 function SeccionGrilla({ nombre, items }) {
   return (
     <section aria-label={`Proyectos de ${nombre}`} className="space-y-4">
@@ -68,6 +69,8 @@ function SeccionGrilla({ nombre, items }) {
   );
 }
 
+//version con carruseles (pagina de proyectos): una seccion por categoria,
+//igual que la portada del panel admin, cada una con su carrusel horizontal
 export default function GrillaProyectos({ vista = 'carrusel' }) {
   const [proyectos, setProyectos] = useState([]);
   const [servicios, setServicios] = useState([]);
@@ -111,18 +114,22 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
     return () => window.removeEventListener('popstate', alVolverPagina);
   }, []);
 
-  //categorias con proyectos para mostrar como chips de filtro
-  const conCategoria = [
+  //categorias con proyectos para mostrar como chips de filtro (motion graphics al final)
+  const conCategoria = ordenarMotionAlFinal([
     ...new Set(proyectos.flatMap((p) => categoriasDeProyecto(p))),
-  ];
+  ]);
   const tieneSinCategoria = proyectos.some((p) => categoriasDeProyecto(p).length === 0);
   const categorias = [
     { slug: '', nombre: 'Todos' },
-    ...conCategoria.map((slug) => ({
+    ...ordenarMotionAlFinal([
+      ...conCategoria,
+      ...(tieneSinCategoria ? [SIN_CATEGORIA] : []),
+    ]).map((slug) => ({
       slug,
-      nombre: servicios.find((s) => s.slug === slug)?.nombre ?? slug,
+      nombre: slug === SIN_CATEGORIA
+        ? 'Sin categoría'
+        : (servicios.find((s) => s.slug === slug)?.nombre ?? slug),
     })),
-    ...(tieneSinCategoria ? [{ slug: SIN_CATEGORIA, nombre: 'Sin categoría' }] : []),
   ];
 
   //proyectos que entran en una categoria (o los que no tienen ninguna)
@@ -143,15 +150,18 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
   const nombreCarrusel = categoria === '' ? 'Todos los proyectos' : nombreDeCategoria(categoria);
 
   //en la grilla cada categoria lleva su propio titulo: con "Todos" se muestran todas juntas,
-  //y al elegir un chip queda solo esa
+  //y al elegir un chip queda solo esa. motion graphics va al final (ver ordenarMotionAlFinal)
   const grupos =
     categoria === ''
-      ? [
-          ...conCategoria.map((slug) => ({ slug, nombre: nombreDeCategoria(slug), items: proyectosDeCategoria(slug) })),
-          ...(tieneSinCategoria
-            ? [{ slug: SIN_CATEGORIA, nombre: 'Sin categoría', items: proyectosDeCategoria(SIN_CATEGORIA) }]
-            : []),
-        ].filter((g) => g.items.length > 0)
+      ? ordenarMotionAlFinal(
+          [
+            ...conCategoria.map((slug) => ({ slug, nombre: nombreDeCategoria(slug), items: proyectosDeCategoria(slug) })),
+            ...(tieneSinCategoria
+              ? [{ slug: SIN_CATEGORIA, nombre: 'Sin categoría', items: proyectosDeCategoria(SIN_CATEGORIA) }]
+              : []),
+          ].filter((g) => g.items.length > 0),
+          (g) => g.slug,
+        )
       : [{ slug: categoria, nombre: nombreCarrusel, items: visibles }];
 
   //estado: detalle de un proyecto (al llegar con ?id= o al tocar una tarjeta)
@@ -226,14 +236,27 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
       )}
 
       {vista === 'grilla' ? (
-        grupos.length === 0 ? (
+        categoria === '' ? (
+          //"Todos": un carrusel horizontal por seccion (como la portada del panel admin)
+          grupos.length === 0 ? (
+            <p className="text-zinc-400 text-center">No hay proyectos en esta categoría todavía.</p>
+          ) : (
+            <div className="space-y-12">
+              {grupos.map((grupo) => (
+                <SeccionCarrusel
+                  key={grupo.slug}
+                  clave={`todos:${grupo.slug}`}
+                  nombre={grupo.nombre}
+                  items={grupo.items}
+                />
+              ))}
+            </div>
+          )
+        ) : visibles.length === 0 ? (
+          //con un filtro elegido: los proyectos de esa seccion en grilla
           <p className="text-zinc-400 text-center">No hay proyectos en esta categoría todavía.</p>
         ) : (
-          <div className="space-y-12">
-            {grupos.map((grupo) => (
-              <SeccionGrilla key={grupo.slug} nombre={grupo.nombre} items={grupo.items} />
-            ))}
-          </div>
+          <SeccionGrilla nombre={nombreCarrusel} items={visibles} />
         )
       ) : visibles.length === 0 ? (
         <p className="text-zinc-400 text-center">No hay proyectos en esta categoría todavía.</p>
