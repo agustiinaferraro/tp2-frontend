@@ -2,12 +2,15 @@
 //primero se muestra la lista de conversaciones (una por cuenta/persona), como en whatsapp:
 //nombre de la persona, el ultimo mensaje, la hora y la cantidad de mensajes que mando
 //al tocar una se abre el hilo completo (burbujas) y se puede responder
+//los mensajes se ven en orden cronologico: el mas viejo arriba y el nuevo abajo (como whatsapp)
+//se puede borrar un mensaje suelto o el chat entero
 //la lista se refresca sola cada pocos segundos (no hace falta boton de refrescar)
 //depende de una sesion ya iniciada por la dueña del sitio
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   obtenerConversaciones,
   borrarMensaje,
+  borrarConversacion,
   responderConversacion,
 } from '../api/mensajes.js';
 import Loading from './Loading.jsx';
@@ -48,6 +51,17 @@ function formatearHora(fechaISO) {
   return fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
 }
 
+//el backend manda los mensajes del mas nuevo al mas viejo; aca se dan vuelta a cronologico
+//(el primero que mando la persona arriba y el ultimo abajo), como se lee una charla
+function ordenarConversacion(conversacion) {
+  return {
+    ...conversacion,
+    mensajes: [...conversacion.mensajes].sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+    ),
+  };
+}
+
 //avatar circular con la inicial de la persona (como las fotos de los chats)
 function AvatarInicial({ nombre, className }) {
   const saludo = nombre || 'Contacto';
@@ -82,6 +96,19 @@ function IconoEnviar({ className }) {
   );
 }
 
+//icono de tacho de basura para eliminar un chat
+function IconoBasura({ className }) {
+  return (
+    <svg aria-hidden="true" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
+    </svg>
+  );
+}
+
 export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, sinEncabezado = false }) {
   const [conversaciones, setConversaciones] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -92,6 +119,8 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
   const [respuesta, setRespuesta] = useState('');
   //true mientras se envia la respuesta (deshabilita el boton)
   const [enviando, setEnviando] = useState(false);
+  //referencia al final del hilo para bajar el scroll cuando llega o se manda un mensaje
+  const finDelHiloRef = useRef(null);
 
   //trae las conversaciones. silencioso=true para el refresco automatico
   //(no muestra el spinner ni pisa la pantalla mientras el usuario lee)
@@ -99,7 +128,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
     if (!silencioso) setCargando(true);
     setError(null);
     obtenerConversaciones()
-      .then(setConversaciones)
+      .then((lista) => setConversaciones(lista.map(ordenarConversacion)))
       .catch((e) => setError(e.message))
       .finally(() => {
         if (!silencioso) setCargando(false);
@@ -122,6 +151,12 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
       setChat(fresco);
     }
   }, [conversaciones, chat]);
+
+  //baja el scroll al final cada vez que se abre un chat o entra/manda un mensaje
+  useEffect(() => {
+    const caja = finDelHiloRef.current;
+    if (caja) caja.scrollTop = caja.scrollHeight;
+  }, [chat?._id, chat?.mensajes.length]);
 
   function abrirChat(conversacion) {
     setChat(conversacion);
@@ -157,6 +192,24 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
     }
   }
 
+  //elimina la conversacion completa (todo el chat con esa persona)
+  async function borrarChat(conversacion) {
+    if (!window.confirm(`¿Eliminar todo el chat con ${conversacion.nombre}? No se puede deshacer.`)) return;
+    setError(null);
+    try {
+      await borrarConversacion(conversacion._id);
+      //si era el chat abierto, se vuelve a la lista
+      if (chat?._id === conversacion._id) {
+        setChat(null);
+        setRespuesta('');
+      }
+      cargar(true);
+      if (alCambiar) alCambiar();
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
   //guarda la respuesta de la dueña dentro del chat y la muestra como burbuja propia
   async function enviarRespuesta(evento) {
     evento.preventDefault();
@@ -166,8 +219,8 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
     setError(null);
     try {
       const cuerpo = await responderConversacion(chat._id, texto, nombre);
-      //el nuevo mensaje va primero porque el hilo esta ordenado de mas nuevo a mas viejo
-      setChat({ ...chat, mensajes: [cuerpo.datos, ...chat.mensajes] });
+      //la respuesta se agrega al final: queda debajo del mensaje que mando la persona
+      setChat({ ...chat, mensajes: [...chat.mensajes, cuerpo.datos] });
       setRespuesta('');
     } catch (e) {
       setError(claveIncorrecta(e) ? 'La sesión expiró. Volvé a entrar.' : e.message);
@@ -176,24 +229,18 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
     }
   }
 
-  //arma el mail de respuesta con lo escrito (o un texto generico si esta vacio)
-  function responderPorMail() {
-    const texto = respuesta.trim();
-    const asunto = `Re: tu mensaje en mi portfolio`;
-    const cuerpo = texto || `Hola ${chat.nombre}, te respondo a tu consulta.`;
-    window.open(
-      `mailto:${chat.email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`,
-      '_blank'
-    );
-  }
-
   //hilo con los mensajes de una persona (burbujas estilo whatsapp) y caja para responder
   if (chat) {
     const respuestas = chat.mensajes.filter((m) => m.esRespuesta).length;
     return (
-      <section aria-label={`Chat con ${chat.nombre}`} className="space-y-3 text-left">
+      //alto fijo (como una ventana de chat): el header y la barra de escribir quedan fijos
+      //y solo se desplaza la lista de mensajes de adentro
+      <section
+        aria-label={`Chat con ${chat.nombre}`}
+        className="flex flex-col gap-3 h-[34rem] text-left"
+      >
         {/*cabecera del chat: volver, avatar, nombre y email*/}
-        <div className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-900 border border-zinc-800">
+        <div className="shrink-0 flex items-center gap-3 p-3 rounded-2xl bg-zinc-900 border border-zinc-800">
           <button
             type="button"
             onClick={volverAlista}
@@ -216,17 +263,30 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
             {chat.cantidad} enviado{chat.cantidad === 1 ? '' : 's'}
             {respuestas > 0 && <> · {respuestas} tuyo{respuestas === 1 ? '' : 's'}</>}
           </span>
+          {/*elimina todo el chat con esta persona*/}
+          <button
+            type="button"
+            onClick={() => borrarChat(chat)}
+            aria-label="Eliminar chat"
+            title="Eliminar chat"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-full text-zinc-400 hover:bg-red-500/15 hover:text-red-400 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
+          >
+            <IconoBasura className="w-5 h-5" />
+          </button>
         </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-400 px-1">
+          <p role="alert" className="shrink-0 text-sm text-red-400 px-1">
             {error}
           </p>
         )}
 
-        {/*hilo de mensajes: lo que manda la persona a la izquierda (gris)
+        {/*hilo de mensajes (unico que hace scroll): lo que manda la persona a la izquierda (gris)
             y lo que responde la dueña a la derecha (verde, como whatsapp)*/}
-        <ul className="space-y-2 max-h-[60vh] overflow-y-auto p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800">
+        <ul
+          ref={finDelHiloRef}
+          className="flex-1 min-h-0 space-y-2 overflow-y-auto p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800"
+        >
           {chat.mensajes.map((mensaje) => (
             <li key={mensaje._id} className={mensaje.esRespuesta ? 'flex justify-end' : 'flex justify-start'}>
               <div
@@ -257,7 +317,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
         </ul>
 
         {/*caja para responder (como la barra de escritura de whatsapp)*/}
-        <form onSubmit={enviarRespuesta} className="flex items-center gap-2">
+        <form onSubmit={enviarRespuesta} className="shrink-0 flex items-center gap-2">
           <label htmlFor="admin-respuesta" className="sr-only">
             Responder en este chat
           </label>
@@ -278,13 +338,6 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
             <IconoEnviar className="w-5 h-5 -ml-0.5" />
           </button>
         </form>
-        <button
-          type="button"
-          onClick={responderPorMail}
-          className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors px-1"
-        >
-          Responder por mail
-        </button>
       </section>
     );
   }
@@ -316,31 +369,43 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
       ) : (
         <ul className="space-y-1.5">
           {conversaciones.map((conversacion) => {
-            const ultimo = conversacion.mensajes[0];
+            const ultimo = conversacion.mensajes[conversacion.mensajes.length - 1];
             const textoUltimo = ultimo?.esRespuesta ? `Tú: ${ultimo.mensaje}` : ultimo?.mensaje ?? '';
             return (
               <li key={conversacion._id}>
-                <button
-                  type="button"
-                  onClick={() => abrirChat(conversacion)}
-                  className="w-full flex items-center gap-3 p-3 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-whatsapp/40 hover:bg-zinc-800/60 active:scale-[0.99] transition-all cursor-pointer text-left"
-                >
-                  <AvatarInicial nombre={conversacion.nombre} className="w-12 h-12 text-lg" />
-                  <span className="flex-1 min-w-0">
-                    <span className="flex items-baseline justify-between gap-3">
-                      <span className="font-semibold text-white truncate">{conversacion.nombre}</span>
-                      <span className="text-[11px] text-zinc-500 shrink-0">{formatearChat(conversacion.ultimaFecha)}</span>
+                <div className="group flex items-center gap-1 p-1.5 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-whatsapp/40 hover:bg-zinc-800/60 transition-all">
+                  <button
+                    type="button"
+                    onClick={() => abrirChat(conversacion)}
+                    className="flex-1 min-w-0 flex items-center gap-3 p-2 rounded-xl active:scale-[0.99] transition-all cursor-pointer text-left"
+                  >
+                    <AvatarInicial nombre={conversacion.nombre} className="w-12 h-12 text-lg" />
+                    <span className="flex-1 min-w-0">
+                      <span className="flex items-baseline justify-between gap-3">
+                        <span className="font-semibold text-white truncate">{conversacion.nombre}</span>
+                        <span className="text-[11px] text-zinc-500 shrink-0">{formatearChat(conversacion.ultimaFecha)}</span>
+                      </span>
+                      <span className="flex items-center justify-between gap-3 mt-0.5">
+                        <span className="text-sm text-zinc-400 truncate">{textoUltimo}</span>
+                        {conversacion.cantidad > 0 && (
+                          <span className="shrink-0 min-w-[20px] text-center text-xs px-1.5 py-0.5 rounded-full bg-whatsapp text-black font-semibold">
+                            {conversacion.cantidad}
+                          </span>
+                        )}
+                      </span>
                     </span>
-                    <span className="flex items-center justify-between gap-3 mt-0.5">
-                      <span className="text-sm text-zinc-400 truncate">{textoUltimo}</span>
-                      {conversacion.cantidad > 0 && (
-                        <span className="shrink-0 min-w-[20px] text-center text-xs px-1.5 py-0.5 rounded-full bg-whatsapp text-black font-semibold">
-                          {conversacion.cantidad}
-                        </span>
-                      )}
-                    </span>
-                  </span>
-                </button>
+                  </button>
+                  {/*elimina el chat entero (aparece al pasar el mouse por la fila)*/}
+                  <button
+                    type="button"
+                    onClick={() => borrarChat(conversacion)}
+                    aria-label={`Eliminar el chat con ${conversacion.nombre}`}
+                    title="Eliminar chat"
+                    className="self-stretch inline-flex items-center justify-center w-9 rounded-xl text-zinc-500 hover:bg-red-500/15 hover:text-red-400 active:scale-95 transition-all cursor-pointer opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0"
+                  >
+                    <IconoBasura className="w-5 h-5" />
+                  </button>
+                </div>
               </li>
             );
           })}

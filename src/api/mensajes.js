@@ -40,3 +40,9 @@ export function responderConversacion(email, respuesta, nombre) {
 export function borrarMensaje(id) {
   return peticionAdmin('DELETE', `/api/mensajes/${id}`);
 }
+
+//borra una conversacion completa (todo el chat de esa persona) - solo la dueña
+//email es el id de la conversacion (el email normalizado de esa persona)
+export function borrarConversacion(email) {
+  return peticionAdmin('DELETE', `/api/mensajes/conversaciones/${encodeURIComponent(email)}`);
+}
