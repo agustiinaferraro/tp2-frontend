@@ -19,7 +19,7 @@ import { comprimirImagen } from '../utils/imagen.js';
 import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 import AdminMensajes from './AdminMensajes.jsx';
 import AdminProyectoCard from './AdminProyectoCard.jsx';
-import CuentaUsuario from './CuentaUsuario.jsx';
+import CuentaUsuario from './CuentaUsuario.jsx';import HistorialProyectos from './HistorialProyectos.jsx';;
 import Loading from './Loading.jsx';
 import SelectorImagenes from './SelectorImagenes.jsx';
 
@@ -822,6 +822,12 @@ export default function AdminProyectos() {
                 ),
               },
               {
+                etiqueta: 'Historial',
+                accion: () => { setVista('historial'); setMensaje(null); },
+                activo: vista === 'historial',
+                icono: (<svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>),
+              },
+              {
                 etiqueta: 'Chats',
                 accion: irAMensajes,
                 activo: vista === 'mensajes',
@@ -1454,6 +1460,13 @@ export default function AdminProyectos() {
 
           {vista === 'mensajes' && (
             <AdminMensajes nombre={perfil?.nombre} alCambiar={cargarCantidadConversaciones} />
+          )}
+
+          {vista === 'historial' && (
+            <div className='rounded-2xl bg-zinc-900 border border-zinc-800 p-4'>
+              <h2 className='text-lg font-semibold text-white mb-3'>Historial de proyectos</h2>
+              <HistorialProyectos alRestaurar={cargarProyectos} />
+            </div>
           )}
 
           {/*mi cuenta: se monta siempre para que el menu pueda abrir el dialogo de agregar/cambiar
