@@ -8,7 +8,7 @@ El proyecto está separado en dos repositorios: **este** (el frontend, sitio web
 
 ## Propuesta y público
 
-Un portfolio personal que presenta a Agustina Ferraro como diseñadora multimedia y desarrolladora full stack. Combina una página institucional (inicio, sobre mí, servicios, contacto) con una **sección de proyectos dinámica y administrable**: los proyectos viven en una base de datos, se cargan con un panel propio con clave, se filtran por categoría, y cada uno abre un **detalle tipo Behance** con galería de imágenes.
+Un portfolio personal que presenta a Agustina Ferraro como diseñadora multimedia y desarrolladora full stack. Combina una página institucional (inicio, sobre mí, servicios, contacto) con una **sección de proyectos dinámica y administrable**: los proyectos viven en una base de datos, se cargan con un panel propio accesible con la cuenta de la dueña, se filtran por categoría, y cada uno abre un **detalle tipo Behance** con galería de imágenes.
 
 La propuesta busca comunicar identidad (paleta oscura con violeta en los botones y verde en los detalles de texto, tipografía limpia, microanimaciones) y a la vez demostrar un recorrido técnico completo: sitio estático con Astro + componentes React interactivos, una API REST propia y una base remota. El público es tanto alguien que visita el portfolio como quien evalúa el trabajo: se puede recorrer la web como visitante o entrar al panel `/admin` para gestionar el contenido.
 
@@ -64,17 +64,20 @@ yarn preview       # sirve localmente la versión generada
 - **Deploy en Vercel**: un proyecto por repositorio; cada `push` a `main` redespliega.
 - **Cada tarjeta de proyecto abre un detalle propio** (`/proyectos/?id=`), no redirige a Behance. Al ser el sitio estático, el detalle se resuelve por parámetro en la URL en lugar de una ruta dinámica que Astro no puede pregenerar para ids arbitrarios.
 - **Imágenes en base64** guardadas en MongoDB, comprimidas en el navegador antes de subir para respetar el límite de tamaño de request de Vercel.
-- **Panel de administración** protegido por usuario y clave (variables de entorno), con sesión compartida con el detalle vía `sessionStorage`.
+- **Panel de administración** que solo se abre con la **cuenta de la dueña en Firebase** (el backend valida el token en cada operación de escritura); admite varias cuentas guardadas en el navegador y **cambio de cuenta desde el panel**, y expone un **historial de proyectos con restauración**.
 
 ## Componentes propios relevantes
 
 - **`Buscador`**: busca en los proyectos (sin imágenes, para ser liviano) por título, descripción o tags y muestra resultados en vivo.
 - **`GrillaProyectos`**: carga los proyectos desde la API, muestra **chips de filtro por categoría** (interacción significativa, modifica qué proyectos se ven), maneja los estados de carga/error/ausencia y resuelve el detalle por `?id=` sincronizando el historial del navegador (botón "atrás").
-- **`ProyectoDetalle`**: vista tipo Behance de un proyecto (galería de imágenes con miniaturas, tags, categoría, link). Si entrás con la clave de admin, permite **editar** todo (incluida la categoría o crear una nueva) y cambiar imágenes.
+- **`ProyectoDetalle`**: vista tipo Behance de un proyecto (galería de imágenes con miniaturas, tags, categoría, link). Si estás logueada con la cuenta de la dueña, permite **editar** todo (incluida la categoría o crear una nueva) y cambiar imágenes.
 - **`SelectorImagenes`**: sube varias imágenes a la vez, las comprime en el navegador, controla el presupuesto de peso total y marca la primera como portada. Se usa tanto en el panel como en el detalle.
-- **`AdminProyectos`**: panel completo (acceso con la cuenta de la dueña, alta/edición/borrado de proyectos, categorías nuevas). Toda la lógica admin.
+- **`AdminProyectos`**: panel completo (solo se abre con la cuenta de la dueña, verificada por el backend con token de Firebase), con alta/edición/borrado de proyectos, categorías nuevas, chats y mensajes, y menú de cuenta. Toda la lógica admin.
+- **`CuentaUsuario`**: perfil y gestión de cuentas (entrar, registrarse, varias cuentas guardadas como en Instagram, cambio de cuenta, cerrar y eliminar cuenta). Si la sesión es la de la dueña, `/perfil` abre directo el panel.
+- **`HistorialProyectos`**: dentro del panel, registra cada alta, edición y borrado de proyectos; lo eliminado se puede **restaurar en un click** (y no duplica si el proyecto ya existe).
 - **`ServicioDetalle`**: página dinámica por servicio (slug) que trae de la API el servicio y lista los proyectos de esa categoría.
 - **`Contacto` / `AdminMensajes`**: formulario de contacto persistido en la base y bandeja de mensajes para el admin.
+- **`Comentarios`**: comentarios por proyecto con la sesión del visitante (se muestran en el detalle).
 
 ## Fuente dinámica / API
 
@@ -85,6 +88,7 @@ El frontend consume la **propia API REST** (`https://agustinaportfolio-api.verce
 - `GET /api/servicios` — categorías/servicios (y `POST /api/servicios` para crear categorías desde admin).
 - `POST /api/mensajes` — mensajes del formulario de contacto.
 - `POST/PUT/DELETE /api/proyectos/:id`, `GET /api/admin/soy-dueno` — operaciones admin protegidas por la sesión de la dueña (token de Firebase).
+- `GET /api/historial-proyectos` y `POST /api/historial-proyectos/restaurar/:id` — historial de movimientos y restauración de proyectos borrados (admin).
 
 Como **fuente externa**, el script `backend/scripts/importar-behance.js` consume el **feed RSS público de Behance** (`https://www.behance.net/agustiinaferraro.rss`) para poblar la base con títulos, descripciones, links y miniaturas de los proyectos publicados en Behance. El sitio no depende de Behance en runtime: solo se importa y la web siempre lee de MongoDB.
 
