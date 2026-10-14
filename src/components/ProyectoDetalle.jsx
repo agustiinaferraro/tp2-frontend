@@ -8,7 +8,7 @@ import { soyDueno, borrarSesion as borrarSesionUsuario } from '../api/usuarios.j
 import SelectorImagenes from './SelectorImagenes.jsx';
 import Loading from './Loading.jsx';
 import Comentarios from './Comentarios.jsx';
-import { galeriaProyecto, textoVisitar, esDespliegue } from '../utils/proyectos.js';
+import { galeriaProyecto, textoVisitar, esDespliegue, esBehance } from '../utils/proyectos.js';
 import { urlVideoCcV } from '../api/behance.js';
 import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 
@@ -48,6 +48,9 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
   //formulario de edicion
   const [titulo, setTitulo] = useState('');
   const [resumen, setResumen] = useState('');
+  //true = el titulo/la descripcion los actualiza behance; false = el texto tuyo tiene prioridad
+  const [tituloBehance, setTituloBehance] = useState(true);
+  const [resumenBehance, setResumenBehance] = useState(true);
   const [link, setLink] = useState('');
   const [video, setVideo] = useState('');
   const [tagsTexto, setTagsTexto] = useState('');
@@ -125,6 +128,8 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
     if (!proyecto) return;
     setTitulo(proyecto.titulo ?? '');
     setResumen(proyecto.resumen ?? '');
+    setTituloBehance(!proyecto.tituloManual);
+    setResumenBehance(!proyecto.resumenManual);
     setLink(proyecto.link ?? '');
     setVideo(proyecto.video ?? '');
     setTagsTexto((proyecto.tags ?? []).join(', '));
@@ -182,6 +187,9 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         imagen: imagenes[0] ?? '',
         imagenes: imagenes.slice(1),
         destacado,
+        //marcan el texto como propio cuando el checkbox de behance queda desactivado
+        tituloManual: !tituloBehance,
+        resumenManual: !resumenBehance,
       };
 
       const actualizado = await actualizarProyecto(id, datos);
@@ -267,9 +275,10 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
   const urlVideo = esEmbedCcV ? mp4Resuelto : (proyecto.video ?? '');
 
   //ficha del proyecto tal como behance la muestra: la descripcion completa solo se muestra
-  //si aporta algo mas que el resumen que ya esta arriba (si no, seria repetir lo mismo)
+  //si aporta algo mas que el resumen que ya esta arriba (si no, seria repetir lo mismo);
+  //y si la descripcion es tuya (editada desde el panel), tu texto manda y no se muestra la de behance
   const descripcionLarga =
-    proyecto.descripcionCompleta && proyecto.descripcionCompleta !== proyecto.resumen
+    !proyecto.resumenManual && proyecto.descripcionCompleta && proyecto.descripcionCompleta !== proyecto.resumen
       ? proyecto.descripcionCompleta
       : '';
   const palabrasClave = (proyecto.palabrasClave ?? []).filter(Boolean);
@@ -493,10 +502,30 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
               id="det-titulo"
               type="text"
               value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
+              onChange={(e) => {
+                //si el texto se aleja del que esta guardado, pasa a ser tuyo y behance deja de pisarlo
+                setTitulo(e.target.value);
+                if (e.target.value !== (proyecto.titulo ?? '')) setTituloBehance(false);
+              }}
               placeholder="Nombre del proyecto"
               className={claseInput}
             />
+            {/*solo los proyectos de behance tienen texto que sincronizar*/}
+            {esBehance(proyecto) && (
+              <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={tituloBehance}
+                  onChange={(e) => setTituloBehance(e.target.checked)}
+                  className="w-4 h-4 accent-verde-app cursor-pointer"
+                />
+                {tituloBehance
+                  ? titulo !== (proyecto.titulo ?? '')
+                    ? 'Behance lo reescribirá en la próxima sincronización (hasta 6 horas)'
+                    : 'Behance actualiza este título en cada sincronización'
+                  : 'Tu título tiene prioridad: behance no lo pisa'}
+              </label>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -506,11 +535,30 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
             <textarea
               id="det-resumen"
               value={resumen}
-              onChange={(e) => setResumen(e.target.value)}
+              onChange={(e) => {
+                //igual que el titulo: al editar el texto pasa a ser tuyo
+                setResumen(e.target.value);
+                if (e.target.value !== (proyecto.resumen ?? '')) setResumenBehance(false);
+              }}
               placeholder="Contá de qué se trata el proyecto..."
               rows={4}
               className={`${claseInput} resize-y`}
             />
+            {esBehance(proyecto) && (
+              <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={resumenBehance}
+                  onChange={(e) => setResumenBehance(e.target.checked)}
+                  className="w-4 h-4 accent-verde-app cursor-pointer"
+                />
+                {resumenBehance
+                  ? resumen !== (proyecto.resumen ?? '')
+                    ? 'Behance la reescribirá en la próxima sincronización (hasta 6 horas)'
+                    : 'Behance actualiza esta descripción en cada sincronización'
+                  : 'Tu descripción tiene prioridad: behance no la pisa'}
+              </label>
+            )}
           </div>
 
           <div className="space-y-1">
