@@ -960,7 +960,7 @@ export default function AdminProyectos() {
                     <IconoImagen className="w-4 h-4" />
                   </button>
                 </div>
-                <div className="flex items-end justify-between px-4 sm:px-6 -mt-12 pb-4">
+                <div className="flex items-end justify-between px-4 sm:px-6 -mt-8 sm:-mt-10 pb-4">
                   <div className="flex items-end gap-3 sm:gap-4 min-w-0">
                     <div className="relative shrink-0">
                       <div className="w-20 sm:w-24 h-20 sm:h-24 rounded-full overflow-hidden bg-zinc-800 border-4 border-black flex items-center justify-center text-zinc-500">
