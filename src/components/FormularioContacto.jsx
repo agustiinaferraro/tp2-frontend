@@ -84,7 +84,7 @@ export default function FormularioContacto() {
     contenido = <AdminMensajes nombre={sesion.nombre} sinEncabezado />;
   } else if (sesion?.token) {
     //estado: persona logueada → chat directo con la admin (muestra su charla y puede seguir mandando)
-    contenido = <ChatVisitante sesion={sesion} />;
+    contenido = <ChatVisitante sesion={sesion} whatsapp={telefonoWhatsapp} />;
   } else {
     //estado: sin cuenta → se pide registrarse/entrar para poder escribir
     contenido = (
@@ -93,8 +93,8 @@ export default function FormularioContacto() {
           Para escribirme necesitás una cuenta.
         </p>
         <p className="text-sm text-zinc-400 leading-relaxed">
-          Creá tu cuenta o entrá y vas a poder hablar directo conmigo:
-          tu mensaje y la respuesta quedan en un chat. Al entrar volvés acá sola.
+          Creá tu cuenta o entrá y vas a poder hablar directo conmigo: tu mensaje queda en el
+          chat y además se envía a mi WhatsApp. Al entrar volvés acá sola.
         </p>
         <div className="flex flex-wrap gap-3">
           <a
