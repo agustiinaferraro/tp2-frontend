@@ -179,6 +179,21 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     setAviso(`Entrá con la contraseña de ${pendiente} para cambiar de cuenta.`);
   }, []);
 
+  //en la pagina /perfil, si la cuenta logueada es la dueña del sitio,
+  //se abre directo el panel de administracion (no tiene sentido ver el perfil ahi)
+  useEffect(() => {
+    if (sinEncabezado || !sesion?.email) return;
+    let vivo = true;
+    soyDueno()
+      .then((es) => {
+        if (es && vivo) window.location.assign('/admin');
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, [sesion?.email, sinEncabezado]);
+
   //dice si la cuenta logueada es la dueña del sitio (para mostrar el acceso al panel)
   useEffect(() => {
     if (!sesion?.email) {
