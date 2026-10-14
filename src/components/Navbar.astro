@@ -73,9 +73,9 @@ const enlaces = [
           </li>
         ))
       }
-      {/*el avatar ya es el acceso al perfil: no se repite el link de texto*/}
+      {/*el perfil entra como una fila mas del menu, alineado a la izquierda como los demas links*/}
       <li>
-        <AvatarAdmin client:idle seccionActiva={seccionActiva} />
+        <AvatarAdmin client:idle seccionActiva={seccionActiva} enMenuMovil />
       </li>
     </ul>
   </div>

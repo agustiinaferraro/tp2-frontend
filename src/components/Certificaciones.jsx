@@ -125,7 +125,7 @@ export default function Certificaciones({ certificaciones = [] }) {
             //solo se cierra tocando el fondo: los clics en la foto, el texto o las flechas no
             if (e.target === e.currentTarget) setAbierta(null);
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 overflow-y-auto animacion-aparecer"
+          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 pt-16 sm:pt-4 bg-black/80 overflow-y-auto animacion-aparecer"
         >
           {/*cruz para cerrar*/}
           <button
@@ -137,25 +137,26 @@ export default function Certificaciones({ certificaciones = [] }) {
             <Cruz />
           </button>
 
-          {/*flecha al certificado anterior*/}
+          {/*flecha al certificado anterior: en escritorio queda a los costados de la foto,
+          en mobile no se superpone (las de abajo reemplazan a estas)*/}
           {total > 1 && (
             <button
               type="button"
               onClick={() => setAbierta((i) => (i - 1 + total) % total)}
               aria-label="Certificado anterior"
-              className="fixed left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+              className="hidden sm:flex fixed left-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
             >
               <Flecha direccion="izquierda" />
             </button>
           )}
 
-          {/*flecha al certificado siguiente*/}
+          {/*flecha al certificado siguiente (mismo tratamiento que la anterior)*/}
           {total > 1 && (
             <button
               type="button"
               onClick={() => setAbierta((i) => (i + 1) % total)}
               aria-label="Certificado siguiente"
-              className="fixed right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+              className="hidden sm:flex fixed right-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
             >
               <Flecha direccion="derecha" />
             </button>
@@ -169,6 +170,27 @@ export default function Certificaciones({ certificaciones = [] }) {
               alt={certAbierta.descripcion}
               className="w-full max-h-[75vh] object-contain rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl"
             />
+            {/*en mobile las flechas van abajo de la foto, nunca encima*/}
+            {total > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-4 sm:hidden">
+                <button
+                  type="button"
+                  onClick={() => setAbierta((i) => (i - 1 + total) % total)}
+                  aria-label="Certificado anterior"
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+                >
+                  <Flecha direccion="izquierda" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAbierta((i) => (i + 1) % total)}
+                  aria-label="Certificado siguiente"
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+                >
+                  <Flecha direccion="derecha" />
+                </button>
+              </div>
+            )}
             {total > 1 && (
               <p className="text-center text-xs text-zinc-400 mt-3">
                 {abierta + 1} / {total}

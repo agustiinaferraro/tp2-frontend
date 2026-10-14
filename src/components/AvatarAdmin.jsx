@@ -7,7 +7,7 @@ function inicial(nombre) {
   return (nombre ?? '?').trim().charAt(0).toUpperCase() || '?';
 }
 
-export default function AvatarAdmin({ seccionActiva = '' }) {
+export default function AvatarAdmin({ seccionActiva = '', enMenuMovil = false }) {
   //la sesion se lee recien en el navegador: en el servidor no hay localstorage
   //(si se leyera antes, el html que genera el build no coincidiria con la pagina y react se queja)
   const [sesion, setSesion] = useState(null);
@@ -104,6 +104,49 @@ export default function AvatarAdmin({ seccionActiva = '' }) {
       {contenido}
     </span>
   );
+
+  //en el menu hamburguesa se dibuja como una fila mas, alineada a la izquierda igual que
+  //los demas links (si no, el avatar centrado se lee raro entre los items del menu)
+  if (enMenuMovil) {
+    return (
+      <a
+        href={destino}
+        aria-label={nombreAccesible}
+        title={esDueno ? 'Panel de administración' : 'Mi perfil'}
+        className="group flex items-center gap-3 w-full rounded-lg px-2 py-2 hover:bg-zinc-800 transition-all duration-200"
+      >
+        <span
+          className={`relative w-9 h-9 shrink-0 rounded-full transition-shadow group-hover:ring-2 group-hover:ring-verde-app group-active:ring-2 group-active:ring-verde-app group-focus-visible:ring-2 group-focus-visible:ring-verde-app ${
+            enPerfil ? 'ring-2 ring-verde-app' : ''
+          }`}
+        >
+          {circulo}
+          {esDueno && (
+            <span
+              title="Dueña del sitio"
+              className="absolute -bottom-0.5 -right-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-verde-app text-black border-2 border-black"
+            >
+              <svg aria-hidden="true" className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+              </svg>
+            </span>
+          )}
+        </span>
+        <span className="min-w-0 text-left">
+          <span
+            className={`block text-sm transition-colors ${
+              enPerfil
+                ? 'text-verde-app font-bold'
+                : 'text-zinc-300 group-hover:text-white group-active:text-white group-focus-visible:text-white'
+            }`}
+          >
+            Mi perfil
+          </span>
+          <span className="block text-[11px] leading-tight text-zinc-500 truncate">{nombreMostrado}</span>
+        </span>
+      </a>
+    );
+  }
 
   return (
     <a
