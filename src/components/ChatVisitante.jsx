@@ -4,7 +4,7 @@
 //el chat se sincroniza con whatsapp: cada mensaje que manda el visitante se guarda en el
 //portfolio y ademas se abre whatsapp con el texto listo, para que le llegue al celular de la admin
 import { useEffect, useState } from 'react';
-import { enviarMensaje, obtenerMensajesMios } from '../api/mensajes.js';
+import { enviarMensaje, guardarTelefono, obtenerMensajesMios } from '../api/mensajes.js';
 import { sesionConTokenFresco } from '../api/usuarios.js';
 import Loading from './Loading.jsx';
 
@@ -25,6 +25,13 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
   const [error, setError] = useState('');
   const [texto, setTexto] = useState('');
   const [enviando, setEnviando] = useState(false);
+  //whatsapp de la persona: si lo deja, la admin puede responderle por whatsapp desde el panel
+  const [telefono, setTelefono] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('chat-whatsapp') ?? '';
+  });
+  const [telGuardado, setTelGuardado] = useState(false);
+  const [guardandoTel, setGuardandoTel] = useState(false);
 
   //pide un token vigente: el del navegador puede estar vencido y la api responderia 401
   useEffect(() => {
@@ -43,7 +50,14 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
     let activo = true;
     obtenerMensajesMios(token)
       .then((lista) => {
-        if (activo) setMensajes(lista);
+        if (!activo) return;
+        setMensajes(lista);
+        //si el numero ya quedo guardado en la conversacion se recupera de ahi
+        const guardado = lista.find((m) => m.telefono)?.telefono ?? '';
+        if (guardado) {
+          setTelefono((actual) => actual || guardado);
+          setTelGuardado(true);
+        }
       })
       .catch((err) => {
         if (activo) setError(err.message);
@@ -72,13 +86,33 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
     )}`;
     window.open(link, '_blank', 'noopener,noreferrer');
     try {
-      const respuesta = await enviarMensaje({ mensaje: textoLimpio }, token);
+      const respuesta = await enviarMensaje(
+        { mensaje: textoLimpio, telefono: telefono.trim() },
+        token
+      );
       const nuevo = respuesta?.datos;
       if (nuevo) setMensajes((prev) => [...prev, nuevo]);
     } catch (err) {
       setError(err.message);
     } finally {
       setEnviando(false);
+    }
+  }
+
+  //guarda el whatsapp de la persona en su conversacion (para que la admin le responda por ahi)
+  async function guardarTel() {
+    const numero = telefono.trim();
+    if (!numero || guardandoTel) return;
+    setGuardandoTel(true);
+    setError('');
+    try {
+      if (mensajes.length > 0 && token) await guardarTelefono(numero, token);
+      localStorage.setItem('chat-whatsapp', numero);
+      setTelGuardado(true);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setGuardandoTel(false);
     }
   }
 
@@ -126,11 +160,19 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
               </div>
               <span className={`text-[11px] text-zinc-500 mt-1 inline-flex items-center gap-1 ${esDeAgustina ? '' : 'text-right'}`}>
                 {esDeAgustina ? m.nombre || nombreAdmin : nombre}
-                {/*etiqueta verde: deja visible que la conversacion pasa por whatsapp*/}
-                <span className="inline-flex items-center gap-1 text-whatsapp">
-                  <IconoWhatsapp className="w-3 h-3" />
-                  {esDeAgustina ? 'Respondido por WhatsApp' : 'Enviado por WhatsApp'}
-                </span>
+                {/*etiqueta verde: solo cuando de verdad el mensaje paso por whatsapp*/}
+                {esDeAgustina && m.porWhatsapp && (
+                  <span className="inline-flex items-center gap-1 text-whatsapp">
+                    <IconoWhatsapp className="w-3 h-3" />
+                    Respondido por WhatsApp
+                  </span>
+                )}
+                {!esDeAgustina && (
+                  <span className="inline-flex items-center gap-1 text-whatsapp">
+                    <IconoWhatsapp className="w-3 h-3" />
+                    Enviado por WhatsApp
+                  </span>
+                )}
               </span>
             </li>
           );
@@ -192,6 +234,39 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
           {enviando ? 'Enviando...' : 'Enviar'}
         </button>
       </form>
+
+      {/*whatsapp de la persona: opcional, para que la admin le pueda responder por ahi*/}
+      <div className="border-t border-zinc-800 pt-4 space-y-2">
+        <label htmlFor="chat-telefono" className="block text-xs text-zinc-400">
+          Tu WhatsApp (opcional): así Agustina te puede responder por ahí
+        </label>
+        <div className="flex items-center gap-2">
+          <input
+            id="chat-telefono"
+            type="tel"
+            value={telefono}
+            onChange={(e) => {
+              setTelefono(e.target.value);
+              setTelGuardado(false);
+            }}
+            placeholder="Ej: 5491122334455 (código de país)"
+            className="flex-1 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-whatsapp"
+          />
+          <button
+            type="button"
+            onClick={guardarTel}
+            disabled={guardandoTel || !telefono.trim()}
+            className="px-4 py-2 rounded-xl bg-whatsapp hover:bg-whatsapp-claro text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95"
+          >
+            {guardandoTel ? 'Guardando...' : 'Guardar'}
+          </button>
+        </div>
+        {telGuardado && (
+          <p className="text-xs text-whatsapp">
+            Número guardado: las respuestas de Agustina pueden llegar a tu WhatsApp.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

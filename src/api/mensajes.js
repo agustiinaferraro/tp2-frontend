@@ -2,9 +2,14 @@
 import { peticionGET, peticionGETAutenticada, peticionConToken, peticionAdmin } from './client.js';
 
 //envia un mensaje del formulario de contacto (con la sesion de la cuenta)
-//datos = { mensaje }; el nombre y el email salen del token en el backend
+//datos = { mensaje, telefono? }; el nombre y el email salen del token en el backend
 export function enviarMensaje(datos, token) {
   return peticionConToken('/api/mensajes', datos, token);
+}
+
+//guarda el whatsapp de la persona en su conversacion (para que la admin le responda por ahi)
+export function guardarTelefono(telefono, token) {
+  return peticionConToken('/api/mensajes/telefono', { telefono }, token);
 }
 
 //devuelve la conversacion de la persona logueada (sus mensajes y las respuestas del admin)
@@ -26,13 +31,14 @@ export function obtenerConversaciones() {
   return peticionAdmin('GET', '/api/mensajes/conversaciones');
 }
 
-//guarda una respuesta del dueño del portfolio dentro del chat de una persona (solo la dueña)
+//guarda una respuesta dentro del chat de una persona (solo la admin)
 //email es el id de la conversacion (el email en minusculas de esa persona)
-export function responderConversacion(email, respuesta, nombre) {
+//porWhatsapp=true marca la respuesta como enviada por whatsapp (el visitante lo ve)
+export function responderConversacion(email, respuesta, nombre, porWhatsapp = false) {
   return peticionAdmin(
     'POST',
     `/api/mensajes/conversaciones/${encodeURIComponent(email)}/respuesta`,
-    { respuesta, nombre }
+    { respuesta, nombre, porWhatsapp }
   );
 }
 
