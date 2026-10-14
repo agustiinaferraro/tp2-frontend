@@ -14,7 +14,7 @@ import {
 import { obtenerServicios, crearServicio } from '../api/servicios.js';
 import { obtenerPerfil, actualizarPerfil } from '../api/perfil.js';
 import { obtenerConversaciones } from '../api/mensajes.js';
-import { soyDueno, borrarSesion as borrarSesionUsuario, linkPerfil } from '../api/usuarios.js';
+import { soyDueno, borrarSesion as borrarSesionUsuario } from '../api/usuarios.js';
 import { comprimirImagen } from '../utils/imagen.js';
 import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 import AdminMensajes from './AdminMensajes.jsx';
@@ -359,7 +359,7 @@ export default function AdminProyectos() {
   }, []);
 
   //si desde "Mi cuenta" se cierra sesión, se cambia de cuenta o se elimina la cuenta,
-  //el panel se revalida solo: si la cuenta deja de ser la dueña, vuelve a la pantalla de acceso
+  //el panel se revalida solo: si la cuenta deja de ser la dueña, se manda al perfil
   useEffect(() => {
     const revalidar = () => {
       soyDueno()
@@ -380,6 +380,14 @@ export default function AdminProyectos() {
     window.addEventListener('sesion-usuario', revalidar);
     return () => window.removeEventListener('sesion-usuario', revalidar);
   }, []);
+
+  //el panel es exclusivo de la dueña: sin sesión (o con otra cuenta) se manda al perfil,
+  //que es donde se entra o se cambia de cuenta
+  useEffect(() => {
+    if (!cargandoSesion && !sesion) {
+      window.location.assign('/perfil');
+    }
+  }, [cargandoSesion, sesion]);
 
   function mostrarMensaje(texto, tipo = 'ok') {
     setMensaje({ texto, tipo });
@@ -715,27 +723,10 @@ export default function AdminProyectos() {
         : 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-verde-app/50'
     }`;
 
-  //entrada al panel: solo para la dueña del sitio (con su cuenta de "mi cuenta")
+  //entrada al panel: solo para la dueña del sitio (con su cuenta de "mi cuenta").
+  //si no hay sesión o la cuenta no es la suya, el effect de arriba manda al perfil
   if (cargandoSesion || !sesion) {
-    return (
-      <div className="max-w-md mx-auto px-4 py-16">
-        <div className="space-y-4 p-6 rounded-2xl bg-zinc-900 border border-zinc-800 text-center">
-          <h1 className="text-2xl font-bold text-white">Panel de administración</h1>
-          {cargandoSesion ? (
-            <Loading claseContenedor="h-16" />
-          ) : (
-            <>
-              <p className="text-sm text-zinc-400">
-                Este panel es privado: entrá con la cuenta de la dueña del sitio.
-              </p>
-              <a href={linkPerfil()} className={`${claseBotonPrimario} inline-block w-full`}>
-                Entrar con mi cuenta
-              </a>
-            </>
-          )}
-        </div>
-      </div>
-    );
+    return <Loading claseContenedor="h-16" />;
   }
 
   const grupos = agruparProyectos(proyectos, listaServicios);

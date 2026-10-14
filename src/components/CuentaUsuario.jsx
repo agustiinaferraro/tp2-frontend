@@ -161,6 +161,23 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
       .catch(() => {});
   }, []);
 
+  //al llegar al perfil con una cuenta pendiente de cambiar (se eligio desde el panel):
+  //se cierra la sesion actual y queda el formulario listo para entrar con la otra
+  useEffect(() => {
+    const pendiente = sessionStorage.getItem('cuenta-a-cambiar');
+    if (!pendiente) return;
+    sessionStorage.removeItem('cuenta-a-cambiar');
+    cerrarSesionFirebase().catch(() => {});
+    borrarSesion();
+    setSesion(null);
+    setModo('login');
+    setForm({ nombre: '', email: pendiente, clave: '' });
+    setVentana('');
+    setGuardado(false);
+    setConfirmandoBorrado(false);
+    setAviso(`Entrá con la contraseña de ${pendiente} para cambiar de cuenta.`);
+  }, []);
+
   //dice si la cuenta logueada es la dueña del sitio (para mostrar el acceso al panel)
   useEffect(() => {
     if (!sesion?.email) {
@@ -337,20 +354,11 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   }
 
   //cambia a otra cuenta guardada. firebase mantiene una sola sesion activa: no se puede
-  //"cambiar" sin volver a entrar, asi que se cierra la actual y se pide la contraseña de la
-  //otra cuenta (email ya precargado), para que el token real quede siendo el de esa persona
+  //"cambiar" sin volver a entrar, asi que se manda al perfil con la cuenta elegida, se cierra
+  //la actual ahi y se pide la contraseña de la otra (email ya precargado)
   async function cambiarCuentaActiva(cuenta) {
-    await cerrarSesionFirebase();
-    borrarSesion();
-    setSesion(null);
-    setModo('login');
-    setForm({ nombre: '', email: cuenta.email, clave: '' });
-    limpiarEdicion('');
-    setGuardado(false);
-    setConfirmandoBorrado(false);
-    setVentana('');
-    setError('');
-    setAviso(`Entrá con la contraseña de ${cuenta.email} para cambiar de cuenta.`);
+    sessionStorage.setItem('cuenta-a-cambiar', cuenta.email);
+    window.location.assign('/perfil');
   }
 
   //cerrar sesion de la cuenta activa: la cuenta sigue existiendo, solo se sale de ella
