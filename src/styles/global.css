@@ -261,6 +261,11 @@ html.con-js .animar-grupo.animado > *:nth-child(8) { transition-delay: 460ms; }
     animation: none;
   }
 
+  /*los avisos flotantes y los modales aparecen sin animacion*/
+  .animacion-aparecer {
+    animation: none;
+  }
+
   html.con-js [data-anim],
   html.con-js .animar-grupo > * {
     opacity: 1;

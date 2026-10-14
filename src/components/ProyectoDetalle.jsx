@@ -58,6 +58,14 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
     setMensaje({ texto, tipo });
   }
 
+  //los avisos flotan arriba a la derecha y se apagan solos a los 2 segundos:
+  //son mensajes efimeros, no ocupan lugar en la pantalla
+  useEffect(() => {
+    if (!mensaje) return undefined;
+    const t = setTimeout(() => setMensaje(null), 2000);
+    return () => clearTimeout(t);
+  }, [mensaje]);
+
   //al entrar: se trae el proyecto (si no vino), la lista de servicios y si sos la dueña
   useEffect(() => {
     let activo = true;
@@ -288,7 +296,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
       {mensaje && (
         <p
           role={mensaje.tipo === 'error' ? 'alert' : 'status'}
-          className={`mt-6 text-sm px-4 py-2 rounded-lg border ${
+          className={`fixed top-20 right-4 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer ${
             mensaje.tipo === 'error'
               ? 'text-red-400 border-red-500/30 bg-red-500/10'
               : 'text-green-400 border-green-500/30 bg-green-500/10'

@@ -304,12 +304,16 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     }
   }
 
-  //el aviso de "cambios guardados" se borra solo a los pocos segundos
+  //los avisos ("cambios guardados", cuenta eliminada, sesion cerrada...) flotan arriba a la
+  //derecha y se apagan solos a los 2 segundos: son mensajes efimeros, no ocupan lugar
   useEffect(() => {
-    if (!guardado) return undefined;
-    const t = setTimeout(() => setGuardado(false), 3000);
+    if (!guardado && !aviso) return undefined;
+    const t = setTimeout(() => {
+      setGuardado(false);
+      setAviso('');
+    }, 2000);
     return () => clearTimeout(t);
-  }, [guardado]);
+  }, [guardado, aviso]);
 
   //eliminar la cuenta: borra en el backend la conversacion y los comentarios, y cierra la sesion
   async function confirmarBorrado() {
@@ -519,11 +523,11 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
         </div>
       )}
 
-      {/*avisos de confirmacion: cambios guardados o cuenta eliminada*/}
+      {/*avisos de confirmacion: flotan arriba a la derecha y desaparecen solos*/}
       {!ocultarPerfil && (guardado || aviso) && (
         <p
           role="status"
-          className="mb-4 text-sm text-center px-4 py-2 rounded-xl bg-verde-app/10 border border-verde-app/30 text-verde-app"
+          className="fixed top-20 right-4 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border border-verde-app/30 bg-verde-app/10 text-verde-app shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer"
         >
           {aviso || 'Cambios guardados'}
         </p>

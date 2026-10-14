@@ -23,6 +23,14 @@ export default function HistorialProyectos({ alRestaurar }) {
 
   useEffect(() => { cargar(); }, []);
 
+  //el aviso de "restaurado" flota arriba a la derecha y se apaga solo a los 2 segundos:
+  //es un mensaje efimero, no ocupa lugar en la lista
+  useEffect(() => {
+    if (!mensaje) return undefined;
+    const t = setTimeout(() => setMensaje(null), 2000);
+    return () => clearTimeout(t);
+  }, [mensaje]);
+
   async function restaurar(id) {
     setRestaurando(id);
     setError(null);
@@ -43,7 +51,11 @@ export default function HistorialProyectos({ alRestaurar }) {
 
   return (
     <div className="space-y-2">
-      {mensaje && <p className="text-sm text-verde-app">{mensaje}</p>}
+      {mensaje && (
+        <p className="fixed top-20 right-4 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border border-verde-app/30 bg-verde-app/10 text-verde-app shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer">
+          {mensaje}
+        </p>
+      )}
       {error && <p className="text-red-400 text-sm">{error}</p>}
       {items.length === 0 && !error && (
         <p className="text-zinc-400 text-sm">No hay historial</p>
