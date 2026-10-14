@@ -53,15 +53,17 @@ function fotoReal(proyecto) {
   }
 
 //galeria de imagenes del proyecto, empezando siempre por la que mejor lo representa:
-//las fotos reales subidas van primero y la captura en vivo del deploy queda al final,
+//las fotos reales subidas van primero, despues la galeria completa que trae de behance
+//(en el orden original de behance) y la captura en vivo del deploy queda al final,
 //como ultima alternativa (ademas es la que suele salir en negro si el deploy no carga)
 export function galeriaProyecto(proyecto) {
   if (!proyecto) return [];
   const propia = [proyecto.imagen, ...(proyecto?.imagenes ?? [])]
     .filter(Boolean)
     .map((img) => mejorarImagenBehance(img));
+  const behance = (proyecto?.imagenesBehance ?? []).filter(Boolean);
   const captura = esDespliegue(proyecto) ? urlCaptura(proyecto.link) : null;
-  return [...propia, captura]
+  return [...propia, ...behance, captura]
     .filter((img, i, lista) => img && lista.indexOf(img) === i && !esPlaceholder(img));
 }
 

@@ -9,6 +9,7 @@ import SelectorImagenes from './SelectorImagenes.jsx';
 import Loading from './Loading.jsx';
 import Comentarios from './Comentarios.jsx';
 import { galeriaProyecto, textoVisitar, esDespliegue } from '../utils/proyectos.js';
+import { urlVideoCcV } from '../api/behance.js';
 import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 
 //categorias conocidas (las que tienen paginas generadas en el build)
@@ -40,6 +41,9 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
 
   //imagen elegida en la galeria del detalle
   const [indiceGaleria, setIndiceGaleria] = useState(0);
+
+  //mp4 resuelto para los videos de adobe (llegan como embed con url firmada que expira)
+  const [mp4Resuelto, setMp4Resuelto] = useState(null);
 
   //formulario de edicion
   const [titulo, setTitulo] = useState('');
@@ -93,6 +97,29 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
   useEffect(() => {
     setIndiceGaleria(0);
   }, [proyecto?._id]);
+
+  //los videos de behance son embeds de adobe ccv con url firmada (expiran): se resuelve el mp4
+  //actual desde la api, igual que en el hero de la home; un video subido a mano (mp4 directo)
+  //no hace falta resolverlo y queda tal cual
+  useEffect(() => {
+    let activo = true;
+    const ccv = /player\/ccv\/([A-Za-z0-9_-]{6,})\//.exec(proyecto?.video ?? '')?.[1];
+    if (!ccv) {
+      setMp4Resuelto(null);
+      return undefined;
+    }
+    urlVideoCcV(ccv)
+      .then((r) => {
+        if (activo) setMp4Resuelto(r.mp4 ?? null);
+      })
+      .catch(() => {
+        //sin mp4 no se muestra el reproductor y listo (el link a behance sigue estando)
+        if (activo) setMp4Resuelto(null);
+      });
+    return () => {
+      activo = false;
+    };
+  }, [proyecto?.video]);
 
   function abrirEditor() {
     if (!proyecto) return;
@@ -235,6 +262,26 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
 //(la de behance si esta publicado alla, o la captura del deploy si es una app web)
   const galeria = galeriaProyecto(proyecto);
 
+  //video del detalle: un embed de adobe se resuelve a mp4 y cualquier otra url se usa tal cual
+  const esEmbedCcV = /player\/ccv\/([A-Za-z0-9_-]{6,})\//.test(proyecto.video ?? '');
+  const urlVideo = esEmbedCcV ? mp4Resuelto : (proyecto.video ?? '');
+
+  //ficha del proyecto tal como behance la muestra: la descripcion completa solo se muestra
+  //si aporta algo mas que el resumen que ya esta arriba (si no, seria repetir lo mismo)
+  const descripcionLarga =
+    proyecto.descripcionCompleta && proyecto.descripcionCompleta !== proyecto.resumen
+      ? proyecto.descripcionCompleta
+      : '';
+  const palabrasClave = (proyecto.palabrasClave ?? []).filter(Boolean);
+  const estadisticas = proyecto.estadisticas ?? null;
+  //las fechas se guardan en utc para que el dia no corra segun el navegador
+  const fechaPublicacion = proyecto.publicadoEn
+    ? new Intl.DateTimeFormat('es-AR', { dateStyle: 'long', timeZone: 'UTC' }).format(
+        new Date(proyecto.publicadoEn)
+      )
+    : '';
+  const hayFicha = Boolean(descripcionLarga || estadisticas || fechaPublicacion || palabrasClave.length);
+
   return (
     <section className="max-w-4xl mx-auto px-4 py-16">
       {volver}
@@ -306,6 +353,21 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         </p>
       )}
 
+      {/*video del proyecto: se reproduce aca mismo para no sacar al visitante del sitio*/}
+      {urlVideo && (
+        <figure className="mt-8">
+          <video
+            src={urlVideo}
+            poster={galeria[0] ?? undefined}
+            controls
+            preload="metadata"
+            className="w-full rounded-2xl border border-zinc-800 bg-black"
+          >
+            Tu navegador no puede reproducir este video.
+          </video>
+        </figure>
+      )}
+
       {galeria.length > 0 && (
         <figure className="mt-8 space-y-3">
           {galeria.length > 1 && (
@@ -362,6 +424,62 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
             {textoVisitar(proyecto)} <span aria-hidden="true">↗</span>
           </a>
         </p>
+      )}
+
+      {/*ficha sincronizada desde behance: descripcion completa, estadisticas, fecha y keywords
+          (solo aparece si el proyecto es de behance y ya se sincronizo su detalle)*/}
+      {hayFicha && (
+        <section className="mt-10 p-6 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+          <h2 className="text-lg font-semibold text-white">Sobre el proyecto</h2>
+
+          {descripcionLarga && (
+            <p className="text-zinc-400 leading-relaxed mt-3 whitespace-pre-line">{descripcionLarga}</p>
+          )}
+
+          {(estadisticas || fechaPublicacion) && (
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm text-zinc-400">
+              {estadisticas && (
+                <>
+                  <li>
+                    <span className="text-white font-semibold">
+                      {(estadisticas.vistas ?? 0).toLocaleString('es-AR')}
+                    </span>{' '}
+                    vistas
+                  </li>
+                  <li>
+                    <span className="text-white font-semibold">
+                      {(estadisticas.apreciaciones ?? 0).toLocaleString('es-AR')}
+                    </span>{' '}
+                    apreciaciones
+                  </li>
+                  <li>
+                    <span className="text-white font-semibold">
+                      {(estadisticas.comentarios ?? 0).toLocaleString('es-AR')}
+                    </span>{' '}
+                    comentarios
+                  </li>
+                </>
+              )}
+              {fechaPublicacion && <li>Publicado el {fechaPublicacion}</li>}
+            </ul>
+          )}
+
+          {palabrasClave.length > 0 && (
+            <div className="mt-5">
+              <p className="text-xs uppercase tracking-widest text-zinc-500">Palabras clave</p>
+              <ul className="flex flex-wrap gap-2 mt-2">
+                {palabrasClave.map((palabra) => (
+                  <li
+                    key={palabra}
+                    className="text-xs px-3 py-1 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700"
+                  >
+                    {palabra}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
       )}
 
       {/*comentarios: cualquiera lee, para comentar hay que registrarse o entrar*/}
