@@ -162,7 +162,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   }, []);
 
   //al llegar al perfil con una cuenta pendiente de cambiar (se eligio desde el panel):
-  //se cierra la sesion actual y queda el formulario listo para entrar con la otra
+  //por las dudas se vuelve a cerrar la sesion y queda el formulario listo para la otra
   useEffect(() => {
     const pendiente = sessionStorage.getItem('cuenta-a-cambiar');
     if (!pendiente) return;
@@ -170,6 +170,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     cerrarSesionFirebase().catch(() => {});
     borrarSesion();
     setSesion(null);
+    setNombreEditado('');
     setModo('login');
     setForm({ nombre: '', email: pendiente, clave: '' });
     setVentana('');
@@ -354,10 +355,15 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   }
 
   //cambia a otra cuenta guardada. firebase mantiene una sola sesion activa: no se puede
-  //"cambiar" sin volver a entrar, asi que se manda al perfil con la cuenta elegida, se cierra
-  //la actual ahi y se pide la contraseña de la otra (email ya precargado)
+  //"cambiar" sin volver a entrar, asi que se cierra la sesion actual ANTES de ir al perfil
+  //(si se cerrara alla, alguna llamada en vuelo podria resucitar la cuenta anterior)
+  //y al llegar queda el formulario listo con el email de la otra cuenta
   async function cambiarCuentaActiva(cuenta) {
     sessionStorage.setItem('cuenta-a-cambiar', cuenta.email);
+    try {
+      await cerrarSesionFirebase();
+    } catch {}
+    borrarSesion();
     window.location.assign('/perfil');
   }
 
