@@ -1,6 +1,6 @@
 //panel de administracion: sirve para cargar, editar y borrar proyectos
 //y para editar el perfil publico (foto, nombre, contacto y redes)
-//tiene cinco vistas: portada (tipo behance), proyecto (cargar/editar), perfil, chats y mi cuenta
+//tiene seis vistas: portada (tipo behance), proyecto (cargar/editar), perfil, servicios, chats y mi cuenta
 //"mi cuenta" (dentro del panel) maneja la sesion: agregar/cambiar cuenta, cerrar sesion y eliminar cuenta
 //solo entra la dueña: el panel se abre cuando la cuenta logueada es la suya
 //la imagen se convierte a base64 y se guarda en la base junto al resto de los datos
@@ -19,6 +19,7 @@ import { comprimirImagen } from '../utils/imagen.js';
 import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
 import AdminMensajes from './AdminMensajes.jsx';
 import AdminProyectoCard from './AdminProyectoCard.jsx';
+import AdminServicios from './AdminServicios.jsx';
 import CuentaUsuario from './CuentaUsuario.jsx';
 import HistorialProyectos from './HistorialProyectos.jsx';
 import Loading from './Loading.jsx';
@@ -835,6 +836,17 @@ export default function AdminProyectos() {
                 icono: (<svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>),
               },
               {
+                etiqueta: 'Servicios',
+                accion: () => { setVista('servicios'); setMensaje(null); },
+                activo: vista === 'servicios',
+                icono: (
+                  <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                  </svg>
+                ),
+              },
+              {
                 etiqueta: 'Chats',
                 accion: irAMensajes,
                 activo: vista === 'mensajes',
@@ -1474,6 +1486,18 @@ export default function AdminProyectos() {
               <h2 className='text-lg font-semibold text-white mb-3'>Historial de proyectos</h2>
               <HistorialProyectos alRestaurar={cargarProyectos} />
             </div>
+          )}
+
+          {/*servicios: editar nombre, descripcion y "que incluye" de cada categoria;
+            al guardar se refresca la lista que usa el formulario de proyectos*/}
+          {vista === 'servicios' && (
+            <AdminServicios
+              alGuardar={() =>
+                obtenerServicios()
+                  .then((lista) => setListaServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
+                  .catch(() => {})
+              }
+            />
           )}
 
           {/*mi cuenta: se monta siempre para que el menu pueda abrir el dialogo de agregar/cambiar

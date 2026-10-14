@@ -48,6 +48,8 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
   //formulario de edicion
   const [titulo, setTitulo] = useState('');
   const [resumen, setResumen] = useState('');
+  //texto propio: que aprendio con este proyecto (behance no lo sincroniza, es tuyo siempre)
+  const [aprendizajes, setAprendizajes] = useState('');
   //true = el titulo/la descripcion los actualiza behance; false = el texto tuyo tiene prioridad
   const [tituloBehance, setTituloBehance] = useState(true);
   const [resumenBehance, setResumenBehance] = useState(true);
@@ -128,6 +130,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
     if (!proyecto) return;
     setTitulo(proyecto.titulo ?? '');
     setResumen(proyecto.resumen ?? '');
+    setAprendizajes(proyecto.aprendizajes ?? '');
     setTituloBehance(!proyecto.tituloManual);
     setResumenBehance(!proyecto.resumenManual);
     setLink(proyecto.link ?? '');
@@ -179,6 +182,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
       const datos = {
         titulo: titulo.trim(),
         resumen: resumen.trim(),
+        aprendizajes: aprendizajes.trim(),
         link: link.trim(),
         video: video.trim(),
         tags: tagsTexto.split(',').map((t) => t.trim()).filter(Boolean),
@@ -486,6 +490,15 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         </section>
       )}
 
+      {/*aprendizajes: texto propio de la dueña, siempre visible si esta escrito
+        (es lo que el proyecto aprendio/resolvio, no un listado de herramientas)*/}
+      {proyecto.aprendizajes && (
+        <section className="mt-10 p-6 rounded-2xl bg-verde-app/5 border border-verde-app/20">
+          <h2 className="text-lg font-semibold text-verde-app">Qué aprendí</h2>
+          <p className="text-zinc-300 leading-relaxed mt-3 whitespace-pre-line">{proyecto.aprendizajes}</p>
+        </section>
+      )}
+
       {/*comentarios: cualquiera lee, para comentar hay que registrarse o entrar*/}
       <Comentarios proyectoId={proyecto._id} />
 
@@ -559,6 +572,23 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
                   : 'Tu descripción tiene prioridad: behance no la pisa'}
               </label>
             )}
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="det-aprendizajes" className="block text-sm text-zinc-300">
+              Qué aprendí de este proyecto (opcional)
+            </label>
+            <textarea
+              id="det-aprendizajes"
+              value={aprendizajes}
+              onChange={(e) => setAprendizajes(e.target.value)}
+              placeholder="Qué resolviste, qué aprendiste, qué harías distinto la próxima..."
+              rows={4}
+              className={`${claseInput} resize-y`}
+            />
+            <p className="text-xs text-zinc-500">
+              Se muestra en el detalle como "Qué aprendí". Este texto es siempre tuyo: behance no lo sincroniza.
+            </p>
           </div>
 
           <div className="space-y-1">

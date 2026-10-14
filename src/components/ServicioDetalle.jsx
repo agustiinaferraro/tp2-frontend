@@ -73,6 +73,23 @@ export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
       )}
       <p className="text-lg text-zinc-400 leading-relaxed mt-6">{servicio.descripcion}</p>
 
+      {/*que incluye el servicio: lista escrita desde el panel (una linea por punto)*/}
+      {Array.isArray(servicio.incluye) && servicio.incluye.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-white">Qué incluye</h2>
+          <ul className="mt-3 space-y-2">
+            {servicio.incluye.map((item) => (
+              <li key={item} className="flex items-start gap-2 text-zinc-300">
+                <span aria-hidden="true" className="text-verde-app mt-0.5 font-semibold">
+                  ✓
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/*proyectos que entran en esta categoria*/}
       {proyectos.length > 0 && (
         <div className="mt-16">

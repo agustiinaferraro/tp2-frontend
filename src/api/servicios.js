@@ -16,3 +16,9 @@ export function crearServicio(nombre, descripcion) {
 export function obtenerServicioPorSlug(slug) {
   return peticionGET(`/api/servicios/${slug}`);
 }
+
+//edita un servicio existente desde el panel (solo la dueña del sitio)
+//el slug no cambia: es la url de la pagina publica del servicio
+export function actualizarServicio(slug, datos) {
+  return peticionAdmin('PUT', `/api/servicios/${slug}`, datos);
+}
