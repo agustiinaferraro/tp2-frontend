@@ -50,7 +50,7 @@ yarn build         # genera la versión estática en dist/
 yarn preview       # sirve localmente la versión generada
 ```
 
-> La web es estática: las secciones dinámicas (proyectos, buscador, servicios) consumen la API por red en el navegador. Configurá la URL de la API con `PUBLIC_API_URL` (en local, `http://localhost:4000`; en producción, la URL del backend en Vercel). Ver `.env.example`.
+> La web es estática: las secciones dinámicas (proyectos, buscador, servicios) consumen la API por red en el navegador. **En producción el navegador llama a `/api` en el mismo dominio del sitio**: un rewrite de Vercel (`vercel.json`) enruta eso al backend, así el visitante nunca ve la URL de la API. En desarrollo, configurá `PUBLIC_API_URL` (por defecto `http://localhost:4000`); en Vercel esa variable se mantiene para los fetchs del build (sobre mí y servicios). Ver `.env.example`.
 
 ### Requisitos
 

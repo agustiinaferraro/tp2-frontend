@@ -2,8 +2,13 @@
 //el frontend consulta la api desde aca, no desde los componentes
 import { tokenActual } from './firebase.js';
 
-//url base del backend. se configura con public_api_url o usa localhost en desarrollo
-export const API_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:4000';
+//url base de la api:
+//- en desarrollo (astro dev) apunta al backend local, o al que diga public_api_url
+//- en produccion el navegador llama a /api en el MISMO dominio del sitio y vercel
+//  enruta eso al backend por atras (ver vercel.json): el visitante nunca ve la url de la api
+export const API_BASE = import.meta.env.DEV
+  ? (import.meta.env.PUBLIC_API_URL ?? 'http://localhost:4000')
+  : '';
 
 //funcion generica que hace una peticion a la api y devuelve los datos en json
 //si la respuesta no es correcta, lanza un error explicando que paso
