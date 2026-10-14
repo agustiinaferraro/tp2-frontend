@@ -55,25 +55,87 @@ async function sesionDesdeUsuario(usuarioFirebase) {
   };
 }
 
+//errores que dicen que la operacion no se completo de verdad (validaciones y credenciales):
+//ante esos nunca se recupera la sesion, para no entrar con una cuenta equivocada
+const ERRORES_DUROS = new Set([
+  'auth/invalid-email',
+  'auth/weak-password',
+  'auth/invalid-credential',
+  'auth/invalid-login-credentials',
+  'auth/wrong-password',
+  'auth/user-not-found',
+  'auth/user-disabled',
+  'auth/operation-not-allowed',
+]);
+
+//en mobile pasa seguido que firebase avisa un error (red interrumpida, popup de google que
+//se cierra solo) pero la sesion igual quedo creada: si hay un usuario de firebase despues del
+//error, se devuelve esa sesion en vez de mostrar un error que "despues igual deja entrar"
+//con email se pasa la cuenta pedida, para no recuperar una sesion de otra cuenta
+async function sesionSiElErrorNoFueReal(error, emailEsperado = '') {
+  if (!error || ERRORES_DUROS.has(error.code)) return null;
+  try {
+    const usuario = await usuarioFirebaseActual();
+    if (!usuario) return null;
+    if (
+      emailEsperado &&
+      (usuario.email ?? '').toLowerCase() !== emailEsperado.trim().toLowerCase()
+    ) {
+      return null;
+    }
+    return await sesionDesdeUsuario(usuario);
+  } catch {
+    return null;
+  }
+}
+
 //crea la cuenta con email y contraseña en firebase
 export async function crearCuentaFirebase({ nombre, email, clave }) {
-  const credenciales = await createUserWithEmailAndPassword(obtenerAuth(), email, clave);
-  if (nombre) {
-    await updateProfile(credenciales.user, { displayName: String(nombre).trim() });
+  try {
+    const credenciales = await createUserWithEmailAndPassword(obtenerAuth(), email, clave);
+    if (nombre) {
+      await updateProfile(credenciales.user, { displayName: String(nombre).trim() });
+    }
+    return await sesionDesdeUsuario(credenciales.user);
+  } catch (error) {
+    //si la cuenta se llego a crear igual (fallo la red al confirmar), se recupera la sesion
+    const recuperada = await sesionSiElErrorNoFueReal(error, email);
+    if (recuperada) return recuperada;
+    throw error;
   }
-  return sesionDesdeUsuario(credenciales.user);
 }
 
 //entra con email y contraseña a firebase
 export async function entrarConEmailFirebase({ email, clave }) {
-  const credenciales = await signInWithEmailAndPassword(obtenerAuth(), email, clave);
-  return sesionDesdeUsuario(credenciales.user);
+  let ultimoError = null;
+  //un fallo de red al primer intento es comun en mobile: se reintenta una sola vez sola
+  for (let intento = 0; intento < 2; intento += 1) {
+    try {
+      const credenciales = await signInWithEmailAndPassword(obtenerAuth(), email, clave);
+      return await sesionDesdeUsuario(credenciales.user);
+    } catch (error) {
+      ultimoError = error;
+      if (error?.code !== 'auth/network-request-failed' || intento === 1) break;
+      await new Promise((resolver) => setTimeout(resolver, 600));
+    }
+  }
+  const recuperada = await sesionSiElErrorNoFueReal(ultimoError, email);
+  if (recuperada) return recuperada;
+  throw ultimoError;
 }
 
 //entra con una cuenta de google (firebase muestra el selector de cuentas)
 export async function entrarConGoogleFirebase() {
-  const credenciales = await signInWithPopup(obtenerAuth(), new GoogleAuthProvider());
-  return sesionDesdeUsuario(credenciales.user);
+  try {
+    const credenciales = await signInWithPopup(obtenerAuth(), new GoogleAuthProvider());
+    return await sesionDesdeUsuario(credenciales.user);
+  } catch (error) {
+    //en mobile el popup a veces se cierra solo y firebase avisa el error, pero la sesion
+    //quedo creada: si hay usuario igual, se entra sin mostrar ese error
+    const recuperada = await sesionSiElErrorNoFueReal(error);
+    if (recuperada) return recuperada;
+    throw error;
+  }
 }
 
 //manda el email con el link para poner una contraseña nueva

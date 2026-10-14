@@ -26,12 +26,27 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
   const [texto, setTexto] = useState('');
   const [enviando, setEnviando] = useState(false);
   //whatsapp de la persona: si lo deja, la admin puede responderle por whatsapp desde el panel
-  const [telefono, setTelefono] = useState(() => {
+  //se carga con un boton que abre un modal (el input fijo hacia zoom en mobile al tocarlo)
+  //telefonoGuardado = lo que quedo persistido; telefono = lo que se esta tipeando en el modal
+  const [telefonoGuardado, setTelefonoGuardado] = useState(() => {
     if (typeof window === 'undefined') return '';
     return localStorage.getItem('chat-whatsapp') ?? '';
   });
-  const [telGuardado, setTelGuardado] = useState(false);
+  const [telefono, setTelefono] = useState(telefonoGuardado);
+  const [ventanaTel, setVentanaTel] = useState(false);
+  const [errorTel, setErrorTel] = useState('');
   const [guardandoTel, setGuardandoTel] = useState(false);
+  const sincronizado = Boolean(telefonoGuardado);
+
+  //el modal de whatsapp se cierra con Escape
+  useEffect(() => {
+    if (!ventanaTel) return undefined;
+    const alPresionar = (e) => {
+      if (e.key === 'Escape') setVentanaTel(false);
+    };
+    window.addEventListener('keydown', alPresionar);
+    return () => window.removeEventListener('keydown', alPresionar);
+  }, [ventanaTel]);
 
   //pide un token vigente: el del navegador puede estar vencido y la api responderia 401
   useEffect(() => {
@@ -56,7 +71,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
         const guardado = lista.find((m) => m.telefono)?.telefono ?? '';
         if (guardado) {
           setTelefono((actual) => actual || guardado);
-          setTelGuardado(true);
+          setTelefonoGuardado((actual) => actual || guardado);
         }
       })
       .catch((err) => {
@@ -87,7 +102,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
     window.open(link, '_blank', 'noopener,noreferrer');
     try {
       const respuesta = await enviarMensaje(
-        { mensaje: textoLimpio, telefono: telefono.trim() },
+        { mensaje: textoLimpio, telefono: telefonoGuardado },
         token
       );
       const nuevo = respuesta?.datos;
@@ -100,20 +115,27 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
   }
 
   //guarda el whatsapp de la persona en su conversacion (para que la admin le responda por ahi)
+  //y cierra el modal mostrando el estado sincronizado
   async function guardarTel() {
     const numero = telefono.trim();
     if (!numero || guardandoTel) return;
     setGuardandoTel(true);
-    setError('');
+    setErrorTel('');
     try {
       if (mensajes.length > 0 && token) await guardarTelefono(numero, token);
       localStorage.setItem('chat-whatsapp', numero);
-      setTelGuardado(true);
+      setTelefonoGuardado(numero);
+      setVentanaTel(false);
     } catch (err) {
-      setError(err.message);
+      setErrorTel(err.message);
     } finally {
       setGuardandoTel(false);
     }
+  }
+
+  function abrirModalTel() {
+    setErrorTel('');
+    setVentanaTel(true);
   }
 
   let contenido;
@@ -237,36 +259,106 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
 
       {/*whatsapp de la persona: opcional, para que la admin le pueda responder por ahi*/}
       <div className="border-t border-zinc-800 pt-4 space-y-2">
-        <label htmlFor="chat-telefono" className="block text-xs text-zinc-400">
-          Tu WhatsApp (opcional): así Agustina te puede responder por ahí
-        </label>
-        <div className="flex items-center gap-2">
-          <input
-            id="chat-telefono"
-            type="tel"
-            value={telefono}
-            onChange={(e) => {
-              setTelefono(e.target.value);
-              setTelGuardado(false);
-            }}
-            placeholder="Ej: 5491122334455 (código de país)"
-            className="flex-1 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-whatsapp"
-          />
-          <button
-            type="button"
-            onClick={guardarTel}
-            disabled={guardandoTel || !telefono.trim()}
-            className="px-4 py-2 rounded-xl bg-whatsapp hover:bg-whatsapp-claro text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            {guardandoTel ? 'Guardando...' : 'Guardar'}
-          </button>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          {sincronizado ? (
+            <span className="inline-flex items-center gap-2 text-sm text-whatsapp font-medium">
+              <IconoWhatsapp className="w-4 h-4" />
+              Sincronizado con WhatsApp
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={abrirModalTel}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-whatsapp/15 border border-whatsapp/40 text-whatsapp text-sm font-medium hover:bg-whatsapp/25 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+            >
+              <IconoWhatsapp className="w-4 h-4" />
+              Sincronizar con WhatsApp
+            </button>
+          )}
+          {sincronizado && (
+            <button
+              type="button"
+              onClick={abrirModalTel}
+              className="text-xs text-zinc-400 underline underline-offset-2 hover:text-white transition-colors cursor-pointer"
+            >
+              Cambiar número
+            </button>
+          )}
         </div>
-        {telGuardado && (
-          <p className="text-xs text-whatsapp">
-            Número guardado: las respuestas de Agustina pueden llegar a tu WhatsApp.
-          </p>
-        )}
+        <p className="text-xs text-zinc-500">
+          {sincronizado
+            ? `Así Agustina te puede responder a ${telefonoGuardado}.`
+            : 'Dejá tu número y las respuestas de Agustina te pueden llegar a tu WhatsApp.'}
+        </p>
       </div>
+
+      {/*modal para dejar el numero: al tocar el input de mobile no se achica la pantalla
+      (el texto va en 16px, menos hace zoom el navegador del telefono)*/}
+      {ventanaTel && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 animacion-aparecer"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setVentanaTel(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Sincronizar con WhatsApp"
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl bg-zinc-900 border border-zinc-700 p-6 shadow-2xl space-y-4"
+          >
+            <span className="flex items-center justify-center w-12 h-12 rounded-full bg-whatsapp/15 border border-whatsapp/30 text-whatsapp">
+              <IconoWhatsapp className="w-6 h-6" />
+            </span>
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-white">Sincronizar con WhatsApp</h3>
+              <p className="text-sm text-zinc-400">
+                Dejá tu número con código de país y las respuestas de Agustina te pueden llegar a
+                tu WhatsApp.
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <label htmlFor="chat-telefono" className="block text-xs text-zinc-400">
+                Tu número (código de país)
+              </label>
+              <input
+                id="chat-telefono"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                autoFocus
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+                placeholder="Ej: 5491122334455"
+                className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-white text-base placeholder:text-zinc-500 focus:outline-none focus:border-whatsapp transition-colors"
+              />
+            </div>
+            {errorTel && (
+              <p role="alert" className="text-red-400 text-sm">
+                {errorTel}
+              </p>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setVentanaTel(false)}
+                className="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-sm transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={guardarTel}
+                disabled={guardandoTel || !telefono.trim()}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-whatsapp hover:bg-whatsapp-claro text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                {guardandoTel ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
