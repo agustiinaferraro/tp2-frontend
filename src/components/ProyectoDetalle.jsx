@@ -173,7 +173,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
 
   // mismo boton flotante de volver que usan las demas paginas (ver BackButton.astro)
   const claseVolver =
-    'fixed top-20 left-4 z-40 inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-900/70 backdrop-blur-md border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 transition-all duration-200 hover:scale-105 active:scale-95';
+    'relative md:fixed md:top-20 md:left-4 z-40 mb-4 md:mb-0 inline-flex items-center justify-center w-14 h-14 rounded-full bg-zinc-900/70 backdrop-blur-md border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 transition-all duration-200 hover:scale-105 active:scale-95';
   const iconoVolver = (
     <svg aria-hidden="true" className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
