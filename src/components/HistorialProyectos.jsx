@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from 'react';
-import { obtenerHistorialProyectos, restaurarHistorialProyecto } from '../servicios/historialProyectos.js';
+import { obtenerHistorialProyectos, restaurarHistorialProyecto } from '../api/historialProyectos.js';
 
 export default function HistorialProyectos({ alRestaurar }) {
   const [items, setItems] = useState([]);

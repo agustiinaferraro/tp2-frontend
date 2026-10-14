@@ -29,9 +29,10 @@ Este repositorio contiene el **frontend**:
 tp2-frontend/
 ├── src/
 │   ├── components/   # componentes Astro y React (islands interactivos)
-│   ├── pages/        # rutas: inicio, sobre mí, servicios, proyectos, contacto, admin
-│   ├── api/          # cliente que consume la API del backend
-│   ├── data/         # datos estáticos (servicios, búsqueda)
+│   ├── pages/        # rutas: inicio, sobre mí, servicios, proyectos, contacto, perfil, recuperar clave, admin
+│   ├── api/          # capa de datos: cliente que consume la API del backend
+│   ├── data/         # datos estáticos (servicios, búsqueda, respaldos si la API no responde)
+│   ├── utils/        # utilidades (compresión de imágenes, orden de categorías)
 │   ├── layouts/      # layout general
 │   └── styles/       # estilos (Tailwind CSS v4)
 ├── public/           # imágenes y recursos estáticos
