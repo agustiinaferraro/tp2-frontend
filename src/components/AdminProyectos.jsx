@@ -843,7 +843,7 @@ export default function AdminProyectos() {
               >
                 {item.icono}
                 <span className="flex-1 text-left">{item.etiqueta}</span>
-                {item.cantidad > 0 && (
+                {item.cantidad > 0 && !item.activo && (
                   <span className="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium bg-verde-app text-black">
                     {item.cantidad}
                   </span>

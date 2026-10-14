@@ -44,7 +44,7 @@ export default function FooterRedes() {
 
   return (
     <>
-      <ul className="flex flex-wrap justify-center items-center gap-7">
+      <ul className="flex flex-wrap justify-center items-center gap-5 sm:gap-7">
         {enlaces.map((enlace) => (
           <li key={enlace.texto}>
             <a

@@ -18,7 +18,7 @@ function IconoWhatsapp({ className = 'w-3.5 h-3.5' }) {
 }
 
 export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro', whatsapp = '5491131166948' }) {
-  const { email, nombre } = sesion ?? {};
+  const { nombre } = sesion ?? {};
   const [token, setToken] = useState(null);
   const [mensajes, setMensajes] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -257,15 +257,15 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
         </button>
       </form>
 
-      {/*whatsapp de la persona: opcional, para que la admin le pueda responder por ahi*/}
-      <div className="border-t border-zinc-800 pt-4 space-y-2">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          {sincronizado ? (
-            <span className="inline-flex items-center gap-2 text-sm text-whatsapp font-medium">
-              <IconoWhatsapp className="w-4 h-4" />
-              Sincronizado con WhatsApp
-            </span>
-          ) : (
+      {/*whatsapp de la persona: abajo del chat, un boton que abre el modal o el estado guardado*/}
+      <div className="border-t border-zinc-800 pt-4">
+        {sincronizado ? (
+          <span className="inline-flex items-center gap-2 text-sm text-whatsapp font-medium">
+            <IconoWhatsapp className="w-4 h-4" />
+            Sincronizado con WhatsApp
+          </span>
+        ) : (
+          <div className="space-y-2">
             <button
               type="button"
               onClick={abrirModalTel}
@@ -274,22 +274,11 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
               <IconoWhatsapp className="w-4 h-4" />
               Sincronizar con WhatsApp
             </button>
-          )}
-          {sincronizado && (
-            <button
-              type="button"
-              onClick={abrirModalTel}
-              className="text-xs text-zinc-400 underline underline-offset-2 hover:text-white transition-colors cursor-pointer"
-            >
-              Cambiar número
-            </button>
-          )}
-        </div>
-        <p className="text-xs text-zinc-500">
-          {sincronizado
-            ? `Así Agustina te puede responder a ${telefonoGuardado}.`
-            : 'Dejá tu número y las respuestas de Agustina te pueden llegar a tu WhatsApp.'}
-        </p>
+            <p className="text-xs text-zinc-500">
+              Dejá tu número y las respuestas de Agustina te pueden llegar a tu WhatsApp.
+            </p>
+          </div>
+        )}
       </div>
 
       {/*modal para dejar el numero: al tocar el input de mobile no se achica la pantalla

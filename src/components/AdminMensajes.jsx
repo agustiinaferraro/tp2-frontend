@@ -247,7 +247,6 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
 
   //hilo con los mensajes de una persona (burbujas estilo whatsapp) y caja para responder
   if (chat) {
-    const respuestas = chat.mensajes.filter((m) => m.esRespuesta).length;
     return (
       //alto fijo (como una ventana de chat): el header y la barra de escribir quedan fijos
       //y solo se desplaza la lista de mensajes de adentro
@@ -288,10 +287,6 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
               </a>
             )}
           </div>
-          <span className="shrink-0 text-xs px-2 py-1 rounded-full bg-whatsapp/15 text-whatsapp border border-whatsapp/25">
-            {chat.cantidad} enviado{chat.cantidad === 1 ? '' : 's'}
-            {respuestas > 0 && <> · {respuestas} tuyo{respuestas === 1 ? '' : 's'}</>}
-          </span>
         </div>
 
         {error && (

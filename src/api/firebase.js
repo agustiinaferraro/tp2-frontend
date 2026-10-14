@@ -72,7 +72,7 @@ const ERRORES_DUROS = new Set([
 //se cierra solo) pero la sesion igual quedo creada: si hay un usuario de firebase despues del
 //error, se devuelve esa sesion en vez de mostrar un error que "despues igual deja entrar"
 //con email se pasa la cuenta pedida, para no recuperar una sesion de otra cuenta
-async function sesionSiElErrorNoFueReal(error, emailEsperado = '') {
+async function sesionSiQuedoCreada(error, emailEsperado = '') {
   if (!error || ERRORES_DUROS.has(error.code)) return null;
   try {
     const usuario = await usuarioFirebaseActual();
@@ -99,7 +99,7 @@ export async function crearCuentaFirebase({ nombre, email, clave }) {
     return await sesionDesdeUsuario(credenciales.user);
   } catch (error) {
     //si la cuenta se llego a crear igual (fallo la red al confirmar), se recupera la sesion
-    const recuperada = await sesionSiElErrorNoFueReal(error, email);
+    const recuperada = await sesionSiQuedoCreada(error, email);
     if (recuperada) return recuperada;
     throw error;
   }
@@ -108,7 +108,7 @@ export async function crearCuentaFirebase({ nombre, email, clave }) {
 //entra con email y contraseña a firebase
 export async function entrarConEmailFirebase({ email, clave }) {
   let ultimoError = null;
-  //un fallo de red al primer intento es comun en mobile: se reintenta una sola vez sola
+  //en mobile la red falla seguido al primer intento: se reintenta una sola vez
   for (let intento = 0; intento < 2; intento += 1) {
     try {
       const credenciales = await signInWithEmailAndPassword(obtenerAuth(), email, clave);
@@ -119,7 +119,7 @@ export async function entrarConEmailFirebase({ email, clave }) {
       await new Promise((resolver) => setTimeout(resolver, 600));
     }
   }
-  const recuperada = await sesionSiElErrorNoFueReal(ultimoError, email);
+  const recuperada = await sesionSiQuedoCreada(ultimoError, email);
   if (recuperada) return recuperada;
   throw ultimoError;
 }
@@ -132,7 +132,7 @@ export async function entrarConGoogleFirebase() {
   } catch (error) {
     //en mobile el popup a veces se cierra solo y firebase avisa el error, pero la sesion
     //quedo creada: si hay usuario igual, se entra sin mostrar ese error
-    const recuperada = await sesionSiElErrorNoFueReal(error);
+    const recuperada = await sesionSiQuedoCreada(error);
     if (recuperada) return recuperada;
     throw error;
   }
