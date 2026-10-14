@@ -219,11 +219,6 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
             En línea
           </p>
         </div>
-        {/*pill verde: avisa que el chat esta sincronizado con whatsapp*/}
-        <span className="ml-auto inline-flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full bg-whatsapp/15 text-whatsapp border border-whatsapp/25 text-[11px] font-medium">
-          <IconoWhatsapp />
-          Sincronizado con WhatsApp
-        </span>
       </div>
 
       {/*aclaracion de como funciona el sincronismo*/}

@@ -358,6 +358,13 @@ export default function AdminProyectos() {
     };
   }, []);
 
+  //al cambiar de seccion se refresca el contador de chats sin leer: asi, despues de
+  //abrir conversaciones, el badge del menu muestra solo lo que sigue sin abrir
+  useEffect(() => {
+    if (!sesion) return;
+    cargarCantidadConversaciones();
+  }, [vista]);
+
   //si desde "Mi cuenta" se cierra sesión, se cambia de cuenta o se elimina la cuenta,
   //el panel se revalida solo: si la cuenta deja de ser la dueña, se manda al perfil
   useEffect(() => {
@@ -393,10 +400,10 @@ export default function AdminProyectos() {
     setMensaje({ texto, tipo });
   }
 
-  //trae cuantas personas escribieron, para el contador del icono de mensajes
+  //trae cuantas conversaciones tienen mensajes sin leer, para el contador del icono de chats
   function cargarCantidadConversaciones() {
     obtenerConversaciones()
-      .then((lista) => setCantidadConversaciones(lista.length))
+      .then((lista) => setCantidadConversaciones(lista.filter((c) => c.cantidad > 0).length))
       .catch(() => {});
   }
 

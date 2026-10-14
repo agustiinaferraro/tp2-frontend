@@ -31,6 +31,15 @@ export function obtenerConversaciones() {
   return peticionAdmin('GET', '/api/mensajes/conversaciones');
 }
 
+//marca los mensajes de esa persona como leidos (solo la admin): el contador de la lista
+//desaparece hasta que llegue un mensaje nuevo
+export function marcarComoLeido(email) {
+  return peticionAdmin(
+    'POST',
+    `/api/mensajes/conversaciones/${encodeURIComponent(email)}/leer`
+  );
+}
+
 //guarda una respuesta dentro del chat de una persona (solo la admin)
 //email es el id de la conversacion (el email en minusculas de esa persona)
 //porWhatsapp=true marca la respuesta como enviada por whatsapp (el visitante lo ve)

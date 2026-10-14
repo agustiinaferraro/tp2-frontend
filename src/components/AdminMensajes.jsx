@@ -1,6 +1,6 @@
 //seccion de la dueña para ver los mensajes del formulario de contacto como chats
 //primero se muestra la lista de conversaciones (una por cuenta/persona), como en whatsapp:
-//nombre de la persona, el ultimo mensaje, la hora y la cantidad de mensajes que mando
+//nombre de la persona, el ultimo mensaje, la hora y la cantidad de mensajes sin leer
 //al tocar una se abre el hilo completo (burbujas) y se puede responder
 //los mensajes se ven en orden cronologico: el mas viejo arriba y el nuevo abajo (como whatsapp)
 //se puede borrar un mensaje suelto o el chat entero
@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   obtenerConversaciones,
+  marcarComoLeido,
   borrarMensaje,
   borrarConversacion,
   responderConversacion,
@@ -153,12 +154,20 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
   }, [cargar]);
 
   //mantiene el chat abierto al dia: si entra un mensaje nuevo se actualiza solo
+  //y queda marcado como leido (la persona lo esta viendo en este momento)
   useEffect(() => {
     if (!chat) return;
     const fresco = conversaciones.find((c) => c._id === chat._id);
     if (!fresco) return;
     if (fresco.mensajes.length !== chat.mensajes.length || fresco.ultimaFecha !== chat.ultimaFecha) {
-      setChat(fresco);
+      marcarComoLeido(chat.email).catch(() => {});
+      setChat({
+        ...fresco,
+        cantidad: 0,
+        mensajes: fresco.mensajes.map((m) =>
+          m.esRespuesta ? m : { ...m, leidoEn: m.leidoEn ?? new Date().toISOString() }
+        ),
+      });
     }
   }, [conversaciones, chat]);
 
@@ -169,7 +178,16 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
   }, [chat?._id, chat?.mensajes.length]);
 
   function abrirChat(conversacion) {
-    setChat(conversacion);
+    //al abrir el chat los mensajes quedan como leidos: se avisa al backend y ademas se
+    //refleja al toque en el estado local (el contador de la lista baja a cero)
+    marcarComoLeido(conversacion.email).catch(() => {});
+    setChat({
+      ...conversacion,
+      cantidad: 0,
+      mensajes: conversacion.mensajes.map((m) =>
+        m.esRespuesta ? m : { ...m, leidoEn: m.leidoEn ?? new Date().toISOString() }
+      ),
+    });
     setError(null);
     setRespuesta('');
   }
@@ -194,8 +212,12 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
         cargar(true);
         if (alCambiar) alCambiar();
       } else {
-        //la cantidad cuenta solo los mensajes de la persona, no las respuestas
-        setChat({ ...chat, cantidad: nuevos.filter((m) => !m.esRespuesta).length, mensajes: nuevos });
+        //la cantidad cuenta solo los mensajes de la persona que queden sin leer
+        setChat({
+          ...chat,
+          cantidad: nuevos.filter((m) => !m.esRespuesta && !m.leidoEn).length,
+          mensajes: nuevos,
+        });
       }
     } catch (e) {
       setError(e.message);
