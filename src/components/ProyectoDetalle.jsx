@@ -323,20 +323,15 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
             <p className="text-lg text-zinc-400 leading-relaxed mt-6 whitespace-pre-line">{proyecto.resumen}</p>
           )}
         </div>
-        {/*editar: solo si hay sesion de administrador*/}
+        {/*editar: solo si hay sesion de administrador (la sesion se cierra desde el panel o el perfil)*/}
         {admin && (
-          <div className="flex items-center gap-4 shrink-0">
-            <button
-              type="button"
-              onClick={editando ? () => setEditando(false) : abrirEditor}
-              className={`${claseBoton} bg-violeta-app hover:bg-violeta-app/90 text-black`}
-            >
-              {editando ? 'Cancelar edición' : 'Editar'}
-            </button>
-            <button type="button" onClick={cerrarSesion} className="inline-block rounded-lg px-2 py-1 text-sm text-zinc-400 hover:bg-zinc-800 hover:text-white active:scale-95 hover:scale-105 transition-all duration-200 cursor-pointer">
-              Cerrar sesión
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={editando ? () => setEditando(false) : abrirEditor}
+            className={`${claseBoton} bg-violeta-app hover:bg-violeta-app/90 text-black shrink-0`}
+          >
+            {editando ? 'Cancelar edición' : 'Editar'}
+          </button>
         )}
       </div>
 
