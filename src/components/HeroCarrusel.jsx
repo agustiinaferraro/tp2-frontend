@@ -1,7 +1,7 @@
 //hero de la home: carrusel con los videos de los proyectos
 //cada video se reproduce solo (muted, loop) hasta 7 segundos y luego funde al siguiente
-//solo entran los proyectos de edicion de video (videos, animaciones, trailers): el resto
-//(branding, apps, web) no tiene video real y queda afuera del carrusel
+//entra todo proyecto que tenga video: el sync de behance va sumando los videos nuevos
+//solo (cada 6 horas) asi el carrusel se renueva sin tocar nada desde el panel
 import { useEffect, useRef, useState } from 'react';
 import { obtenerProyectos, obtenerProyectosDestacados } from '../api/proyectos.js';
 import { urlVideoCcV } from '../api/behance.js';
@@ -11,9 +11,6 @@ import Loading from './Loading.jsx';
 const MAX_SEGUNDOS = 7;
 const INTERVALO_MS = MAX_SEGUNDOS * 1000;
 const DURACION_FUNDIDO_MS = 500;
-
-//categoria de videos, animaciones y trailers: es lo unico que rota en el hero
-const SERVICIO_VIDEO = 'edicion-de-video';
 
 //los videos de behance se alojan en adobe ccv con una url firmada que expira:
 //el proyecto guarda el embed estable y aca se resuelve el mp4 actual cuando hace falta
@@ -64,16 +61,16 @@ export default function HeroCarrusel({ variante = 'hero' }) {
   //true mientras dura el fundido: frena cualquier avance que llegue en ese rato
   const rotandoRef = useRef(false);
 
-  //carga: solo los proyectos de edicion de video que tienen video (los destacados arrancan)
+  //carga: todos los proyectos que tengan video (los destacados arrancan primero)
   useEffect(() => {
     Promise.all([obtenerProyectos(), obtenerProyectosDestacados().catch(() => [])])
       .then(([todos, destacados]) => {
-        const deVideo = todos.filter((p) => p.video && p.servicio === SERVICIO_VIDEO);
+        const conVideo = todos.filter((p) => p.video);
         const primero = destacados
-          .map((d) => deVideo.find((p) => p._id === d._id))
+          .map((d) => conVideo.find((p) => p._id === d._id))
           .filter(Boolean);
         const yaEstan = new Set(primero.map((p) => p._id));
-        setProyectos([...primero, ...deVideo.filter((p) => !yaEstan.has(p._id))]);
+        setProyectos([...primero, ...conVideo.filter((p) => !yaEstan.has(p._id))]);
       })
       .catch(() => setProyectos([]))
       .finally(() => setCargando(false));
