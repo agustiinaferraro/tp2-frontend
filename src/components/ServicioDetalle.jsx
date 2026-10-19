@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { obtenerServicioPorSlug } from '../api/servicios.js';
 import { obtenerProyectosPorServicio } from '../api/proyectos.js';
 import IconoServicio from './IconoServicio.jsx';
-import ImagenProyecto from './ImagenProyecto.jsx';
+import PreviewProyecto from './PreviewProyecto.jsx';
 import Loading from './Loading.jsx';
 import { textoVisitar } from '../utils/proyectos.js';
 
@@ -99,11 +99,13 @@ export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
               <li key={proyecto._id}>
                 <article className="h-full flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-verde-app/50 transition-colors">
                   {/*la portada es la imagen que mejor representa al proyecto
-                    (la de behance, o la captura del deploy en los proyectos web)*/}
+                    (la de behance, o la captura del deploy en los proyectos web); si el
+                    proyecto tiene video o gif animado, PreviewProyecto lo mueve adentro
+                    de la misma tarjeta, igual que en la grilla general*/}
                   {(proyecto.imagen || proyecto.imagenes?.[0] || proyecto.link) && (
                     <figure className="m-0 overflow-hidden bg-zinc-800">
                       <a href={`/proyectos/?id=${proyecto._id}`}>
-                        <ImagenProyecto
+                        <PreviewProyecto
                           proyecto={proyecto}
                           alternativa={false}
                           className="w-full h-40 object-cover hover:opacity-90 transition-opacity"
