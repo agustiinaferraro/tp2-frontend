@@ -3,12 +3,15 @@
 // que se subio a behance y el boton para visitar el proyecto publicado.
 // el link externo nunca va dentro del principal (html no anida links), va aparte al pie de la card
 // se reusa en los carruseles y en la grilla de proyectos
+// la portada no es una imagen fija: PreviewProyecto se encarga de que los proyectos con
+// video o gif animado se muevan solos en la tarjeta, y si el medio no carga cae a la
+// imagen de behance / miniatura default como antes
 // titulo y resumen se acotan con line-clamp (2 y 2 lineas): el recorte se adapta al ancho de
 // la tarjeta. la card tiene un alto fijo (el de una tarjeta con descripcion, la de "Certificado
 // - Bautismo") igual para todas: si el titulo ocupa 2 lineas, la descripcion se achica para que
 // todo entre y la tarjeta no crezca. el link de "ver proyecto" queda anclado abajo. los tags se
 // acotan a una fila
-import ImagenProyecto from './ImagenProyecto.jsx';
+import PreviewProyecto from './PreviewProyecto.jsx';
 import { textoVisitar } from '../utils/proyectos.js';
 
 export default function ProyectoCard({ proyecto, destacado = false }) {
@@ -41,11 +44,12 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
 
       {/* link principal: siempre al detalle del proyecto en el sitio */}
       <a href={`/proyectos/?id=${proyecto._id}`} className={claseEnlacePrincipal}>
-        {/* portada: la imagen que mejor representa al proyecto
-            (de behance es la que se subio alla; de desarrollo, la captura del deploy) */}
+        {/* portada: la imagen que mejor representa al proyecto (de behance es la que se
+            subio alla; de desarrollo, la captura del deploy); si el proyecto tiene video o
+            gif animado, PreviewProyecto la deja moverse adentro de la misma tarjeta */}
         {(proyecto.imagen || proyecto.imagenes?.[0] || proyecto.link) && (
           <figure className="m-0 overflow-hidden bg-zinc-800">
-            <ImagenProyecto
+            <PreviewProyecto
               proyecto={proyecto}
               alternativa={false}
               className="w-full h-24 object-cover group-hover:opacity-90 transition-opacity"

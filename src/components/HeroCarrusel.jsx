@@ -1,9 +1,16 @@
-//hero de la home: carrusel con los videos de los proyectos
+//hero de la home: carrusel con los videos y las animaciones de los proyectos
 //cada video se reproduce solo (muted, loop) hasta 7 segundos y luego funde al siguiente
-//condiciones para rotar: tener video Y pertenecer a una de estas categorias (array
-//por si suma otra). todo llega solo: el sync de behance trae los videos nuevos cada
-//6 horas, las categorias nuevas se detectan al importar y si un proyecto deja de ser
-//de video/animacion (o se le carga un video desde el panel) tambien se refleja aca
+//condiciones para rotar (todo automatico, sin tener que avisar nada): tener video O
+//pertenecer a una de estas categorias de video/animacion (array por si suma otra), y ademas
+//tener algo que mostrar. asi entran:
+//  - los proyectos con video, aunque su categoria diga otra cosa (p.ej. una infografia
+//    animada guardada como UX/UI, o un proyecto al que se le cargo un video desde el panel)
+//  - los que estan categorizados como video/animacion pero behance los publico como gif
+//    (no tienen campo "video": entran por categoria y se ven moviendose, porque la portada
+//    es el gif)
+//todo llega solo: el sync de behance trae los videos nuevos cada 6 horas, las categorias
+//nuevas se detectan al importar y si un proyecto deja de ser de video/animacion (o se le
+//carga un video desde el panel) tambien se refleja aca
 const CATEGORIAS_VIDEO = ['edicion-de-video', 'motion-graphics'];
 
 //categorias de un proyecto: la lista nueva ("servicios") o la vieja ("servicio")
@@ -18,6 +25,7 @@ function categoriasDeProyecto(proyecto) {
 import { useEffect, useRef, useState } from 'react';
 import { obtenerProyectos, obtenerProyectosDestacados } from '../api/proyectos.js';
 import { urlVideoCcV } from '../api/behance.js';
+import { gifDeProyecto, tieneMedio } from '../utils/proyectos.js';
 import Loading from './Loading.jsx';
 
 //segundos que se reproduce cada video y duracion del fundido entre uno y otro
@@ -74,12 +82,18 @@ export default function HeroCarrusel({ variante = 'hero' }) {
   //true mientras dura el fundido: frena cualquier avance que llegue en ese rato
   const rotandoRef = useRef(false);
 
-  //carga: proyectos con video de las categorias de video/animacion (los destacados arrancan)
+  //carga: proyectos con video o animacion (los destacados arrancan). el criterio es
+  //"tiene video" (aunque su categoria diga otra cosa) O "esta categorizado como video/
+  //animacion" (para los gifs, que no traen campo video); ademas tiene que haber algo que
+  //mostrar, sino el hero estaria rotando cuadros negros
   useEffect(() => {
     Promise.all([obtenerProyectos(), obtenerProyectosDestacados().catch(() => [])])
       .then(([todos, destacados]) => {
         const deVideo = todos.filter(
-          (p) => p.video && categoriasDeProyecto(p).some((s) => CATEGORIAS_VIDEO.includes(s))
+          (p) =>
+            (Boolean(p.video?.trim()) ||
+              categoriasDeProyecto(p).some((s) => CATEGORIAS_VIDEO.includes(s))) &&
+            tieneMedio(p)
         );
         const primero = destacados
           .map((d) => deVideo.find((p) => p._id === d._id))
@@ -195,9 +209,11 @@ export default function HeroCarrusel({ variante = 'hero' }) {
             allowFullScreen
           />
         ) : (
+          //portada del proyecto mientras no hay video resuelto (o si es de los que subio
+          //un gif animado: ahi va el gif y se ve moviendose)
           <img
             key={proyecto._id}
-            src={proyecto.imagen || proyecto.imagenes?.[0] || ''}
+            src={gifDeProyecto(proyecto) || proyecto.imagen || proyecto.imagenes?.[0] || ''}
             alt=""
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
               fade ? 'opacity-100' : 'opacity-0'

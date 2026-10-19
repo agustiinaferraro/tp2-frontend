@@ -52,6 +52,24 @@ function fotoReal(proyecto) {
     return mejorarImagenBehance(proyecto.imagen || proyecto.imagenes?.[0] || null);
   }
 
+//gif animado que tenga el proyecto (behance publica las animaciones cortas como gif, sin
+//marcarlas como "video"): primero se mira la portada y despues la galeria de behance, para
+//que un gif que no quedo de portada igual se vea moviendose en las tarjetas y en el hero
+export function gifDeProyecto(proyecto) {
+  const candidatas = [proyecto?.imagen, ...(proyecto?.imagenes ?? []), ...(proyecto?.imagenesBehance ?? [])];
+  return candidatas.find((img) => typeof img === 'string' && /\.gif(?:\?\S*)?$/i.test(img)) ?? null;
+}
+
+//true si hay algo que mostrar del proyecto (video, gif animado o imagen): el hero lo usa
+//para no meter proyectos de categoria de video a los que behance no les entrega ningun
+//medio, porque ahi no habria nada que rotar y se veria un cuadro negro
+export function tieneMedio(proyecto) {
+  if (!proyecto) return false;
+  if (proyecto.video?.trim()) return true;
+  if (gifDeProyecto(proyecto)) return true;
+  return Boolean(imagenPreferida(proyecto));
+}
+
 //galeria de imagenes del proyecto, empezando siempre por la que mejor lo representa:
 //las fotos reales subidas van primero, despues la galeria completa que trae de behance
 //(en el orden original de behance) y la captura en vivo del deploy queda al final,
