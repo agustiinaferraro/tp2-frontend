@@ -7,8 +7,10 @@ import ProyectoCard from './ProyectoCard.jsx';
 import Loading from './Loading.jsx';
 
 //tarjetas mas chicas que las del carrusel de proyectos: son las primeras de la home y no
-//necesitan tanto ancho
-const TARJETA_DESTACADA = 'w-[clamp(11rem,60%,14rem)]';
+//necesitan tanto ancho. el ancho va FIJO (sin %): la fila es max-content y con un % el
+//navegador suma el contenido entero de cada card al calcular el ancho, y la fila se
+//disparaba (63.000 px) con lo que el loop translateX(-50%) volaba y dejaba un vacio eterno
+const TARJETA_DESTACADA = 'w-56';
 
 export default function CarruselDestacados() {
   const [proyectos, setProyectos] = useState([]);
@@ -35,32 +37,18 @@ export default function CarruselDestacados() {
         Proyectos destacados
       </h2>
       <div
-        className="flex gap-6 whitespace-nowrap animate-carousel hover:[animation-play-state:paused] focus-within:[animation-play-state:paused]"
+        className="flex items-start gap-6 w-max will-change-transform animate-carrusel-loop hover:[animation-play-state:paused] focus-within:[animation-play-state:paused]"
+        style={{ '--carrusel-duracion': '30s' }}
       >
         {loopProyectos.map((proyecto, index) => (
           <div
             key={`${proyecto._id || index}-${index}`}
-            className={`relative inline-block ${TARJETA_DESTACADA} shrink-0 cursor-pointer overflow-hidden rounded-lg transition-transform duration-300 hover:scale-105`}
+            className={`relative inline-block ${TARJETA_DESTACADA} shrink-0 cursor-pointer overflow-visible rounded-lg transition-transform duration-300 hover:scale-105`}
           >
             <ProyectoCard proyecto={proyecto} destacado />
           </div>
         ))}
       </div>
-
-      <style jsx>{`
-        @keyframes carousel {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        .animate-carousel {
-          display: inline-flex;
-          animation: carousel 30s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }
