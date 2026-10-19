@@ -1,9 +1,20 @@
 //hero de la home: carrusel con los videos de los proyectos
 //cada video se reproduce solo (muted, loop) hasta 7 segundos y luego funde al siguiente
-//entra todo proyecto que tenga video: venga del sync de behance (cada 6 horas trae
-//los videos nuevos) o de la propia dueña poniendole un video desde el panel
-//exclusiones puntuales: proyectos que tienen video pero no deben rotar aca
-const EXCLUIR_DEL_HERO = ['DENGUE: INFOGRAFIA INFANTIL MOBILE ANIMADA'];
+//condiciones para rotar: tener video Y pertenecer a una de estas categorias (array
+//por si suma otra). todo llega solo: el sync de behance trae los videos nuevos cada
+//6 horas, las categorias nuevas se detectan al importar y si un proyecto deja de ser
+//de video/animacion (o se le carga un video desde el panel) tambien se refleja aca
+const CATEGORIAS_VIDEO = ['edicion-de-video', 'motion-graphics'];
+
+//categorias de un proyecto: la lista nueva ("servicios") o la vieja ("servicio")
+function categoriasDeProyecto(proyecto) {
+  const lista = Array.isArray(proyecto.servicios) && proyecto.servicios.length
+    ? proyecto.servicios
+    : proyecto.servicio
+      ? [proyecto.servicio]
+      : [];
+  return lista;
+}
 import { useEffect, useRef, useState } from 'react';
 import { obtenerProyectos, obtenerProyectosDestacados } from '../api/proyectos.js';
 import { urlVideoCcV } from '../api/behance.js';
@@ -63,12 +74,12 @@ export default function HeroCarrusel({ variante = 'hero' }) {
   //true mientras dura el fundido: frena cualquier avance que llegue en ese rato
   const rotandoRef = useRef(false);
 
-  //carga: todo proyecto con video, menos las exclusiones puntuales (los destacados arrancan)
+  //carga: proyectos con video de las categorias de video/animacion (los destacados arrancan)
   useEffect(() => {
     Promise.all([obtenerProyectos(), obtenerProyectosDestacados().catch(() => [])])
       .then(([todos, destacados]) => {
         const deVideo = todos.filter(
-          (p) => p.video && !EXCLUIR_DEL_HERO.includes(p.titulo)
+          (p) => p.video && categoriasDeProyecto(p).some((s) => CATEGORIAS_VIDEO.includes(s))
         );
         const primero = destacados
           .map((d) => deVideo.find((p) => p._id === d._id))
