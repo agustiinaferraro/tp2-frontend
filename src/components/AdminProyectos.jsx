@@ -16,7 +16,7 @@ import { obtenerPerfil, actualizarPerfil } from '../api/perfil.js';
 import { obtenerConversaciones } from '../api/mensajes.js';
 import { soyDueno, borrarSesion as borrarSesionUsuario } from '../api/usuarios.js';
 import { comprimirImagen } from '../utils/imagen.js';
-import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
+import { ordenarAnimacionPrimero } from '../utils/ordenCategorias.js';
 import AdminMensajes from './AdminMensajes.jsx';
 import AdminProyectoCard from './AdminProyectoCard.jsx';
 import AdminServicios from './AdminServicios.jsx';
@@ -122,10 +122,11 @@ function agruparProyectos(lista, listaServicios) {
       grupos[indices.get(clave)].proyectos.push(proyecto);
     }
   }
-  //orden alfabetico; motion graphics siempre al final: comparte los mismos proyectos
-  //que edicion de video y asi los dos carruseles no quedan pegados uno al lado del otro
+  //orden alfabetico; animacion (motion graphics) siempre primero porque sus portadas tienen
+  //video, y edicion de video al final: comparte los mismos proyectos que motion y asi los dos
+  //carruseles no quedan pegados uno al lado del otro
   grupos.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-  return ordenarMotionAlFinal(grupos, (g) => g.slug);
+  return ordenarAnimacionPrimero(grupos, (g) => g.slug);
 }
 
 //inicial del nombre para cuando el perfil no tiene foto cargada
@@ -353,7 +354,7 @@ export default function AdminProyectos() {
         if (activo) setCargandoSesion(false);
       });
     obtenerServicios()
-      .then((lista) => setListaServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
+      .then((lista) => setListaServicios(ordenarAnimacionPrimero(lista, (s) => s.slug)))
       .catch(() => {});
     return () => {
       activo = false;
@@ -521,7 +522,7 @@ export default function AdminProyectos() {
       const slugNuevo = creado.datos.slug;
       listaServicios = [...new Set([...serviciosSel, slugNuevo])];
       obtenerServicios()
-        .then((lista) => setListaServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
+        .then((lista) => setListaServicios(ordenarAnimacionPrimero(lista, (s) => s.slug)))
         .catch(() => {});
     }
     //la primera imagen del formulario es la portada y el resto la galeria del detalle
@@ -1494,7 +1495,7 @@ export default function AdminProyectos() {
             <AdminServicios
               alGuardar={() =>
                 obtenerServicios()
-                  .then((lista) => setListaServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
+                  .then((lista) => setListaServicios(ordenarAnimacionPrimero(lista, (s) => s.slug)))
                   .catch(() => {})
               }
             />

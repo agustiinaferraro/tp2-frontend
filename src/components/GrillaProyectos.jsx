@@ -11,7 +11,7 @@ import ProyectoDetalle from './ProyectoDetalle.jsx';
 import ProyectoCard from './ProyectoCard.jsx';
 import Carrusel, { TARJETA_CARRUSEL } from './Carrusel.jsx';
 import Loading from './Loading.jsx';
-import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
+import { ordenarAnimacionPrimero, SLUG_ANIMACION_PRIMERO } from '../utils/ordenCategorias.js';
 
 //marca interna para el chip "sin categoria"
 const SIN_CATEGORIA = '__sin_categoria__';
@@ -92,7 +92,18 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
   //se cargan los proyectos y la lista de servicios para los filtros
   useEffect(() => {
     obtenerProyectos()
-      .then((datos) => setProyectos(datos))
+      //los proyectos de animacion quedan siempre primero en cada listado (carrusel, grilla
+      //y secciones): sus portadas traen video o gif en movimiento y son las que mas llaman
+      //la atencion; el orden de los demas proyectos no se toca (sort estable)
+      .then((datos) =>
+        setProyectos(
+          [...datos].sort(
+            (a, b) =>
+              Number(categoriasDeProyecto(b).includes(SLUG_ANIMACION_PRIMERO)) -
+              Number(categoriasDeProyecto(a).includes(SLUG_ANIMACION_PRIMERO))
+          )
+        )
+      )
       .catch((e) => setError(e.message))
       .finally(() => setCargando(false));
     obtenerServicios()
@@ -114,14 +125,14 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
     return () => window.removeEventListener('popstate', alVolverPagina);
   }, []);
 
-  //categorias con proyectos para mostrar como chips de filtro (motion graphics al final)
-  const conCategoria = ordenarMotionAlFinal([
+  //categorias con proyectos para mostrar como chips de filtro (animacion primero)
+  const conCategoria = ordenarAnimacionPrimero([
     ...new Set(proyectos.flatMap((p) => categoriasDeProyecto(p))),
   ]);
   const tieneSinCategoria = proyectos.some((p) => categoriasDeProyecto(p).length === 0);
   const categorias = [
     { slug: '', nombre: 'Todos' },
-    ...ordenarMotionAlFinal([
+    ...ordenarAnimacionPrimero([
       ...conCategoria,
       ...(tieneSinCategoria ? [SIN_CATEGORIA] : []),
     ]).map((slug) => ({
@@ -150,10 +161,10 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
   const nombreCarrusel = categoria === '' ? 'Todos los proyectos' : nombreDeCategoria(categoria);
 
   //en la grilla cada categoria lleva su propio titulo: con "Todos" se muestran todas juntas,
-  //y al elegir un chip queda solo esa. motion graphics va al final (ver ordenarMotionAlFinal)
+  //y al elegir un chip queda solo esa. animacion va primero (ver ordenarAnimacionPrimero)
   const grupos =
     categoria === ''
-      ? ordenarMotionAlFinal(
+      ? ordenarAnimacionPrimero(
           [
             ...conCategoria.map((slug) => ({ slug, nombre: nombreDeCategoria(slug), items: proyectosDeCategoria(slug) })),
             ...(tieneSinCategoria

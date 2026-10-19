@@ -10,7 +10,7 @@ import Loading from './Loading.jsx';
 import Comentarios from './Comentarios.jsx';
 import { galeriaProyecto, textoVisitar, esDespliegue, esBehance } from '../utils/proyectos.js';
 import { urlVideoCcV } from '../api/behance.js';
-import { ordenarMotionAlFinal } from '../utils/ordenCategorias.js';
+import { ordenarAnimacionPrimero } from '../utils/ordenCategorias.js';
 
 //categorias conocidas (las que tienen paginas generadas en el build)
 //las nuevas no tienen pagina pero si se muestran como chip
@@ -83,7 +83,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
     });
 
     obtenerServicios()
-      .then((lista) => setServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
+      .then((lista) => setServicios(ordenarAnimacionPrimero(lista, (s) => s.slug)))
       .catch(() => {});
 
     if (!proyectoInicial) {
@@ -175,7 +175,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         const slugNuevo = creado.datos.slug;
         listaServicios = [...new Set([...serviciosSel, slugNuevo])];
         obtenerServicios()
-          .then((lista) => setServicios(ordenarMotionAlFinal(lista, (s) => s.slug)))
+          .then((lista) => setServicios(ordenarAnimacionPrimero(lista, (s) => s.slug)))
           .catch(() => {});
       }
 
