@@ -10,9 +10,10 @@
 //como se cuida la caida:
 //  - el video recien se monta cuando la tarjeta entra en pantalla y se pausa al salir
 //    (si no, con la grilla cargada se bajarian todos los videos juntos de una)
-//  - si da error o tarda mas de ESPERA_VIDEO_MS en poder reproducirse (sin wifi, adobe
-//    caido, url firmada vencida) se cae a la imagen de behance y, si esa tampoco, a la
-//    miniatura default con la inicial del titulo: nunca queda un hueco ni un video roto
+//  - si da error, o estando en pantalla tarda mas de ESPERA_VIDEO_MS en poder
+//    reproducirse de verdad (sin wifi, adobe caido, url firmada vencida), se cae a la
+//    imagen de behance y, si esa tampoco, a la miniatura default con la inicial del
+//    titulo: nunca queda un hueco ni un video roto
 import { useEffect, useRef, useState } from 'react';
 import ImagenProyecto from './ImagenProyecto.jsx';
 import { urlVideoCcV } from '../api/behance.js';
@@ -94,16 +95,19 @@ export default function PreviewProyecto({ proyecto, className = '', alternativa 
   const srcVideo = fuente?.tipo === 'directo' ? fuente.src : mp4;
   const reproducir = Boolean(srcVideo) && !falla && vioPantalla;
 
-  //techo para el video: si no dio senal de que puede reproducirse en el plazo, se muestra
-  //la imagen (tambien cubre el caso del video que nunca llega a cargar ni a fallar)
+  //techo para el video, pero solo mientras esta EN PANTALLA: uno que quedo montado
+  //fuera de la vista esta pausado a proposito (para no bajar datos), asi que no puede
+  //pasar de la metadata y declararlo muerto ahi seria un falso positivo que mata el
+  //video de tarjetas que el visitante ni llego a ver. al entrar en pantalla arranca el
+  //reloj de nuevo: si en ese plazo no puede reproducirse de verdad, ahi si se cae a la imagen
   useEffect(() => {
-    if (!reproducir) return undefined;
+    if (!reproducir || !enPantalla) return undefined;
     const techo = setTimeout(() => {
       const video = videoRef.current;
       if (!video || video.readyState < 2) setFalla(true);
     }, ESPERA_VIDEO_MS);
     return () => clearTimeout(techo);
-  }, [reproducir]);
+  }, [reproducir, enPantalla]);
 
   //reproduce al entrar y pausa al salir de pantalla. si el navegador bloquea el autoplay,
   //queda el <video> con su poster (la portada de behance), nunca un cuadro negro
