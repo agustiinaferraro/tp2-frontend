@@ -254,6 +254,12 @@ html.con-js .animar-grupo.animado > *:nth-child(6) { transition-delay: 340ms; }
 html.con-js .animar-grupo.animado > *:nth-child(7) { transition-delay: 400ms; }
 html.con-js .animar-grupo.animado > *:nth-child(8) { transition-delay: 460ms; }
 
+/*forma de escudo para las tarjetas de servicios: costados rectos y punta abajo al centro.
+  va en porcentajes para que se adapte a cualquier ancho/alto de tarjeta (home y /servicios)*/
+.forma-escudo {
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+}
+
 /*si el sistema pide menos movimiento, no se anima nada y todo queda visible.
   ojo: NO se apaga el avance solo de los carruseles (clase animate-carrusel-loop):
   es el contenido principal de la home (los destacados), se frena con el mouse y con
