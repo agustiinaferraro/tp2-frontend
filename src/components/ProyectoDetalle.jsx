@@ -342,14 +342,16 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
             <p className="text-lg text-zinc-400 leading-relaxed mt-6 whitespace-pre-line">{proyecto.resumen}</p>
           )}
         </div>
-        {/*editar: solo si hay sesion de administrador (la sesion se cierra desde el panel o el perfil)*/}
+        {/*editar: solo si hay sesion de administrador (la sesion se cierra desde el panel o el perfil).
+            el texto aclara que el editor cambia todo el proyecto, no solo la descripcion*/}
         {admin && (
           <button
             type="button"
             onClick={editando ? () => setEditando(false) : abrirEditor}
+            aria-label={editando ? 'Cancelar edición' : 'Editar este proyecto'}
             className={`${claseBoton} bg-violeta-app hover:bg-violeta-app/90 text-black shrink-0`}
           >
-            {editando ? 'Cancelar edición' : 'Editar'}
+            {editando ? 'Cancelar edición' : '✎ Editar proyecto'}
           </button>
         )}
       </div>
@@ -366,148 +368,6 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
           {mensaje.texto}
         </p>
       )}
-
-      {/*video del proyecto: se reproduce aca mismo para no sacar al visitante del sitio.
-          el poster es solo el cuadro que se ve mientras carga, no agrega una imagen debajo*/}
-      {urlVideo && (
-        <figure className="mt-8">
-          <video
-            src={urlVideo}
-            poster={galeria[0] ?? imagenPreferida(proyecto) ?? undefined}
-            controls
-            preload="metadata"
-            className="w-full rounded-2xl border border-zinc-800 bg-black"
-          >
-            Tu navegador no puede reproducir este video.
-          </video>
-        </figure>
-      )}
-
-      {galeria.length > 0 && (
-        <figure className="mt-8 space-y-3">
-          {galeria.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-1">
-              {galeria.map((img, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setIndiceGaleria(i)}
-                  className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors cursor-pointer ${
-                    i === indiceGaleria ? 'border-verde-app' : 'border-zinc-800 hover:border-zinc-600'
-                  }`}
-                  aria-label={`Ver imagen ${i + 1}`}
-                >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
-          {/*en proyectos de desarrollo la imagen lleva al sitio publicado (ej. vercel);
-              en los de behance no, porque el boton de abajo ya lleva a behance*/}
-          {(() => {
-            const imagenPrincipal = (
-              <img
-                src={galeria[Math.min(indiceGaleria, galeria.length - 1)]}
-                alt={`Imagen del proyecto ${proyecto.titulo}`}
-                className="w-full rounded-2xl border border-zinc-800"
-              />
-            );
-            if (!esDespliegue(proyecto) || !proyecto.link) return imagenPrincipal;
-            return (
-              <a
-                href={proyecto.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={`Abrir ${proyecto.titulo} en una pestaña nueva`}
-                className="block rounded-2xl overflow-hidden ring-offset-2 ring-offset-zinc-950 hover:ring-2 hover:ring-verde-app/60 transition-all"
-              >
-                {imagenPrincipal}
-              </a>
-            );
-          })()}
-        </figure>
-      )}
-
-      {proyecto.link && (
-        <p className="mt-8">
-          <a
-            href={proyecto.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-violeta-app text-black font-medium hover:bg-violeta-app/90 hover:scale-105 active:scale-95 active:bg-violeta-app/80 transition-all duration-200"
-          >
-            {textoVisitar(proyecto)} <span aria-hidden="true">↗</span>
-          </a>
-        </p>
-      )}
-
-      {/*ficha sincronizada desde behance: descripcion completa, estadisticas, fecha y keywords
-          (solo aparece si el proyecto es de behance y ya se sincronizo su detalle)*/}
-      {hayFicha && (
-        <section className="mt-10 p-6 rounded-2xl bg-zinc-900/60 border border-zinc-800">
-          <h2 className="text-lg font-semibold text-white">Sobre el proyecto</h2>
-
-          {descripcionLarga && (
-            <p className="text-zinc-400 leading-relaxed mt-3 whitespace-pre-line">{descripcionLarga}</p>
-          )}
-
-          {(estadisticas || fechaPublicacion) && (
-            <ul className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm text-zinc-400">
-              {estadisticas && (
-                <>
-                  <li>
-                    <span className="text-white font-semibold">
-                      {(estadisticas.vistas ?? 0).toLocaleString('es-AR')}
-                    </span>{' '}
-                    vistas
-                  </li>
-                  <li>
-                    <span className="text-white font-semibold">
-                      {(estadisticas.apreciaciones ?? 0).toLocaleString('es-AR')}
-                    </span>{' '}
-                    apreciaciones
-                  </li>
-                  <li>
-                    <span className="text-white font-semibold">
-                      {(estadisticas.comentarios ?? 0).toLocaleString('es-AR')}
-                    </span>{' '}
-                    comentarios
-                  </li>
-                </>
-              )}
-              {fechaPublicacion && <li>Publicado el {fechaPublicacion}</li>}
-            </ul>
-          )}
-
-          {palabrasClave.length > 0 && (
-            <div className="mt-5">
-              <p className="text-xs uppercase tracking-widest text-zinc-500">Palabras clave</p>
-              <ul className="flex flex-wrap gap-2 mt-2">
-                {palabrasClave.map((palabra) => (
-                  <li
-                    key={palabra}
-                    className="text-xs px-3 py-1 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700"
-                  >
-                    {palabra}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/*aprendizajes: texto propio de la dueña, siempre visible si esta escrito
-        (es lo que el proyecto aprendio/resolvio, no un listado de herramientas)*/}
-      {proyecto.aprendizajes && (
-        <section className="mt-10 p-6 rounded-2xl bg-verde-app/5 border border-verde-app/20">
-          <h2 className="text-lg font-semibold text-verde-app">Qué aprendí</h2>
-          <p className="text-zinc-300 leading-relaxed mt-3 whitespace-pre-line">{proyecto.aprendizajes}</p>
-        </section>
-      )}
-
-      {/*comentarios: cualquiera lee, para comentar hay que registrarse o entrar*/}
-      <Comentarios proyectoId={proyecto._id} />
 
       {/*formulario de edicion, solo para admin*/}
       {admin && editando && (
@@ -750,6 +610,149 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
           </div>
         </form>
       )}
+
+      {/*video del proyecto: se reproduce aca mismo para no sacar al visitante del sitio.
+          el poster es solo el cuadro que se ve mientras carga, no agrega una imagen debajo*/}
+      {urlVideo && (
+        <figure className="mt-8">
+          <video
+            src={urlVideo}
+            poster={galeria[0] ?? imagenPreferida(proyecto) ?? undefined}
+            controls
+            preload="metadata"
+            className="w-full rounded-2xl border border-zinc-800 bg-black"
+          >
+            Tu navegador no puede reproducir este video.
+          </video>
+        </figure>
+      )}
+
+      {galeria.length > 0 && (
+        <figure className="mt-8 space-y-3">
+          {galeria.length > 1 && (
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {galeria.map((img, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setIndiceGaleria(i)}
+                  className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors cursor-pointer ${
+                    i === indiceGaleria ? 'border-verde-app' : 'border-zinc-800 hover:border-zinc-600'
+                  }`}
+                  aria-label={`Ver imagen ${i + 1}`}
+                >
+                  <img src={img} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+          {/*en proyectos de desarrollo la imagen lleva al sitio publicado (ej. vercel);
+              en los de behance no, porque el boton de abajo ya lleva a behance*/}
+          {(() => {
+            const imagenPrincipal = (
+              <img
+                src={galeria[Math.min(indiceGaleria, galeria.length - 1)]}
+                alt={`Imagen del proyecto ${proyecto.titulo}`}
+                className="w-full rounded-2xl border border-zinc-800"
+              />
+            );
+            if (!esDespliegue(proyecto) || !proyecto.link) return imagenPrincipal;
+            return (
+              <a
+                href={proyecto.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`Abrir ${proyecto.titulo} en una pestaña nueva`}
+                className="block rounded-2xl overflow-hidden ring-offset-2 ring-offset-zinc-950 hover:ring-2 hover:ring-verde-app/60 transition-all"
+              >
+                {imagenPrincipal}
+              </a>
+            );
+          })()}
+        </figure>
+      )}
+
+      {proyecto.link && (
+        <p className="mt-8">
+          <a
+            href={proyecto.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-violeta-app text-black font-medium hover:bg-violeta-app/90 hover:scale-105 active:scale-95 active:bg-violeta-app/80 transition-all duration-200"
+          >
+            {textoVisitar(proyecto)} <span aria-hidden="true">↗</span>
+          </a>
+        </p>
+      )}
+
+      {/*ficha sincronizada desde behance: descripcion completa, estadisticas, fecha y keywords
+          (solo aparece si el proyecto es de behance y ya se sincronizo su detalle)*/}
+      {hayFicha && (
+        <section className="mt-10 p-6 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+          <h2 className="text-lg font-semibold text-white">Sobre el proyecto</h2>
+
+          {descripcionLarga && (
+            <p className="text-zinc-400 leading-relaxed mt-3 whitespace-pre-line">{descripcionLarga}</p>
+          )}
+
+          {(estadisticas || fechaPublicacion) && (
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 mt-4 text-sm text-zinc-400">
+              {estadisticas && (
+                <>
+                  <li>
+                    <span className="text-white font-semibold">
+                      {(estadisticas.vistas ?? 0).toLocaleString('es-AR')}
+                    </span>{' '}
+                    vistas
+                  </li>
+                  <li>
+                    <span className="text-white font-semibold">
+                      {(estadisticas.apreciaciones ?? 0).toLocaleString('es-AR')}
+                    </span>{' '}
+                    apreciaciones
+                  </li>
+                  <li>
+                    <span className="text-white font-semibold">
+                      {(estadisticas.comentarios ?? 0).toLocaleString('es-AR')}
+                    </span>{' '}
+                    comentarios
+                  </li>
+                </>
+              )}
+              {fechaPublicacion && <li>Publicado el {fechaPublicacion}</li>}
+            </ul>
+          )}
+
+          {palabrasClave.length > 0 && (
+            <div className="mt-5">
+              <p className="text-xs uppercase tracking-widest text-zinc-500">Palabras clave</p>
+              <ul className="flex flex-wrap gap-2 mt-2">
+                {palabrasClave.map((palabra) => (
+                  <li
+                    key={palabra}
+                    className="text-xs px-3 py-1 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700"
+                  >
+                    {palabra}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/*aprendizajes: texto propio de la dueña, siempre visible si esta escrito
+        (es lo que el proyecto aprendio/resolvio, no un listado de herramientas)*/}
+      {proyecto.aprendizajes && (
+        <section className="mt-10 p-6 rounded-2xl bg-verde-app/5 border border-verde-app/20">
+          <h2 className="text-lg font-semibold text-verde-app">Qué aprendí</h2>
+          <p className="text-zinc-300 leading-relaxed mt-3 whitespace-pre-line">{proyecto.aprendizajes}</p>
+        </section>
+      )}
+
+      {/*comentarios: cualquiera lee, para comentar hay que registrarse o entrar*/}
+      <Comentarios proyectoId={proyecto._id} />
+
     </section>
   );
 }
