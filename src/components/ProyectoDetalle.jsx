@@ -8,7 +8,7 @@ import { soyDueno, borrarSesion as borrarSesionUsuario } from '../api/usuarios.j
 import SelectorImagenes from './SelectorImagenes.jsx';
 import Loading from './Loading.jsx';
 import Comentarios from './Comentarios.jsx';
-import { galeriaProyecto, textoVisitar, esDespliegue, esBehance } from '../utils/proyectos.js';
+import { galeriaProyecto, textoVisitar, esDespliegue, esBehance, imagenPreferida } from '../utils/proyectos.js';
 import { urlVideoCcV } from '../api/behance.js';
 import { ordenarAnimacionPrimero } from '../utils/ordenCategorias.js';
 
@@ -367,12 +367,13 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
         </p>
       )}
 
-      {/*video del proyecto: se reproduce aca mismo para no sacar al visitante del sitio*/}
+      {/*video del proyecto: se reproduce aca mismo para no sacar al visitante del sitio.
+          el poster es solo el cuadro que se ve mientras carga, no agrega una imagen debajo*/}
       {urlVideo && (
         <figure className="mt-8">
           <video
             src={urlVideo}
-            poster={galeria[0] ?? undefined}
+            poster={galeria[0] ?? imagenPreferida(proyecto) ?? undefined}
             controls
             preload="metadata"
             className="w-full rounded-2xl border border-zinc-800 bg-black"

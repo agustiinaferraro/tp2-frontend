@@ -73,14 +73,20 @@ export function tieneMedio(proyecto) {
 //galeria de imagenes del proyecto, empezando siempre por la que mejor lo representa:
 //las fotos reales subidas van primero, despues la galeria completa que trae de behance
 //(en el orden original de behance) y la captura en vivo del deploy queda al final,
-//como ultima alternativa (ademas es la que suele salir en negro si el deploy no carga)
+//como ultima alternativa (ademas es la que suele salir en negro si el deploy no carga).
+//los proyectos con video no llevan imagen extra: en behance el video ocupa ese lugar y la
+//portada es solo un cover automatico que behance genera (no es una imagen del proyecto), asi
+//que ahi la galeria se arma unicamente con las imagenes que behance tiene publicadas de verdad
 export function galeriaProyecto(proyecto) {
   if (!proyecto) return [];
-  const propia = [proyecto.imagen, ...(proyecto?.imagenes ?? [])]
-    .filter(Boolean)
-    .map((img) => mejorarImagenBehance(img));
+  const conVideo = Boolean(proyecto?.video?.trim());
+  const propia = conVideo
+    ? []
+    : [proyecto.imagen, ...(proyecto?.imagenes ?? [])]
+        .filter(Boolean)
+        .map((img) => mejorarImagenBehance(img));
   const behance = (proyecto?.imagenesBehance ?? []).filter(Boolean);
-  const captura = esDespliegue(proyecto) ? urlCaptura(proyecto.link) : null;
+  const captura = !conVideo && esDespliegue(proyecto) ? urlCaptura(proyecto.link) : null;
   return [...propia, ...behance, captura]
     .filter((img, i, lista) => img && lista.indexOf(img) === i && !esPlaceholder(img));
 }
