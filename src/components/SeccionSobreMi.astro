@@ -18,7 +18,7 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
     {/*marco de colores: capa de atras con 4px, asi el clip-path no corta un border normal.
       el gradiente va violeta -> blanco -> verde y se enciende entero al pasar el mouse*/}
     <div
-      class="p-[4px] forma-escudo bg-gradient-to-br from-violeta-app/70 via-white/90 to-verde-app/70 group-hover:from-violeta-app group-hover:via-white group-hover:to-verde-app group-hover:scale-[1.01] transition-all duration-300"
+      class="p-[4px] forma-escudo bg-gradient-to-br from-verde-app/70 via-white/90 to-violeta-app/70 group-hover:from-verde-app group-hover:via-white group-hover:to-violeta-app group-hover:scale-[1.01] transition-all duration-300"
     >
       {/*cuerpo semitransparente: el blanco al 85% deja asomar el degradé del marco (tonos pastel)
         y un brillo barre la card cuando entra el mouse. los tres puntitos de la esquina son la paleta*/}
@@ -26,8 +26,8 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
         class="forma-escudo overflow-hidden relative bg-white/85 backdrop-blur-[2px] group-hover:bg-white/95 transition-colors duration-300 before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-1/3 before:z-10 before:bg-gradient-to-r before:from-transparent before:via-white/70 before:to-transparent before:rotate-12 before:-translate-x-[200%] before:pointer-events-none before:transition-transform before:duration-1000 group-hover:before:translate-x-[500%]"
       >
         <div aria-hidden="true" class="absolute top-6 right-8 hidden md:flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-violeta-app"></span>
           <span class="w-2.5 h-2.5 rounded-full bg-verde-app"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-violeta-app"></span>
           <span class="w-2.5 h-2.5 rounded-full bg-zinc-950/15"></span>
         </div>
         <div class="grid md:grid-cols-[minmax(0,17rem)_1fr] gap-8 md:gap-10 p-8 sm:p-12 pb-28 sm:pb-32">
@@ -36,12 +36,12 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
             <div class="relative shrink-0">
               <div
                 aria-hidden="true"
-                class="absolute inset-0 rounded-3xl bg-gradient-to-br from-violeta-app to-verde-app blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-300"
+                class="absolute inset-0 rounded-3xl bg-gradient-to-br from-verde-app to-violeta-app blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-300"
               >
               </div>
               {/*marco de la foto: mismo gradiente violeta -> blanco -> verde que el de la card*/}
               <div
-                class="relative p-[3px] rounded-[1.35rem] bg-gradient-to-br from-violeta-app via-white to-verde-app shadow-lg shadow-zinc-950/20"
+                class="relative p-[3px] rounded-[1.35rem] bg-gradient-to-br from-verde-app via-white to-violeta-app shadow-lg shadow-zinc-950/20"
               >
                 <img
                   src="/img/sobre-mi.jpg"
@@ -63,7 +63,7 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
             <h2 class="text-4xl font-bold text-zinc-950 inline-flex items-center gap-3">
               <svg
                 aria-hidden="true"
-                class="w-9 h-9 text-violeta-app"
+                class="w-9 h-9 text-verde-app"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
@@ -104,7 +104,7 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
 
             {/*la card entera ya es el enlace: este queda como invitacion visual*/}
             <span
-              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verde-app group-hover:bg-verde-app/90 text-black text-sm font-medium transition-all duration-200"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-violeta-app group-hover:bg-violeta-app/90 text-black text-sm font-medium transition-all duration-200"
             >
               Ver mi recorrido completo
               <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">

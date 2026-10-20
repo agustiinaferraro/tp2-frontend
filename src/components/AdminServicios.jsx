@@ -94,7 +94,7 @@ export default function AdminServicios({ alGuardar = null }) {
   }
 
   const claseInput =
-    'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-verde-app transition-all';
+    'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-violeta-app transition-all';
 
   //estado: error
   if (error) {
@@ -134,7 +134,7 @@ export default function AdminServicios({ alGuardar = null }) {
             <li key={servicio.slug} className="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 space-y-4">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <p className="text-sm text-zinc-500">
-                  /servicios/<span className="text-verde-app">{servicio.slug}</span>
+                  /servicios/<span className="text-violeta-app">{servicio.slug}</span>
                 </p>
                 {avisando && (
                   <p
@@ -191,7 +191,7 @@ export default function AdminServicios({ alGuardar = null }) {
                 type="button"
                 onClick={() => guardar(servicio)}
                 disabled={guardandoSlug === servicio.slug}
-                className="px-4 py-2 rounded-lg font-medium bg-violeta-app hover:bg-violeta-app/90 text-black transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-lg font-medium bg-verde-app hover:bg-verde-app/90 text-black transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {guardandoSlug === servicio.slug ? 'Guardando...' : 'Guardar servicio'}
               </button>

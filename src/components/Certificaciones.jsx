@@ -72,7 +72,7 @@ export default function Certificaciones({ certificaciones = [] }) {
         <h2 className="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
           <svg
             aria-hidden="true"
-            className="w-8 h-8 text-violeta-app"
+            className="w-8 h-8 text-verde-app"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.8"
@@ -105,7 +105,7 @@ export default function Certificaciones({ certificaciones = [] }) {
                     className="w-full h-64 object-cover object-top bg-zinc-800"
                   />
                   <p className="flex items-start gap-2 px-4 py-4 text-white text-sm font-semibold">
-                    <Check className="w-5 h-5 text-verde-app shrink-0 mt-0.5" />
+                    <Check className="w-5 h-5 text-violeta-app shrink-0 mt-0.5" />
                     {cert.descripcion}
                   </p>
                 </button>
@@ -132,7 +132,7 @@ export default function Certificaciones({ certificaciones = [] }) {
             type="button"
             onClick={() => setAbierta(null)}
             aria-label="Cerrar"
-            className="fixed top-4 right-4 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+            className="fixed top-4 right-4 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-violeta-app hover:text-black hover:border-violeta-app active:scale-90"
           >
             <Cruz />
           </button>
@@ -144,7 +144,7 @@ export default function Certificaciones({ certificaciones = [] }) {
               type="button"
               onClick={() => setAbierta((i) => (i - 1 + total) % total)}
               aria-label="Certificado anterior"
-              className="hidden sm:flex fixed left-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+              className="hidden sm:flex fixed left-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-violeta-app hover:text-black hover:border-violeta-app active:scale-90"
             >
               <Flecha direccion="izquierda" />
             </button>
@@ -156,7 +156,7 @@ export default function Certificaciones({ certificaciones = [] }) {
               type="button"
               onClick={() => setAbierta((i) => (i + 1) % total)}
               aria-label="Certificado siguiente"
-              className="hidden sm:flex fixed right-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+              className="hidden sm:flex fixed right-4 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-violeta-app hover:text-black hover:border-violeta-app active:scale-90"
             >
               <Flecha direccion="derecha" />
             </button>
@@ -177,7 +177,7 @@ export default function Certificaciones({ certificaciones = [] }) {
                   type="button"
                   onClick={() => setAbierta((i) => (i - 1 + total) % total)}
                   aria-label="Certificado anterior"
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-violeta-app hover:text-black hover:border-violeta-app active:scale-90"
                 >
                   <Flecha direccion="izquierda" />
                 </button>
@@ -185,7 +185,7 @@ export default function Certificaciones({ certificaciones = [] }) {
                   type="button"
                   onClick={() => setAbierta((i) => (i + 1) % total)}
                   aria-label="Certificado siguiente"
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90"
+                  className="flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900/90 border border-zinc-700 text-white transition-all duration-200 cursor-pointer hover:scale-110 hover:bg-violeta-app hover:text-black hover:border-violeta-app active:scale-90"
                 >
                   <Flecha direccion="derecha" />
                 </button>

@@ -9,10 +9,10 @@ import {
 } from '../api/usuarios.js';
 
 const claseInput =
-  'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-verde-app transition-all';
+  'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-violeta-app transition-all';
 
 const claseBotonPrimario =
-  'w-full px-5 py-2.5 rounded-full bg-violeta-app hover:bg-violeta-app/90 active:bg-violeta-app/80 text-black text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer';
+  'w-full px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 text-black text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer';
 
 const claseBotonSecundario =
   'w-full px-5 py-2.5 rounded-full bg-zinc-800 hover:bg-zinc-700 hover:text-white active:bg-zinc-600 text-zinc-200 border border-zinc-700 text-sm transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer';
@@ -81,7 +81,7 @@ export default function RecuperarClave() {
       <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-8 space-y-4 text-center">
         <span
           aria-hidden="true"
-          className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-verde-app/10 border border-verde-app/30 text-verde-app"
+          className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-violeta-app/10 border border-violeta-app/30 text-violeta-app"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
             <path d="m5 13 4 4L19 7" />
@@ -91,7 +91,7 @@ export default function RecuperarClave() {
         <p className="text-sm text-zinc-400">Ya podés entrar con tu contraseña nueva.</p>
         <a
           href="/perfil"
-          className="inline-block px-6 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 hover:scale-105 active:scale-95 text-black text-sm font-medium transition-all duration-200"
+          className="inline-block px-6 py-2.5 rounded-full bg-violeta-app hover:bg-violeta-app/90 active:bg-violeta-app/80 hover:scale-105 active:scale-95 text-black text-sm font-medium transition-all duration-200"
         >
           Ir a mi perfil
         </a>
@@ -133,7 +133,7 @@ export default function RecuperarClave() {
         </form>
       ) : enviado ? (
         <div className="space-y-4 text-center">
-          <p role="status" className="text-sm text-verde-app leading-relaxed">
+          <p role="status" className="text-sm text-violeta-app leading-relaxed">
             Listo. Si <span className="font-semibold text-white">{email.trim()}</span> tiene una
             cuenta, te llegó un mail con el enlace para confirmar y crear tu contraseña nueva.
           </p>

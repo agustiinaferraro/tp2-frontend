@@ -63,12 +63,12 @@ export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
   //estado: con datos
   return (
     <section className="max-w-5xl mx-auto px-4 py-16">
-      <span className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-verde-app/10 border border-verde-app/20 text-verde-app mb-6">
+      <span className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-violeta-app/10 border border-violeta-app/20 text-violeta-app mb-6">
         <IconoServicio slug={servicio.slug} className="w-8 h-8" />
       </span>
       {mostrarTitulo && (
         <>
-          <p className="text-verde-app font-medium tracking-widest uppercase text-sm">Servicio</p>
+          <p className="text-violeta-app font-medium tracking-widest uppercase text-sm">Servicio</p>
           <h1 className="text-4xl font-bold text-white mt-2">{servicio.nombre}</h1>
         </>
       )}
@@ -81,7 +81,7 @@ export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
           <ul className="mt-3 space-y-2">
             {servicio.incluye.map((item) => (
               <li key={item} className="flex items-start gap-2 text-zinc-300">
-                <span aria-hidden="true" className="text-verde-app mt-0.5 font-semibold">
+                <span aria-hidden="true" className="text-violeta-app mt-0.5 font-semibold">
                   ✓
                 </span>
                 <span>{item}</span>
@@ -98,7 +98,7 @@ export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
           <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {proyectos.map((proyecto) => (
               <li key={proyecto._id}>
-                <article className="h-full flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-verde-app/50 transition-colors">
+                <article className="h-full flex flex-col overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-violeta-app/50 transition-colors">
                   {/*la portada es la imagen que mejor representa al proyecto
                     (la de behance, o la captura del deploy en los proyectos web); si el
                     proyecto tiene video o gif animado, PreviewProyecto lo mueve adentro
@@ -116,7 +116,7 @@ export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
                   )}
                   <div className="p-6 flex flex-col gap-3 flex-1">
                     <h3 className="text-xl font-bold text-white">
-                      <a href={`/proyectos/?id=${proyecto._id}`} className="rounded-lg px-2 py-1 hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200">
+                      <a href={`/proyectos/?id=${proyecto._id}`} className="rounded-lg px-2 py-1 hover:bg-violeta-app/10 hover:text-violeta-app/80 active:scale-95 hover:scale-105 transition-all duration-200">
                         {proyecto.titulo}
                       </a>
                     </h3>
@@ -127,7 +127,7 @@ export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
                           href={proyecto.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-verde-app hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200"
+                          className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-violeta-app hover:bg-violeta-app/10 hover:text-violeta-app/80 active:scale-95 hover:scale-105 transition-all duration-200"
                         >
                           {textoVisitar(proyecto)} <span aria-hidden="true">→</span>
                         </a>

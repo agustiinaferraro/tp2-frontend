@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { obtenerHistorialProyectos, restaurarHistorialProyecto } from '../api/historialProyectos.js';
 
 export default function HistorialProyectos({ alRestaurar }) {
@@ -52,7 +52,7 @@ export default function HistorialProyectos({ alRestaurar }) {
   return (
     <div className="space-y-2">
       {mensaje && (
-        <p className="fixed top-20 right-4 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border border-verde-app/30 bg-verde-app/10 text-verde-app shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer">
+        <p className="fixed top-20 right-4 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border border-violeta-app/30 bg-violeta-app/10 text-violeta-app shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer">
           {mensaje}
         </p>
       )}
@@ -66,7 +66,7 @@ export default function HistorialProyectos({ alRestaurar }) {
             <span className="text-zinc-300">{h.tipo} - {h.titulo}</span>
             <span className="text-zinc-500 ml-2">{new Date(h.createdAt).toLocaleString()}</span>
             {h.restaurado && (
-              <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-verde-app border border-zinc-700">
+              <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-zinc-800 text-violeta-app border border-zinc-700">
                 Restaurado
               </span>
             )}
@@ -76,7 +76,7 @@ export default function HistorialProyectos({ alRestaurar }) {
               type="button"
               onClick={() => restaurar(h._id)}
               disabled={restaurando === h._id}
-              className="text-xs px-2 py-1 rounded bg-verde-app text-black disabled:opacity-60"
+              className="text-xs px-2 py-1 rounded bg-violeta-app text-black disabled:opacity-60"
             >
               {restaurando === h._id ? 'Restaurando...' : 'Restaurar'}
             </button>

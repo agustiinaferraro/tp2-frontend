@@ -148,7 +148,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="text-violeta-app text-sm rounded-lg px-2 py-1 hover:bg-violeta-app/10 hover:text-violeta-app/80 active:scale-95 hover:scale-105 transition-all duration-200 cursor-pointer"
+          className="text-verde-app text-sm rounded-lg px-2 py-1 hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200 cursor-pointer"
         >
           Reintentar
         </button>
@@ -175,7 +175,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
                 className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm ${
                   esDeAgustina
                     ? 'rounded-tl-sm bg-zinc-800 border border-zinc-700 text-zinc-200'
-                    : 'rounded-tr-sm bg-verde-app text-black'
+                    : 'rounded-tr-sm bg-whatsapp text-black'
                 }`}
               >
                 <p className="m-0 whitespace-pre-wrap break-words">{m.mensaje}</p>
@@ -207,7 +207,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
     <div className="p-6 rounded-2xl bg-black/60 border border-zinc-800 space-y-4">
       {/*header tipo redes: el nombre de agustina arriba con un indicador de en linea*/}
       <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
-        <span className="flex items-center justify-center w-10 h-10 rounded-full bg-violeta-app/20 border border-violeta-app/30 text-violeta-app font-bold text-lg">
+        <span className="flex items-center justify-center w-10 h-10 rounded-full bg-verde-app/20 border border-verde-app/30 text-verde-app font-bold text-lg">
           {nombreAdmin.charAt(0).toUpperCase()}
         </span>
         <div className="leading-tight">
@@ -241,12 +241,12 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
           onChange={(e) => setTexto(e.target.value)}
           placeholder="Escribí tu mensaje..."
           aria-label="Escribí tu mensaje"
-          className="flex-1 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder:text-zinc-600 focus:outline-none focus:border-violeta-app"
+          className="flex-1 px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white placeholder:text-zinc-600 focus:outline-none focus:border-verde-app"
         />
         <button
           type="submit"
           disabled={enviando || !texto.trim()}
-          className="px-4 py-2 rounded-xl bg-violeta-app hover:bg-violeta-app/90 text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95"
+          className="px-4 py-2 rounded-xl bg-verde-app hover:bg-verde-app/90 text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95"
         >
           {enviando ? 'Enviando...' : 'Enviar'}
         </button>

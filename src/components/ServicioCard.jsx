@@ -11,12 +11,12 @@ export default function ServicioCard({ servicio, proyecto = null }) {
   return (
     <a
       href={`/servicios/${servicio.slug ?? servicio._id}`}
-      className="block h-full group relative [filter:drop-shadow(0_8px_12px_rgba(0,0,0,0.5))] group-hover:[filter:drop-shadow(0_0_18px_rgba(105,245,204,0.2))]"
+      className="block h-full group relative [filter:drop-shadow(0_8px_12px_rgba(0,0,0,0.5))] group-hover:[filter:drop-shadow(0_0_18px_rgba(184,132,231,0.2))]"
     >
       {/*resplandor ambiental de hover: va fuera del escudo para que el clip no lo corte*/}
-      <div className="absolute -inset-1 bg-gradient-to-r from-verde-app/0 via-verde-app/20 to-verde-app/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none" />
+      <div className="absolute -inset-1 bg-gradient-to-r from-violeta-app/0 via-violeta-app/20 to-violeta-app/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none" />
 
-      <article className="h-full p-[2px] bg-verde-app/25 group-hover:bg-verde-app/90 group-hover:scale-[1.03] active:scale-95 transition-all duration-300 forma-escudo relative z-0 hover:z-10 focus-within:z-10">
+      <article className="h-full p-[2px] bg-violeta-app/25 group-hover:bg-violeta-app/90 group-hover:scale-[1.03] active:scale-95 transition-all duration-300 forma-escudo relative z-0 hover:z-10 focus-within:z-10">
         {/*min-h: la tarjeta crece un poco mas alla de su contenido (el alto lo manda la portada).
           va en la capa interna para que el article siempre la siga sin importar el contexto*/}
         <div className="h-full min-h-[26rem] bg-zinc-950 forma-escudo overflow-hidden relative flex flex-col">
@@ -43,17 +43,17 @@ export default function ServicioCard({ servicio, proyecto = null }) {
             <div>
               {/* Cabecera de la card: Ícono + Chip identificador para saber de qué es la tarjeta */}
               <div className="flex items-center justify-between mb-3">
-                <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-black/60 backdrop-blur-md border border-verde-app/50 text-verde-app group-hover:border-verde-app group-hover:scale-110 group-hover:bg-verde-app group-hover:text-black transition-all duration-300 shadow-md">
+                <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-black/60 backdrop-blur-md border border-violeta-app/50 text-violeta-app group-hover:border-violeta-app group-hover:scale-110 group-hover:bg-violeta-app group-hover:text-black transition-all duration-300 shadow-md">
                   <IconoServicio slug={servicio.slug ?? servicio._id} className="w-5 h-5" />
                 </span>
 
                 {/* Tag aclaratorio del servicio */}
-                <span className="text-[11px] uppercase tracking-wider font-semibold text-verde-app/90 bg-verde-app/10 border border-verde-app/30 px-2.5 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-verde-app/20 transition-all">
+                <span className="text-[11px] uppercase tracking-wider font-semibold text-violeta-app/90 bg-violeta-app/10 border border-violeta-app/30 px-2.5 py-0.5 rounded-full backdrop-blur-sm group-hover:bg-violeta-app/20 transition-all">
                   Servicio
                 </span>
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-verde-app transition-colors duration-200 tracking-tight">
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-violeta-app transition-colors duration-200 tracking-tight">
                 {servicio.nombre}
               </h3>
 
@@ -64,9 +64,9 @@ export default function ServicioCard({ servicio, proyecto = null }) {
             </div>
 
             <p className="mt-4 pt-2 border-t border-white/5 text-center">
-              <span className="inline-flex items-center gap-2 rounded-lg text-sm font-semibold text-verde-app group-hover:text-white transition-all duration-200">
+              <span className="inline-flex items-center gap-2 rounded-lg text-sm font-semibold text-violeta-app group-hover:text-white transition-all duration-200">
                 Ver detalles
-                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1.5 text-verde-app">→</span>
+                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1.5 text-violeta-app">→</span>
               </span>
             </p>
           </div>

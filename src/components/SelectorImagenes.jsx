@@ -50,7 +50,7 @@ export default function SelectorImagenes({ imagenes, alCambiar, mostrarMensaje }
         multiple
         onChange={alElegirArchivos}
         disabled={comprimiendo}
-        className="block w-full text-sm text-transparent file:mr-4 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-violeta-app file:text-black file:font-medium file:cursor-pointer hover:file:bg-violeta-app/90 file:transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="block w-full text-sm text-transparent file:mr-4 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-verde-app file:text-black file:font-medium file:cursor-pointer hover:file:bg-verde-app/90 file:transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       />
       <p className="text-xs text-zinc-600">
         Podés elegir varias a la vez. Cada una se comprime sola. La primera es la portada y el resto se ven en el detalle.
@@ -69,7 +69,7 @@ export default function SelectorImagenes({ imagenes, alCambiar, mostrarMensaje }
                   className="h-24 w-24 object-cover rounded-lg border border-zinc-700 bg-black"
                 />
                 {indice === 0 && (
-                  <span className="absolute bottom-1 left-1 text-[10px] px-1.5 py-0.5 rounded bg-verde-app text-black">
+                  <span className="absolute bottom-1 left-1 text-[10px] px-1.5 py-0.5 rounded bg-violeta-app text-black">
                     Portada
                   </span>
                 )}

@@ -83,8 +83,8 @@ export default function AvatarAdmin({ seccionActiva = '', enMenuMovil = false })
       aria-hidden="true"
       className={`text-zinc-300 font-bold text-sm transition-colors ${
         enPerfil
-          ? 'text-verde-app'
-          : 'group-hover:text-verde-app group-active:text-verde-app group-focus-visible:text-verde-app'
+          ? 'text-violeta-app'
+          : 'group-hover:text-violeta-app group-active:text-violeta-app group-focus-visible:text-violeta-app'
       }`}
     >
       {listo ? (sesion ? inicial(nombre) : 'A') : ''}
@@ -97,8 +97,8 @@ export default function AvatarAdmin({ seccionActiva = '', enMenuMovil = false })
     <span
       className={`w-full h-full rounded-full overflow-hidden shrink-0 inline-flex items-center justify-center bg-zinc-800 border transition-colors ${
         enPerfil
-          ? 'border-verde-app'
-          : 'border-zinc-700 group-hover:border-verde-app group-active:border-verde-app group-focus-visible:border-verde-app'
+          ? 'border-violeta-app'
+          : 'border-zinc-700 group-hover:border-violeta-app group-active:border-violeta-app group-focus-visible:border-violeta-app'
       }`}
     >
       {contenido}
@@ -116,15 +116,15 @@ export default function AvatarAdmin({ seccionActiva = '', enMenuMovil = false })
         className="group flex items-center gap-3 w-full rounded-lg px-2 py-2 hover:bg-zinc-800 transition-all duration-200"
       >
         <span
-          className={`relative w-9 h-9 shrink-0 rounded-full transition-shadow group-hover:ring-2 group-hover:ring-verde-app group-active:ring-2 group-active:ring-verde-app group-focus-visible:ring-2 group-focus-visible:ring-verde-app ${
-            enPerfil ? 'ring-2 ring-verde-app' : ''
+          className={`relative w-9 h-9 shrink-0 rounded-full transition-shadow group-hover:ring-2 group-hover:ring-violeta-app group-active:ring-2 group-active:ring-violeta-app group-focus-visible:ring-2 group-focus-visible:ring-violeta-app ${
+            enPerfil ? 'ring-2 ring-violeta-app' : ''
           }`}
         >
           {circulo}
           {esDueno && (
             <span
               title="Dueña del sitio"
-              className="absolute -bottom-0.5 -right-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-verde-app text-black border-2 border-black"
+              className="absolute -bottom-0.5 -right-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-violeta-app text-black border-2 border-black"
             >
               <svg aria-hidden="true" className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
@@ -136,7 +136,7 @@ export default function AvatarAdmin({ seccionActiva = '', enMenuMovil = false })
           <span
             className={`block text-sm transition-colors ${
               enPerfil
-                ? 'text-verde-app font-bold'
+                ? 'text-violeta-app font-bold'
                 : 'text-zinc-300 group-hover:text-white group-active:text-white group-focus-visible:text-white'
             }`}
           >
@@ -156,8 +156,8 @@ export default function AvatarAdmin({ seccionActiva = '', enMenuMovil = false })
       className="group flex flex-col items-center gap-1 rounded-lg px-2 py-1 hover:bg-zinc-800 hover:scale-105 active:scale-95 active:bg-zinc-700 transition-all duration-200"
     >
       <span
-        className={`relative w-9 h-9 rounded-full transition-shadow group-hover:ring-2 group-hover:ring-verde-app group-active:ring-2 group-active:ring-verde-app group-focus-visible:ring-2 group-focus-visible:ring-verde-app ${
-          enPerfil ? 'ring-2 ring-verde-app' : ''
+        className={`relative w-9 h-9 rounded-full transition-shadow group-hover:ring-2 group-hover:ring-violeta-app group-active:ring-2 group-active:ring-violeta-app group-focus-visible:ring-2 group-focus-visible:ring-violeta-app ${
+          enPerfil ? 'ring-2 ring-violeta-app' : ''
         }`}
       >
         {circulo}
@@ -165,7 +165,7 @@ export default function AvatarAdmin({ seccionActiva = '', enMenuMovil = false })
         {esDueno && (
           <span
             title="Dueña del sitio"
-            className="absolute -bottom-0.5 -right-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-verde-app text-black border-2 border-black"
+            className="absolute -bottom-0.5 -right-0.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-violeta-app text-black border-2 border-black"
           >
             <svg aria-hidden="true" className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
@@ -177,8 +177,8 @@ export default function AvatarAdmin({ seccionActiva = '', enMenuMovil = false })
       <span
         className={`max-w-20 truncate text-[11px] leading-none transition-colors ${
           enPerfil
-            ? 'text-verde-app font-bold'
-            : 'text-zinc-400 group-hover:text-verde-app group-hover:font-bold group-active:text-verde-app group-active:font-bold group-focus-visible:text-verde-app group-focus-visible:font-bold'
+            ? 'text-violeta-app font-bold'
+            : 'text-zinc-400 group-hover:text-violeta-app group-hover:font-bold group-active:text-violeta-app group-active:font-bold group-focus-visible:text-violeta-app group-focus-visible:font-bold'
         }`}
       >
         {nombreMostrado}

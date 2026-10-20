@@ -173,7 +173,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
       {/*encabezado: eyebrow, titulo, categorias y descripcion*/}
       <div className="flex items-start justify-between gap-4 flex-wrap pt-2">
         <div className="min-w-0">
-          <p className="text-verde-app font-medium tracking-widest uppercase text-sm">Proyecto</p>
+          <p className="text-violeta-app font-medium tracking-widest uppercase text-sm">Proyecto</p>
           <h1 className="text-4xl font-bold text-white mt-2">{proyecto.titulo}</h1>
           <ul className="flex flex-wrap gap-2 mt-4">
             {categoriasProyecto.map((slug) => {
@@ -183,12 +183,12 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
                   {esCategoriaConocida(servicios, slug) ? (
                     <a
                       href={`/servicios/${slug}`}
-                      className="text-xs px-3 py-1 rounded-full bg-verde-app/10 text-verde-app border border-verde-app/20 hover:bg-verde-app/20 transition-colors"
+                      className="text-xs px-3 py-1 rounded-full bg-violeta-app/10 text-violeta-app border border-violeta-app/20 hover:bg-violeta-app/20 transition-colors"
                     >
                       {nombre}
                     </a>
                   ) : (
-                    <span className="text-xs px-3 py-1 rounded-full bg-verde-app/10 text-verde-app border border-verde-app/20">
+                    <span className="text-xs px-3 py-1 rounded-full bg-violeta-app/10 text-violeta-app border border-violeta-app/20">
                       {nombre}
                     </span>
                   )}
@@ -236,7 +236,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
                   type="button"
                   onClick={() => setIndiceGaleria(i)}
                   className={`shrink-0 w-20 h-14 rounded-lg overflow-hidden border-2 transition-colors cursor-pointer ${
-                    i === indiceGaleria ? 'border-verde-app' : 'border-zinc-800 hover:border-zinc-600'
+                    i === indiceGaleria ? 'border-violeta-app' : 'border-zinc-800 hover:border-zinc-600'
                   }`}
                   aria-label={`Ver imagen ${i + 1}`}
                 >
@@ -262,7 +262,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`Abrir ${proyecto.titulo} en una pestaña nueva`}
-                className="block rounded-2xl overflow-hidden ring-offset-2 ring-offset-zinc-950 hover:ring-2 hover:ring-verde-app/60 transition-all"
+                className="block rounded-2xl overflow-hidden ring-offset-2 ring-offset-zinc-950 hover:ring-2 hover:ring-violeta-app/60 transition-all"
               >
                 {imagenPrincipal}
               </a>
@@ -277,7 +277,7 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
             href={proyecto.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-violeta-app text-black font-medium hover:bg-violeta-app/90 hover:scale-105 active:scale-95 active:bg-violeta-app/80 transition-all duration-200"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-verde-app text-black font-medium hover:bg-verde-app/90 hover:scale-105 active:scale-95 active:bg-verde-app/80 transition-all duration-200"
           >
             {textoVisitar(proyecto)} <span aria-hidden="true">↗</span>
           </a>
@@ -343,8 +343,8 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
       {/*aprendizajes: texto propio de la dueña, siempre visible si esta escrito
         (es lo que el proyecto aprendio/resolvio, no un listado de herramientas)*/}
       {proyecto.aprendizajes && (
-        <section className="mt-10 p-6 rounded-2xl bg-verde-app/5 border border-verde-app/20">
-          <h2 className="text-lg font-semibold text-verde-app">Qué aprendí</h2>
+        <section className="mt-10 p-6 rounded-2xl bg-violeta-app/5 border border-violeta-app/20">
+          <h2 className="text-lg font-semibold text-violeta-app">Qué aprendí</h2>
           <p className="text-zinc-300 leading-relaxed mt-3 whitespace-pre-line">{proyecto.aprendizajes}</p>
         </section>
       )}

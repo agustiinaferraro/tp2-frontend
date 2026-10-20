@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { paginasBusqueda } from "../data/busqueda.js";
 import { obtenerProyectosLigeros } from "../api/proyectos.js";
 import { obtenerServicios } from "../api/servicios.js";
@@ -78,7 +78,7 @@ export default function Buscador() {
 
   return (
     <div ref={contenedor} className="relative">
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 focus-within:border-verde-app transition-colors">
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 focus-within:border-violeta-app transition-colors">
         <svg aria-hidden="true" className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
         </svg>

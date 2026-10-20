@@ -7,8 +7,8 @@ import Loading from './Loading.jsx';
 
 //colores del circulo del avatar segun la primera letra del nombre
 const coloresAvatar = [
-  'bg-violeta-app/20 text-violeta-app border-violeta-app/30',
-  'bg-verde-app/15 text-verde-app border-verde-app/30',
+  'bg-verde-app/20 text-verde-app border-verde-app/30',
+  'bg-violeta-app/15 text-violeta-app border-violeta-app/30',
   'bg-sky-500/15 text-sky-300 border-sky-500/30',
   'bg-amber-400/15 text-amber-300 border-amber-400/30',
 ];
@@ -39,7 +39,7 @@ function formatearFecha(fecha) {
 }
 
 const claseInput =
-  'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-verde-app transition-all';
+  'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-violeta-app transition-all';
 
 export default function Comentarios({ proyectoId }) {
   const [comentarios, setComentarios] = useState([]);
@@ -139,7 +139,7 @@ export default function Comentarios({ proyectoId }) {
   return (
     <section className="mt-12 space-y-6" aria-label="Comentarios del proyecto">
       <h2 className="flex items-center gap-3 text-2xl font-bold text-white">
-        <svg aria-hidden="true" className="w-7 h-7 text-violeta-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <svg aria-hidden="true" className="w-7 h-7 text-verde-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
         </svg>
         Comentarios
@@ -200,7 +200,7 @@ export default function Comentarios({ proyectoId }) {
               <button
                 type="submit"
                 disabled={enviando || !texto.trim()}
-                className="px-5 py-2 rounded-full bg-violeta-app hover:bg-violeta-app/90 text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95"
+                className="px-5 py-2 rounded-full bg-verde-app hover:bg-verde-app/90 text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95"
               >
                 {enviando ? 'Publicando...' : 'Comentar'}
               </button>
@@ -224,7 +224,7 @@ export default function Comentarios({ proyectoId }) {
               </a>
               <a
                 href={linkPerfil('registro')}
-                className="inline-block px-5 py-2 rounded-full bg-violeta-app hover:bg-violeta-app/90 active:bg-violeta-app/80 text-black text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+                className="inline-block px-5 py-2 rounded-full bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 text-black text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
               >
                 Crear cuenta
               </a>

@@ -238,8 +238,8 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
                 aria-pressed={categoria === c.slug}
                 className={`px-3 py-1 rounded-full text-sm border transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${
                   categoria === c.slug
-                    ? 'bg-violeta-app text-black border-violeta-app'
-                    : 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-verde-app/50'
+                    ? 'bg-verde-app text-black border-verde-app'
+                    : 'bg-zinc-900 text-zinc-300 border-zinc-700 hover:border-violeta-app/50'
                 }`}
               >
                 {c.nombre}

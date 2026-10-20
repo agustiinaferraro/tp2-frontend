@@ -70,7 +70,7 @@ function AvatarInicial({ nombre, className }) {
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex items-center justify-center rounded-full bg-violeta-app text-black font-bold shrink-0 ${className}`}
+      className={`inline-flex items-center justify-center rounded-full bg-verde-app text-black font-bold shrink-0 ${className}`}
     >
       {inicial}
     </span>
@@ -291,7 +291,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
             <p className="font-semibold text-white truncate leading-tight">{chat.nombre}</p>
             <a
               href={`mailto:${chat.email}`}
-              className="text-xs text-zinc-400 hover:text-verde-app transition-colors break-all"
+              className="text-xs text-zinc-400 hover:text-violeta-app transition-colors break-all"
             >
               {chat.email}
             </a>

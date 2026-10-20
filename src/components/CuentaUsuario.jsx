@@ -25,7 +25,7 @@ import {
 import { comprimirImagen } from '../utils/imagen.js';
 
 const claseInput =
-  'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-verde-app transition-all';
+  'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-violeta-app transition-all';
 
 function IconoGoogle() {
   return (
@@ -465,7 +465,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
           <button
             type="submit"
             disabled={enviando}
-            className="w-full px-5 py-2.5 rounded-full bg-violeta-app hover:bg-violeta-app/90 text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+            className="w-full px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 text-black text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
           >
             {enviando ? 'Esperá...' : modo === 'registro' ? 'Crear cuenta' : 'Entrar'}
           </button>
@@ -479,7 +479,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
             <button
               type="button"
               onClick={() => { setModo('registro'); setError(''); }}
-              className="inline-block font-medium text-verde-app rounded-lg px-2 py-1 hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200 cursor-pointer"
+              className="inline-block font-medium text-violeta-app rounded-lg px-2 py-1 hover:bg-violeta-app/10 hover:text-violeta-app/80 active:scale-95 hover:scale-105 transition-all duration-200 cursor-pointer"
             >
               Registrate acá
             </button>
@@ -527,7 +527,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
       {!ocultarPerfil && (guardado || aviso) && (
         <p
           role="status"
-          className="fixed top-20 right-4 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border border-verde-app/30 bg-verde-app/10 text-verde-app shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer"
+          className="fixed top-20 right-4 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border border-violeta-app/30 bg-violeta-app/10 text-violeta-app shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer"
         >
           {aviso || 'Cambios guardados'}
         </p>
@@ -555,12 +555,12 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               aria-label="Cambiar foto de perfil"
               className="group relative shrink-0 cursor-pointer"
             >
-              <span className="flex items-center justify-center w-20 h-20 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 transition-colors group-hover:border-verde-app">
+              <span className="flex items-center justify-center w-20 h-20 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 transition-colors group-hover:border-violeta-app">
                 <AvatarPerfil
                   foto={fotoNueva || sesion.foto}
                   nombre={sesion.nombre}
                   className="w-full h-full object-cover"
-                  classNameInicial="text-verde-app font-extrabold text-3xl"
+                  classNameInicial="text-violeta-app font-extrabold text-3xl"
                 />
               </span>
               <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/55 text-white opacity-0 group-hover:opacity-100 transition-opacity">
@@ -574,13 +574,13 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               </p>
               <p className="text-zinc-400 text-sm truncate">{sesion.email}</p>
               <div className="flex items-center gap-2 flex-wrap mt-1">
-                <span className="inline-flex items-center gap-1.5 text-xs text-verde-app">
-                  <span className="w-1.5 h-1.5 rounded-full bg-verde-app" aria-hidden="true"></span>
+                <span className="inline-flex items-center gap-1.5 text-xs text-violeta-app">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violeta-app" aria-hidden="true"></span>
                   Sesión activa
                 </span>
                 {/*la cuenta de la dueña se marca aca, ademas del acceso al panel de abajo*/}
                 {esDueno && (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-black bg-verde-app rounded-full px-2 py-0.5">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-black bg-violeta-app rounded-full px-2 py-0.5">
                     <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
                     </svg>
@@ -621,7 +621,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                 type="button"
                 onClick={guardarCambios}
                 disabled={!hayCambios || guardando}
-                className="w-full px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 active:scale-95 text-black text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-verde-app disabled:active:scale-100 cursor-pointer"
+                className="w-full px-5 py-2.5 rounded-full bg-violeta-app hover:bg-violeta-app/90 active:bg-violeta-app/80 active:scale-95 text-black text-sm font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-violeta-app disabled:active:scale-100 cursor-pointer"
               >
                 {guardando ? 'Guardando...' : 'Guardar'}
               </button>
@@ -635,7 +635,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               {esDueno && !ocultarAccesoAdmin && (
                 <a
                   href="/admin"
-                  className="block w-full px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 text-black text-sm font-medium text-center transition-all duration-200 hover:scale-105 active:scale-95"
+                  className="block w-full px-5 py-2.5 rounded-full bg-violeta-app hover:bg-violeta-app/90 text-black text-sm font-medium text-center transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   Gestionar mis proyectos
                 </a>
@@ -823,14 +823,14 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                         foto={sesion.foto}
                         nombre={sesion.nombre}
                         className="w-full h-full object-cover"
-                        classNameInicial="text-verde-app font-bold"
+                        classNameInicial="text-violeta-app font-bold"
                       />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium text-zinc-100 truncate">{sesion.nombre}</span>
                       <span className="block text-xs text-zinc-500 truncate">{sesion.email}</span>
                     </span>
-                    <span className="inline-flex items-center gap-1 text-xs text-verde-app shrink-0">
+                    <span className="inline-flex items-center gap-1 text-xs text-violeta-app shrink-0">
                       <svg aria-hidden="true" className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                       </svg>
@@ -849,7 +849,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                             foto={cuenta.foto}
                             nombre={cuenta.nombre}
                             className="w-full h-full object-cover"
-                            classNameInicial="text-verde-app font-bold"
+                            classNameInicial="text-violeta-app font-bold"
                           />
                         </span>
                         <span className="min-w-0">
@@ -878,7 +878,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
                     setForm({ nombre: '', email: '', clave: '' });
                     setError('');
                   }}
-                  className="w-full px-5 py-2.5 rounded-full bg-violeta-app hover:bg-violeta-app/90 text-black text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                  className="w-full px-5 py-2.5 rounded-full bg-verde-app hover:bg-verde-app/90 text-black text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   Agregar cuenta
                 </button>

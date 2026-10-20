@@ -34,7 +34,7 @@ export default function AdminProyectoCard({ proyecto, grupoNombre, alEditar, alE
           alEditar(proyecto);
         }
       }}
-      className="group relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 focus-within:ring-2 focus-within:ring-verde-app cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200"
+      className="group relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 focus-within:ring-2 focus-within:ring-violeta-app cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200"
     >
       {tieneImagen ? (
         <img
@@ -49,7 +49,7 @@ export default function AdminProyectoCard({ proyecto, grupoNombre, alEditar, alE
       )}
       <div className="p-3">
         <p className="text-sm font-medium text-white truncate">{proyecto.titulo}</p>
-        <p className="text-xs text-verde-app truncate">{grupoNombre}</p>
+        <p className="text-xs text-violeta-app truncate">{grupoNombre}</p>
       </div>
       <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
         <button
@@ -60,7 +60,7 @@ export default function AdminProyectoCard({ proyecto, grupoNombre, alEditar, alE
           }}
           aria-label={`Editar ${proyecto.titulo}`}
           title="Editar"
-          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-zinc-900/90 text-verde-app hover:text-black hover:bg-verde-app hover:scale-110 active:scale-90 transition-all duration-200 cursor-pointer"
+          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-zinc-900/90 text-violeta-app hover:text-black hover:bg-violeta-app hover:scale-110 active:scale-90 transition-all duration-200 cursor-pointer"
         >
           <IconoLapiz className="w-4 h-4" />
         </button>

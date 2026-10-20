@@ -11,12 +11,12 @@ const { estadisticas, recorrido, habilidades, certificaciones } = Astro.props;
 //tarjeta ahora es la clase compartida .card-vidrio, en gradiente violeta -> verde)
 const colores = {
   estudio: {
-    punto: 'bg-verde-app ring-verde-app/25',
-    pildora: 'bg-verde-app/10 text-verde-app border-verde-app/30',
-  },
-  trabajo: {
     punto: 'bg-violeta-app ring-violeta-app/25',
     pildora: 'bg-violeta-app/10 text-violeta-app border-violeta-app/30',
+  },
+  trabajo: {
+    punto: 'bg-verde-app ring-verde-app/25',
+    pildora: 'bg-verde-app/10 text-verde-app border-verde-app/30',
   },
   logro: {
     punto: 'bg-amber-400 ring-amber-400/25',
@@ -32,9 +32,9 @@ const colores = {
   <div class="px-4 pt-10 pb-4 max-w-4xl mx-auto space-y-8">
     <div class="space-y-4">
       <h1 class="text-4xl md:text-5xl font-bold text-white text-left leading-tight">
-        Un recorrido entre el <span class="text-verde-app">diseño</span>, la{' '}
-        <span class="text-violeta-app">tecnología</span> y la{' '}
-        <span class="text-verde-app">enseñanza</span>.
+        Un recorrido entre el <span class="text-violeta-app">diseño</span>, la{' '}
+        <span class="text-verde-app">tecnología</span> y la{' '}
+        <span class="text-violeta-app">enseñanza</span>.
       </h1>
       <p class="text-zinc-300 leading-relaxed text-lg text-left">
         Soy <span class="font-bold text-white">técnica en comunicación interactiva y diseño multimedial</span>{' '}
@@ -51,7 +51,7 @@ const colores = {
         estadisticas.map((numero) => (
           <div class="rounded-2xl card-vidrio p-5 text-left">
             <dt class="text-sm text-zinc-400 mb-2">{numero.descripcion}</dt>
-            <dd class="text-4xl font-bold bg-gradient-to-r from-verde-app to-violeta-app bg-clip-text text-transparent">
+            <dd class="text-4xl font-bold bg-gradient-to-r from-violeta-app to-verde-app bg-clip-text text-transparent">
               {numero.valor}
             </dd>
           </div>
@@ -63,7 +63,7 @@ const colores = {
   {/*titulo universitario: formacion destacada con la imagen del diploma*/}
   <div class="px-4 py-10 max-w-4xl mx-auto">
     <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
-      <svg aria-hidden="true" class="w-8 h-8 text-violeta-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
         <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
         <path d="M6 12v5c3 3 9 3 12 0v-5" />
       </svg>
@@ -91,14 +91,14 @@ const colores = {
           <span class="text-xs px-3 py-1 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/30 font-bold">
             Título universitario
           </span>
-          <span class="text-xs px-3 py-1 rounded-full bg-verde-app/10 text-verde-app border border-verde-app/30 font-bold">
+          <span class="text-xs px-3 py-1 rounded-full bg-violeta-app/10 text-violeta-app border border-violeta-app/30 font-bold">
             Sigo estudiando
           </span>
         </div>
         <h3 class="text-xl md:text-2xl font-bold text-white">
           Técnica en Comunicación Interactiva y Diseño Multimedial
         </h3>
-        <p class="text-sm text-violeta-app">Universidad Maimónides</p>
+        <p class="text-sm text-verde-app">Universidad Maimónides</p>
         <p class="text-zinc-400 text-sm leading-relaxed">
           Este es mi título universitario: lo obtuve en la Universidad Maimónides y con él sigo
           formándome. Hoy estoy en 4º año de la Licenciatura en Tecnología Multimedial en la misma
@@ -111,7 +111,7 @@ const colores = {
   {/*el recorrido en linea de tiempo: alterna las tarjetas a los lados en pantallas grandes*/}
   <div class="px-4 py-14 max-w-4xl mx-auto">
     <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
-      <svg aria-hidden="true" class="w-8 h-8 text-violeta-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
       </svg>
@@ -119,7 +119,7 @@ const colores = {
     </h2>
 
     <ol class="relative space-y-8 md:space-y-12">
-      <div aria-hidden="true" class="absolute top-2 bottom-2 left-5 w-px bg-gradient-to-b from-violeta-app via-zinc-700 to-verde-app md:left-1/2 md:-translate-x-1/2"></div>
+      <div aria-hidden="true" class="absolute top-2 bottom-2 left-5 w-px bg-gradient-to-b from-verde-app via-zinc-700 to-violeta-app md:left-1/2 md:-translate-x-1/2"></div>
       {
         recorrido.map((paso, index) => {
           const color = colores[paso.tipo];
@@ -159,7 +159,7 @@ const colores = {
                   }
                 </div>
                 <h3 class="text-xl font-bold text-white">{paso.titulo}</h3>
-                <p class="text-sm text-violeta-app mt-1">{paso.lugar}</p>
+                <p class="text-sm text-verde-app mt-1">{paso.lugar}</p>
                 <p class="text-zinc-400 text-sm leading-relaxed mt-3">{paso.texto}</p>
               </div>
             </li>
@@ -169,7 +169,7 @@ const colores = {
       {/*cierre del recorrido: donde estoy hoy*/}
       <li class="hidden md:flex md:justify-center">
         <div class="inline-flex items-center gap-3 rounded-full card-vidrio px-6 py-3 text-zinc-300">
-          <span class="w-2.5 h-2.5 rounded-full bg-verde-app animate-pulse"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-violeta-app animate-pulse"></span>
           Hoy: diseño, enseño y sigo aprendiendo.
         </div>
       </li>
@@ -179,7 +179,7 @@ const colores = {
   {/*habilidades agrupadas por area*/}
   <div class="px-4 pb-14 max-w-4xl mx-auto">
     <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
-      <svg aria-hidden="true" class="w-8 h-8 text-violeta-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
         <polyline points="20 6 9 17 4 12" />
       </svg>
       Lo que manejo
@@ -189,7 +189,7 @@ const colores = {
         habilidades.map((grupo) => (
           <div class="rounded-2xl card-vidrio p-6">
             <div class="flex items-center gap-3 mb-4">
-              <span class="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-verde-app/10 text-verde-app border border-verde-app/20">
+              <span class="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-violeta-app/10 text-violeta-app border border-violeta-app/20">
                 {
                   grupo.version === 'pen-tool' && (
                     <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">

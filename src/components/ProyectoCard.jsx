@@ -22,7 +22,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
   //los destacados del carrusel de la home llevan un borde naranja para que se distingan de una vez
   const claseBorde = destacado
     ? 'border-orange-400/70 ring-2 ring-orange-400/25 hover:border-orange-400'
-    : 'border-zinc-800 hover:border-verde-app/50';
+    : 'border-zinc-800 hover:border-violeta-app/50';
 
   return (
     <article
@@ -62,7 +62,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
           <div className="shrink-0">
             <h3
               className={`text-base font-bold text-white line-clamp-2 transition-colors ${
-                destacado ? 'group-hover:text-orange-300' : 'group-hover:text-verde-app/80'
+                destacado ? 'group-hover:text-orange-300' : 'group-hover:text-violeta-app/80'
               }`}
             >
               {proyecto.titulo}
@@ -75,7 +75,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
               {proyecto.tags.map((tag) => (
                 <li
                   key={tag}
-                  className="text-xs px-2 py-1 rounded-full bg-verde-app/10 text-verde-app border border-verde-app/20"
+                  className="text-xs px-2 py-1 rounded-full bg-violeta-app/10 text-violeta-app border border-violeta-app/20"
                 >
                   {tag}
                 </li>
@@ -96,7 +96,7 @@ export default function ProyectoCard({ proyecto, destacado = false }) {
             href={proyecto.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-verde-app hover:bg-verde-app/10 hover:text-verde-app/80 active:scale-95 hover:scale-105 transition-all duration-200"
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-violeta-app hover:bg-violeta-app/10 hover:text-violeta-app/80 active:scale-95 hover:scale-105 transition-all duration-200"
           >
             {textoVisitar(proyecto)} <span aria-hidden="true">↗</span>
           </a>

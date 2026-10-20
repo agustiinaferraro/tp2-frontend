@@ -99,7 +99,7 @@ export default function FormularioContacto() {
         <div className="flex flex-wrap gap-3">
           <a
             href={linkPerfil('registro')}
-            className="inline-block px-6 py-3 rounded-full bg-violeta-app hover:bg-violeta-app/90 active:bg-violeta-app/80 text-black font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+            className="inline-block px-6 py-3 rounded-full bg-verde-app hover:bg-verde-app/90 active:bg-verde-app/80 text-black font-medium transition-all duration-200 hover:scale-105 active:scale-95"
           >
             Crear cuenta o entrar
           </a>
@@ -123,7 +123,7 @@ export default function FormularioContacto() {
         <h2 className="text-4xl font-bold text-white inline-flex items-center gap-3">
           <svg
             aria-hidden="true"
-            className="w-9 h-9 text-verde-app"
+            className="w-9 h-9 text-violeta-app"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.8"

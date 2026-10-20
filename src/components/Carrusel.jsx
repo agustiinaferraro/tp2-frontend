@@ -115,7 +115,7 @@ export default function Carrusel({
     `shrink-0 self-center w-11 h-11 rounded-full bg-black/80 border border-zinc-700 text-zinc-200 transition-all duration-200 ${
       desactivado
         ? 'opacity-40 cursor-not-allowed'
-        : 'hover:scale-110 hover:bg-verde-app hover:text-black hover:border-verde-app active:scale-90 active:bg-violeta-app active:text-black active:border-violeta-app cursor-pointer'
+        : 'hover:scale-110 hover:bg-violeta-app hover:text-black hover:border-violeta-app active:scale-90 active:bg-verde-app active:text-black active:border-verde-app cursor-pointer'
     }`;
 
   return (

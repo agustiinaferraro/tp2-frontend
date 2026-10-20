@@ -84,7 +84,7 @@ export default function ImagenProyecto({ proyecto, className = '', alternativa =
   return (
     <span
       aria-hidden="true"
-      className={`${className} flex items-center justify-center bg-gradient-to-br from-violeta-app/30 via-zinc-800 to-verde-app/20 text-white font-bold select-none`}
+      className={`${className} flex items-center justify-center bg-gradient-to-br from-verde-app/30 via-zinc-800 to-violeta-app/20 text-white font-bold select-none`}
     >
       {inicial}
     </span>
