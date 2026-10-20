@@ -1,5 +1,7 @@
-//tarjeta de un proyecto en el carrusel del panel admin: imagen, titulo, categoria y botones editar/borrar
+//tarjeta de un proyecto en el carrusel del panel admin: portada, titulo, categoria y botones editar/borrar
+//la portada usa PreviewProyecto: si el proyecto tiene video o gif, se mueve sola igual que en el sitio
 //toda la card es clickeable: abre la edicion del proyecto (los botones hacen su propia accion)
+import PreviewProyecto from './PreviewProyecto.jsx';
 function IconoLapiz({ className }) {
   return (
     <svg aria-hidden="true" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
@@ -36,11 +38,11 @@ export default function AdminProyectoCard({ proyecto, grupoNombre, alEditar, alE
       }}
       className="group relative rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 focus-within:ring-2 focus-within:ring-violeta-app cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200"
     >
-      {tieneImagen ? (
-        <img
-          src={proyecto.imagen || proyecto.imagenes[0]}
-          alt=""
-          className="w-full aspect-[4/3] object-cover"
+      {tieneImagen || proyecto.video ? (
+        <PreviewProyecto
+          proyecto={proyecto}
+          alternativa={false}
+          className="w-full aspect-[4/3]"
         />
       ) : (
         <div className="w-full aspect-[4/3] bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs">
