@@ -2,6 +2,8 @@
 //seccion "sobre mi": presentacion personal
 //es estatica, por eso es un componente astro (no manda javascript al navegador)
 //el saludo al final usa el nombre de quien esta conectado (isla de react)
+//la card es toda un enlace a /sobre-mi: forma de escudo (igual que los servicios), borde con
+//los colores de la paleta (verde -> violeta), foto mas grande y hover/active en toda la tarjeta
 import SaludoPersonalizado from './SaludoPersonalizado.jsx';
 ---
 
@@ -20,89 +22,96 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
     </div>
   </div>
 
-  <div data-anim class="relative max-w-5xl mx-auto">
+  <a
+    href="/sobre-mi"
+    data-anim
+    class="group block relative max-w-6xl mx-auto [filter:drop-shadow(0_16px_24px_rgba(0,0,0,0.5))] hover:[filter:drop-shadow(0_0_28px_rgba(105,245,204,0.25))] transition-[filter] duration-300 active:scale-[0.99]"
+  >
+    {/*borde de la paleta: capa de atras con 2px, asi el clip-path no corta un border normal*/}
     <div
-      class="rounded-3xl border border-zinc-800 bg-zinc-900/60 backdrop-blur-xl shadow-2xl shadow-black/50 overflow-hidden"
+      class="p-[2px] forma-escudo bg-gradient-to-br from-verde-app/50 via-zinc-700 to-violeta-app/50 group-hover:from-verde-app group-hover:via-verde-app/70 group-hover:to-violeta-app group-hover:scale-[1.01] transition-all duration-300"
     >
-      <div class="grid md:grid-cols-[minmax(0,15rem)_1fr] gap-8 md:gap-10 p-8 sm:p-12">
-        {/*columna izquierda: firma visual de la autora*/}
-        <div class="flex md:flex-col items-center md:items-start gap-5">
-          <div class="relative shrink-0">
-            <div
-              aria-hidden="true"
-              class="absolute inset-0 rounded-2xl bg-gradient-to-br from-verde-app to-violeta-app blur-xl opacity-40"
-            >
+      <div class="forma-escudo overflow-hidden bg-zinc-950">
+        <div class="grid md:grid-cols-[minmax(0,17rem)_1fr] gap-8 md:gap-10 p-8 sm:p-12 pb-28 sm:pb-32">
+          {/*columna izquierda: firma visual de la autora, con la foto en grande*/}
+          <div class="flex md:flex-col items-center md:items-start gap-5">
+            <div class="relative shrink-0">
+              <div
+                aria-hidden="true"
+                class="absolute inset-0 rounded-3xl bg-gradient-to-br from-verde-app to-violeta-app blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300"
+              >
+              </div>
+              <img
+                src="/img/sobre-mi.jpg"
+                alt="Retrato de Agustina Ferraro"
+                loading="lazy"
+                class="relative w-40 h-40 md:w-full md:h-80 rounded-3xl object-cover border border-zinc-700 group-hover:border-verde-app/60 transition-colors duration-300"
+              />
             </div>
-            <img
-              src="/img/sobre-mi.jpg"
-              alt="Retrato de Agustina Ferraro"
-              loading="lazy"
-              class="relative w-24 h-24 rounded-2xl object-cover border border-zinc-700"
-            />
+            <div class="text-center md:text-left">
+              <p class="text-xs uppercase tracking-[0.2em] text-verde-app font-semibold">Diseñadora</p>
+              <p class="text-lg font-bold text-white leading-tight">Multimedia</p>
+              <p class="text-sm text-zinc-400 mt-1">Diseño · Código · Video</p>
+            </div>
           </div>
-          <div class="text-center md:text-left">
-            <p class="text-xs uppercase tracking-[0.2em] text-verde-app font-semibold">Diseñadora</p>
-            <p class="text-lg font-bold text-white leading-tight">Multimedia</p>
-            <p class="text-sm text-zinc-400 mt-1">Diseño · Código · Video</p>
-          </div>
-        </div>
 
-        {/*columna derecha: el texto de presentacion*/}
-        <div class="space-y-6">
-          <h2 class="text-4xl font-bold text-white inline-flex items-center gap-3">
-            <svg
-              aria-hidden="true"
-              class="w-9 h-9 text-verde-app"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              viewBox="0 0 24 24"
+          {/*columna derecha: el texto de presentacion*/}
+          <div class="space-y-6">
+            <h2 class="text-4xl font-bold text-white inline-flex items-center gap-3">
+              <svg
+                aria-hidden="true"
+                class="w-9 h-9 text-verde-app"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              Sobre mí
+            </h2>
+
+            <div class="space-y-4 text-zinc-300 leading-relaxed text-lg text-left">
+              <p>
+                Soy <span class="font-bold text-white">Diseñadora Multimedia</span>. Mi trabajo abarca
+                todo el proceso de un proyecto digital: desde la identidad visual y el diseño de
+                experiencia (UX/UI), hasta el desarrollo del código, la animación y la edición
+                audiovisual.
+              </p>
+              <p>
+                Tener una formación integral me permite entender los proyectos de manera global. Puedo
+                proyectar cómo se ve y se siente una interfaz, cómo se estructura técnicamente por
+                dentro y cómo comunicarla a través del lenguaje audiovisual.
+              </p>
+              <p>
+                Me interesa crear productos <span class="font-bold text-white">funcionales</span>,
+                correctamente diseñados y técnicamente sólidos.
+              </p>
+            </div>
+
+            {/*saludo con el nombre de quien esta conectado (si hay sesion)*/}
+            <p class="text-lg text-zinc-300">
+              <SaludoPersonalizado
+                client:load
+                sinNombre="Te cuento un poco más de mi trayectoria."
+                conNombre="{nombre}, te cuento un poco más de mi trayectoria."
+              />
+            </p>
+
+            {/*la card entera ya es el enlace: este queda como invitacion visual*/}
+            <span
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-violeta-app group-hover:bg-violeta-app/90 text-black text-sm font-medium transition-all duration-200"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-            Sobre mí
-          </h2>
-
-          <div class="space-y-4 text-zinc-300 leading-relaxed text-lg text-left">
-            <p>
-              Soy <span class="font-bold text-white">Diseñadora Multimedia</span>. Mi trabajo abarca
-              todo el proceso de un proyecto digital: desde la identidad visual y el diseño de
-              experiencia (UX/UI), hasta el desarrollo del código, la animación y la edición
-              audiovisual.
-            </p>
-            <p>
-              Tener una formación integral me permite entender los proyectos de manera global. Puedo
-              proyectar cómo se ve y se siente una interfaz, cómo se estructura técnicamente por
-              dentro y cómo comunicarla a través del lenguaje audiovisual.
-            </p>
-            <p>
-              Me interesa crear productos <span class="font-bold text-white">funcionales</span>,
-              correctamente diseñados y técnicamente sólidos.
-            </p>
+              Ver mi recorrido completo
+              <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </span>
           </div>
-
-          {/*saludo con el nombre de quien esta conectado (si hay sesion)*/}
-          <p class="text-lg text-zinc-300">
-            <SaludoPersonalizado
-              client:load
-              sinNombre="Te cuento un poco más de mi trayectoria."
-              conNombre="{nombre}, te cuento un poco más de mi trayectoria."
-            />
-          </p>
-
-          <a
-            href="/sobre-mi"
-            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-violeta-app hover:bg-violeta-app/90 text-black text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            Ver mi recorrido completo
-            <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-              <path d="M5 12h14" />
-              <path d="m12 5 7 7-7 7" />
-            </svg>
-          </a>
         </div>
       </div>
     </div>
-  </div>
+  </a>
 </section>
