@@ -3,7 +3,7 @@
 //es estatica, por eso es un componente astro (no manda javascript al navegador)
 //el saludo al final usa el nombre de quien esta conectado (isla de react)
 //la card es toda un enlace a /sobre-mi: forma de escudo (igual que los servicios), borde con
-//los colores de la paleta (verde -> violeta), foto mas grande y hover/active en toda la tarjeta
+//los colores de la paleta (violeta -> verde), foto mas grande y hover/active en toda la tarjeta
 import SaludoPersonalizado from './SaludoPersonalizado.jsx';
 ---
 
@@ -13,8 +13,8 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
 >
   {/*fondo decorativo: dos luces de color y una trama de puntos muy suave*/}
   <div aria-hidden="true" class="pointer-events-none absolute inset-0">
-    <div class="absolute -top-32 left-[12%] w-96 h-96 rounded-full bg-violeta-app/15 blur-3xl"></div>
-    <div class="absolute bottom-0 right-[10%] w-96 h-96 rounded-full bg-verde-app/10 blur-3xl"></div>
+    <div class="absolute -top-32 left-[12%] w-96 h-96 rounded-full bg-verde-app/15 blur-3xl"></div>
+    <div class="absolute bottom-0 right-[10%] w-96 h-96 rounded-full bg-violeta-app/10 blur-3xl"></div>
     <div
       class="absolute inset-0 opacity-[0.04]"
       style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 24px 24px;"
@@ -25,11 +25,11 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
   <a
     href="/sobre-mi"
     data-anim
-    class="group block relative max-w-6xl mx-auto [filter:drop-shadow(0_16px_24px_rgba(0,0,0,0.5))] hover:[filter:drop-shadow(0_0_28px_rgba(105,245,204,0.25))] transition-[filter] duration-300 active:scale-[0.99]"
+    class="group block relative max-w-6xl mx-auto [filter:drop-shadow(0_16px_24px_rgba(0,0,0,0.5))] hover:[filter:drop-shadow(0_0_28px_rgba(184,132,231,0.25))] transition-[filter] duration-300 active:scale-[0.99]"
   >
     {/*borde de la paleta: capa de atras con 2px, asi el clip-path no corta un border normal*/}
     <div
-      class="p-[2px] forma-escudo bg-gradient-to-br from-verde-app/50 via-zinc-700 to-violeta-app/50 group-hover:from-verde-app group-hover:via-verde-app/70 group-hover:to-violeta-app group-hover:scale-[1.01] transition-all duration-300"
+      class="p-[2px] forma-escudo bg-gradient-to-br from-violeta-app/50 via-zinc-700 to-verde-app/50 group-hover:from-violeta-app group-hover:via-violeta-app/70 group-hover:to-verde-app group-hover:scale-[1.01] transition-all duration-300"
     >
       <div class="forma-escudo overflow-hidden bg-zinc-950">
         <div class="grid md:grid-cols-[minmax(0,17rem)_1fr] gap-8 md:gap-10 p-8 sm:p-12 pb-28 sm:pb-32">
@@ -38,18 +38,18 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
             <div class="relative shrink-0">
               <div
                 aria-hidden="true"
-                class="absolute inset-0 rounded-3xl bg-gradient-to-br from-verde-app to-violeta-app blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300"
+                class="absolute inset-0 rounded-3xl bg-gradient-to-br from-violeta-app to-verde-app blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300"
               >
               </div>
               <img
                 src="/img/sobre-mi.jpg"
                 alt="Retrato de Agustina Ferraro"
                 loading="lazy"
-                class="relative w-40 h-40 md:w-full md:h-80 rounded-3xl object-cover border border-zinc-700 group-hover:border-verde-app/60 transition-colors duration-300"
+                class="relative w-40 h-40 md:w-full md:h-80 rounded-3xl object-cover border border-zinc-700 group-hover:border-violeta-app/60 transition-colors duration-300"
               />
             </div>
             <div class="text-center md:text-left">
-              <p class="text-xs uppercase tracking-[0.2em] text-verde-app font-semibold">Diseñadora</p>
+              <p class="text-xs uppercase tracking-[0.2em] text-violeta-app font-semibold">Diseñadora</p>
               <p class="text-lg font-bold text-white leading-tight">Multimedia</p>
               <p class="text-sm text-zinc-400 mt-1">Diseño · Código · Video</p>
             </div>
@@ -60,7 +60,7 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
             <h2 class="text-4xl font-bold text-white inline-flex items-center gap-3">
               <svg
                 aria-hidden="true"
-                class="w-9 h-9 text-verde-app"
+                  class="w-9 h-9 text-violeta-app"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
@@ -101,7 +101,7 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
 
             {/*la card entera ya es el enlace: este queda como invitacion visual*/}
             <span
-              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-violeta-app group-hover:bg-violeta-app/90 text-black text-sm font-medium transition-all duration-200"
+              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-verde-app group-hover:bg-verde-app/90 text-black text-sm font-medium transition-all duration-200"
             >
               Ver mi recorrido completo
               <svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
