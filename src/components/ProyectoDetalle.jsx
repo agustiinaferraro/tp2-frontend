@@ -280,9 +280,15 @@ export default function ProyectoDetalle({ id, proyectoInicial = null, alVolver =
 
   //ficha del proyecto tal como behance la muestra: la descripcion completa solo se muestra
   //si aporta algo mas que el resumen que ya esta arriba (si no, seria repetir lo mismo);
-  //y si la descripcion es tuya (editada desde el panel), tu texto manda y no se muestra la de behance
+  //y si la descripcion es tuya (editada desde el panel), tu texto manda y no se muestra la de behance.
+  //la comparacion se hace sobre el TEXTO PLANO: el resumen se guarda ya limpio y la descripcion
+  //completa con sus etiquetas html, asi que comparar los crudos hacia atras siempre encontraba
+  //diferencias y el mismo parrafo terminaba apareciendo dos veces (bajada y ficha)
+  const textoPlano = (texto) => String(texto ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
   const descripcionLarga =
-    !proyecto.resumenManual && proyecto.descripcionCompleta && proyecto.descripcionCompleta !== proyecto.resumen
+    !proyecto.resumenManual &&
+    proyecto.descripcionCompleta &&
+    textoPlano(proyecto.descripcionCompleta) !== textoPlano(proyecto.resumen)
       ? proyecto.descripcionCompleta
       : '';
   const palabrasClave = (proyecto.palabrasClave ?? []).filter(Boolean);
