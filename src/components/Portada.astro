@@ -13,10 +13,12 @@ const {
 } = Astro.props;
 
 //en la home el bloque ocupa toda la pantalla: sin bordes ni esquinas redondeadas
+//el "isolate" es clave: los videos van con -z-10 y sin propio contexto de apilamiento se
+//escapan al documento, quedando DETRAS del background del main (fondo-seccion) de las paginas
 const esHero = variante === 'hero';
 const claseContenedor = esHero
-  ? 'relative min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 overflow-hidden'
-  : `relative overflow-hidden rounded-3xl border border-zinc-800 ${alto}`;
+  ? 'relative isolate min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 overflow-hidden'
+  : `relative isolate overflow-hidden rounded-3xl border border-zinc-800 ${alto}`;
 const claseContenido = esHero
   ? 'relative w-full max-w-3xl mx-auto text-center space-y-6'
   : 'relative h-full flex flex-col justify-end gap-2 p-6 sm:p-10';
