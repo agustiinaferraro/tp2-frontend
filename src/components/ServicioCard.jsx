@@ -17,7 +17,9 @@ export default function ServicioCard({ servicio, proyecto = null }) {
       <div className="absolute -inset-1 bg-gradient-to-r from-verde-app/0 via-verde-app/20 to-verde-app/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none" />
 
       <article className="h-full p-[2px] bg-verde-app/25 group-hover:bg-verde-app/90 group-hover:scale-[1.03] active:scale-95 transition-all duration-300 forma-escudo relative z-0 hover:z-10 focus-within:z-10">
-        <div className="h-full bg-zinc-950 forma-escudo overflow-hidden relative flex flex-col">
+        {/*min-h: la tarjeta crece un poco mas alla de su contenido (el alto lo manda la portada).
+          va en la capa interna para que el article siempre la siga sin importar el contexto*/}
+        <div className="h-full min-h-[26rem] bg-zinc-950 forma-escudo overflow-hidden relative flex flex-col">
           {/* Portada o Fallback cuando NO hay imagen de proyecto (ej. Programación) */}
           <figure className="m-0 absolute inset-0 w-full h-full overflow-hidden bg-zinc-900 z-0">
             {proyecto ? (
@@ -35,8 +37,9 @@ export default function ServicioCard({ servicio, proyecto = null }) {
           {/* Overlays de lectura: degradado superior e inferior */}
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/85 to-zinc-950/60 group-hover:via-zinc-950/75 transition-colors duration-300 pointer-events-none z-10" />
 
-          {/* Contenido principal: el pb deja libre la punta del escudo para que nada quede cortado */}
-          <div className="p-5 pb-16 flex flex-col flex-1 relative z-20 justify-between">
+          {/* Contenido principal: el pb deja libre la punta del escudo (20% del alto) para
+              que nada quede cortado ni con la tarjeta mas alta de lo minimo */}
+          <div className="p-5 pb-28 flex flex-col flex-1 relative z-20 justify-between">
             <div>
               {/* Cabecera de la card: Ícono + Chip identificador para saber de qué es la tarjeta */}
               <div className="flex items-center justify-between mb-3">
