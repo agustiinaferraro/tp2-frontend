@@ -254,13 +254,12 @@ html.con-js .animar-grupo.animado > *:nth-child(6) { transition-delay: 340ms; }
 html.con-js .animar-grupo.animado > *:nth-child(7) { transition-delay: 400ms; }
 html.con-js .animar-grupo.animado > *:nth-child(8) { transition-delay: 460ms; }
 
-/*si el sistema pide menos movimiento, no se anima nada y todo queda visible*/
+/*si el sistema pide menos movimiento, no se anima nada y todo queda visible.
+  ojo: NO se apaga el avance solo de los carruseles (clase animate-carrusel-loop):
+  es el contenido principal de la home (los destacados), se frena con el mouse y con
+  el foco, y con el Windows con "animaciones" desactivadas se quedaba quieto para
+  siempre. las demas animaciones si se respetan aca*/
 @media (prefers-reduced-motion: reduce) {
-  /*el carrusel automatico deja de avanzar*/
-  .animate-carrusel-loop {
-    animation: none;
-  }
-
   /*los avisos flotantes y los modales aparecen sin animacion*/
   .animacion-aparecer {
     animation: none;

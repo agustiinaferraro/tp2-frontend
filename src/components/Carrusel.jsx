@@ -104,8 +104,8 @@ export default function Carrusel({
 
 //la rotacion automatica no se controla desde JS: el CSS mueve la lista y solo hay que
   //pausarla cuando el mouse esta encima o el teclado esta adentro. con menos de dos
-  //tarjetas no hay nada que deslizar. si el sistema pide menos movimiento, global.css
-  //apaga la animacion.
+  //tarjetas no hay nada que deslizar. el avance NO se apaga con prefers-reduced-motion
+  //(global.css): con el Windows sin animaciones el destacado quedaba quieto para siempre
   const claseAuto = auto && cantidad > 1 ? (pausado ? 'flex w-full will-change-transform animate-carrusel-loop carrusel-auto-pausado gap-6' : 'flex w-full will-change-transform animate-carrusel-loop gap-6') : '';
   const estiloAuto = auto ? { '--carrusel-duracion': `${duracionMs}s`, '--carrusel-cantidad': cantidad, '--carrusel-gap': '1.5rem' } : undefined;
   //el carrusel automatico se mueve con transform, asi que no necesita scroll propio
