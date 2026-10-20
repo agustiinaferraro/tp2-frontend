@@ -6,7 +6,7 @@ import { obtenerProyectosPorServicio } from '../api/proyectos.js';
 import IconoServicio from './IconoServicio.jsx';
 import PreviewProyecto from './PreviewProyecto.jsx';
 import Loading from './Loading.jsx';
-import { textoVisitar } from '../utils/proyectos.js';
+import { textoVisitar, ordenarVideosPrimero } from '../utils/proyectos.js';
 
 //prop "mostrarTitulo": si la pagina ya muestra el nombre en la portada de arriba, se omite aqui
 export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
@@ -25,7 +25,8 @@ export default function ServicioDetalle({ slug, mostrarTitulo = true }) {
         setServicio(datos);
         return obtenerProyectosPorServicio(slug);
       })
-      .then(setProyectos)
+      //los proyectos con portada en movimiento (video o gif) arrancan primero en la pagina
+      .then((lista) => setProyectos(ordenarVideosPrimero(lista)))
       .catch((e) => setError(e.message))
       .finally(() => setCargando(false));
   }, [slug]);

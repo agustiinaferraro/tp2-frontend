@@ -12,6 +12,7 @@ import ProyectoCard from './ProyectoCard.jsx';
 import Carrusel, { TARJETA_CARRUSEL } from './Carrusel.jsx';
 import Loading from './Loading.jsx';
 import { ordenarAnimacionPrimero, SLUG_ANIMACION_PRIMERO } from '../utils/ordenCategorias.js';
+import { ordenarVideosPrimero } from '../utils/proyectos.js';
 
 //marca interna para el chip "sin categoria"
 const SIN_CATEGORIA = '__sin_categoria__';
@@ -92,15 +93,17 @@ export default function GrillaProyectos({ vista = 'carrusel' }) {
   //se cargan los proyectos y la lista de servicios para los filtros
   useEffect(() => {
     obtenerProyectos()
-      //los proyectos de animacion quedan siempre primero en cada listado (carrusel, grilla
-      //y secciones): sus portadas traen video o gif en movimiento y son las que mas llaman
-      //la atencion; el orden de los demas proyectos no se toca (sort estable)
+      //los proyectos cuya portada se mueve (video o gif) quedan siempre primero en cada
+      //listado (carrusel, grilla y secciones de cada categoria); si empatan, manda el
+      //orden de animacion primero (los sort son estables: el resto no se toca)
       .then((datos) =>
         setProyectos(
-          [...datos].sort(
-            (a, b) =>
-              Number(categoriasDeProyecto(b).includes(SLUG_ANIMACION_PRIMERO)) -
-              Number(categoriasDeProyecto(a).includes(SLUG_ANIMACION_PRIMERO))
+          ordenarVideosPrimero(
+            [...datos].sort(
+              (a, b) =>
+                Number(categoriasDeProyecto(b).includes(SLUG_ANIMACION_PRIMERO)) -
+                Number(categoriasDeProyecto(a).includes(SLUG_ANIMACION_PRIMERO))
+            )
           )
         )
       )

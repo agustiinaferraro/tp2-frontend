@@ -60,6 +60,21 @@ export function gifDeProyecto(proyecto) {
   return candidatas.find((img) => typeof img === 'string' && /\.gif(?:\?\S*)?$/i.test(img)) ?? null;
 }
 
+//true si la portada del proyecto se mueve sola en las tarjetas: que tenga video (el embed
+//de adobe resuelto a mp4, o un .mp4/.webm directo) o un gif animado en la portada o la galeria
+export function seMueve(proyecto) {
+  if (!proyecto) return false;
+  if (proyecto.video?.trim()) return true;
+  return Boolean(gifDeProyecto(proyecto));
+}
+
+//deja primero los proyectos cuya portada se mueve (video o gif): son los que mas llaman la
+//atencion, asi que en cada listado (seccion de categoria, grilla filtrada y carrusel)
+//arrancan adelante. es estable: el resto conserva el orden que traia.
+export function ordenarVideosPrimero(lista) {
+  return [...lista].sort((a, b) => Number(seMueve(b)) - Number(seMueve(a)));
+}
+
 //true si hay algo que mostrar del proyecto (video, gif animado o imagen): el hero lo usa
 //para no meter proyectos de categoria de video a los que behance no les entrega ningun
 //medio, porque ahi no habria nada que rotar y se veria un cuadro negro
