@@ -14,7 +14,7 @@ import {
 import { obtenerServicios, crearServicio } from '../api/servicios.js';
 import { obtenerPerfil, actualizarPerfil } from '../api/perfil.js';
 import { obtenerConversaciones } from '../api/mensajes.js';
-import { soyDueno, borrarSesion as borrarSesionUsuario } from '../api/usuarios.js';
+import { soyDueno, borrarSesion as borrarSesionUsuario, actualizarFoto } from '../api/usuarios.js';
 import { comprimirImagen } from '../utils/imagen.js';
 import { ordenarAnimacionPrimero } from '../utils/ordenCategorias.js';
 import { esBehance } from '../utils/proyectos.js';
@@ -600,6 +600,9 @@ export default function AdminProyectos() {
       const datos = respuesta.datos ?? { ...(perfil ?? {}), foto: base64 };
       setPerfil(datos);
       setPFoto(datos.foto ?? '');
+      //ademas del perfil publico, la foto se guarda en la sesion del navegador:
+      //asi el avatar del navbar (en el panel y en todo el sitio) la muestra al instante
+      actualizarFoto(datos.foto ?? base64);
       mostrarMensaje('Foto de perfil actualizada');
       window.dispatchEvent(new CustomEvent('perfil-actualizado'));
     } catch (error) {

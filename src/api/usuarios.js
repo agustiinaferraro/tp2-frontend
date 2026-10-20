@@ -201,13 +201,14 @@ export async function sesionConTokenFresco() {
   if (!token) return null;
 
   //la cuenta real es la de firebase: se corrige la sesion guardada si quedo desfasada
-  //(por ejemplo si se "cambio de cuenta" sin que firebase cambie de usuario)
+  //(por ejemplo si se "cambio de cuenta" sin que firebase cambie de usuario).
+  //en foto manda lo elegido en el sitio: la de google queda solo como respaldo
   const nueva = {
     ...sesion,
     token,
     nombre: usuario.displayName || sesion.nombre,
     email: usuario.email || sesion.email,
-    foto: usuario.photoURL || sesion.foto,
+    foto: sesion.foto || usuario.photoURL || '',
   };
   guardarSesion(nueva);
   guardarCuenta(nueva);
