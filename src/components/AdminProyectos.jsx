@@ -17,6 +17,7 @@ import { obtenerConversaciones } from '../api/mensajes.js';
 import { soyDueno, borrarSesion as borrarSesionUsuario } from '../api/usuarios.js';
 import { comprimirImagen } from '../utils/imagen.js';
 import { ordenarAnimacionPrimero } from '../utils/ordenCategorias.js';
+import { esBehance } from '../utils/proyectos.js';
 import AdminMensajes from './AdminMensajes.jsx';
 import AdminProyectoCard from './AdminProyectoCard.jsx';
 import AdminServicios from './AdminServicios.jsx';
@@ -303,8 +304,14 @@ export default function AdminProyectos() {
 
   const [titulo, setTitulo] = useState('');
   const [resumen, setResumen] = useState('');
+  //texto propio: que aprendio con este proyecto (behance no lo sincroniza, es tuyo siempre)
+  const [aprendizajes, setAprendizajes] = useState('');
+  //true = el titulo/la descripcion los actualiza behance; false = el texto tuyo tiene prioridad
+  const [tituloBehance, setTituloBehance] = useState(true);
+  const [resumenBehance, setResumenBehance] = useState(true);
   const [link, setLink] = useState('');
   const [video, setVideo] = useState('');
+  const [tagsTexto, setTagsTexto] = useState('');
   //categorias elegidas del proyecto (pueden ser varias: aparece en todas)
   const [serviciosSel, setServiciosSel] = useState([]);
   const [usarCategoriaNueva, setUsarCategoriaNueva] = useState(false);
@@ -458,8 +465,12 @@ export default function AdminProyectos() {
   function resetearFormulario() {
     setTitulo('');
     setResumen('');
+    setAprendizajes('');
+    setTituloBehance(true);
+    setResumenBehance(true);
     setLink('');
     setVideo('');
+    setTagsTexto('');
     setServiciosSel([]);
     setUsarCategoriaNueva(false);
     setNuevaNombre('');
@@ -482,8 +493,12 @@ export default function AdminProyectos() {
     setEditandoId(proyecto._id);
     setTitulo(proyecto.titulo ?? '');
     setResumen(proyecto.resumen ?? '');
+    setAprendizajes(proyecto.aprendizajes ?? '');
+    setTituloBehance(!proyecto.tituloManual);
+    setResumenBehance(!proyecto.resumenManual);
     setLink(proyecto.link ?? '');
     setVideo(proyecto.video ?? '');
+    setTagsTexto((proyecto.tags ?? []).join(', '));
     setServiciosSel(categoriasDeProyecto(proyecto));
     setUsarCategoriaNueva(false);
     setNuevaNombre('');
@@ -529,12 +544,18 @@ export default function AdminProyectos() {
     const datos = {
       titulo: titulo.trim(),
       resumen: resumen.trim(),
-      servicios: listaServicios,
-      imagen: imagenes[0] ?? '',
-      imagenes: imagenes.slice(1),
+      aprendizajes: aprendizajes.trim(),
       link: link.trim(),
       video: video.trim(),
+      tags: tagsTexto.split(',').map((t) => t.trim()).filter(Boolean),
+      servicios: listaServicios,
+      //la primera imagen del formulario es la portada y el resto la galeria del detalle
+      imagen: imagenes[0] ?? '',
+      imagenes: imagenes.slice(1),
       destacado,
+      //marcan el texto como propio cuando el checkbox de behance queda desactivado
+      tituloManual: !tituloBehance,
+      resumenManual: !resumenBehance,
     };
     try {
       if (editandoId) {
@@ -726,6 +747,10 @@ export default function AdminProyectos() {
       }
     }
   }
+
+  //proyecto que se esta editando: si es de behance aparecen los checkboxes de prioridad de texto
+  const proyectoEditando = proyectos.find((p) => p._id === editandoId) ?? null;
+  const editandoBehance = Boolean(proyectoEditando && esBehance(proyectoEditando));
 
   const claseInput =
     'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-verde-app transition-all';
@@ -1124,10 +1149,32 @@ export default function AdminProyectos() {
                   id="admin-titulo"
                   type="text"
                   value={titulo}
-                  onChange={(e) => setTitulo(e.target.value)}
+                  onChange={(e) => {
+                    setTitulo(e.target.value);
+                    //si el texto se aleja del guardado, pasa a ser tuyo y behance deja de pisarlo
+                    if (proyectoEditando && e.target.value !== (proyectoEditando.titulo ?? '')) {
+                      setTituloBehance(false);
+                    }
+                  }}
                   placeholder="Nombre del proyecto"
                   className={claseInput}
                 />
+                {/*solo los proyectos de behance tienen texto que sincronizar*/}
+                {editandoBehance && (
+                  <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={tituloBehance}
+                      onChange={(e) => setTituloBehance(e.target.checked)}
+                      className="w-4 h-4 accent-verde-app cursor-pointer"
+                    />
+                    {tituloBehance
+                      ? titulo !== (proyectoEditando?.titulo ?? '')
+                        ? 'Behance lo reescribirá en la próxima sincronización (hasta 6 horas)'
+                        : 'Behance actualiza este título en cada sincronización'
+                      : 'Tu título tiene prioridad: behance no lo pisa'}
+                  </label>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -1137,11 +1184,49 @@ export default function AdminProyectos() {
                 <textarea
                   id="admin-resumen"
                   value={resumen}
-                  onChange={(e) => setResumen(e.target.value)}
+                  onChange={(e) => {
+                    //igual que el titulo: al editar el texto pasa a ser tuyo
+                    setResumen(e.target.value);
+                    if (proyectoEditando && e.target.value !== (proyectoEditando.resumen ?? '')) {
+                      setResumenBehance(false);
+                    }
+                  }}
                   placeholder="Contá de qué se trata el proyecto..."
                   rows={4}
                   className={`${claseInput} resize-y`}
                 />
+                {editandoBehance && (
+                  <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={resumenBehance}
+                      onChange={(e) => setResumenBehance(e.target.checked)}
+                      className="w-4 h-4 accent-verde-app cursor-pointer"
+                    />
+                    {resumenBehance
+                      ? resumen !== (proyectoEditando?.resumen ?? '')
+                        ? 'Behance la reescribirá en la próxima sincronización (hasta 6 horas)'
+                        : 'Behance actualiza esta descripción en cada sincronización'
+                      : 'Tu descripción tiene prioridad: behance no la pisa'}
+                  </label>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="admin-aprendizajes" className="block text-sm text-zinc-300">
+                  Qué aprendí de este proyecto (opcional)
+                </label>
+                <textarea
+                  id="admin-aprendizajes"
+                  value={aprendizajes}
+                  onChange={(e) => setAprendizajes(e.target.value)}
+                  placeholder="Qué resolviste, qué aprendiste, qué harías distinto la próxima..."
+                  rows={4}
+                  className={`${claseInput} resize-y`}
+                />
+                <p className="text-xs text-zinc-500">
+                  Se muestra en el detalle como "Qué aprendí". Este texto es siempre tuyo: behance no lo sincroniza.
+                </p>
               </div>
 
               <div className="space-y-1">
@@ -1182,6 +1267,20 @@ export default function AdminProyectos() {
                 />
                 Destacado en la portada
               </label>
+
+              <div className="space-y-1">
+                <label htmlFor="admin-tags" className="block text-sm text-zinc-300">
+                  Tags (separados por comas)
+                </label>
+                <input
+                  id="admin-tags"
+                  type="text"
+                  value={tagsTexto}
+                  onChange={(e) => setTagsTexto(e.target.value)}
+                  placeholder="ux/ui, ilustración, branding"
+                  className={claseInput}
+                />
+              </div>
 
               <div className="space-y-1">
                 <label className="block text-sm text-zinc-300">
