@@ -2,9 +2,9 @@
 //seccion "sobre mi": presentacion personal
 //es estatica, por eso es un componente astro (no manda javascript al navegador)
 //el saludo al final usa el nombre de quien esta conectado (isla de react)
-//la card es toda un enlace a /sobre-mi: forma de escudo (igual que los servicios), borde con
-//los colores de la paleta (violeta -> verde), card blanca con texto negro para contrastar
-//contra el fondo oscuro, foto mas grande y hover/active en toda la tarjeta
+//la card es toda un enlace a /sobre-mi: forma de escudo (igual que los servicios), marco en
+//gradiente de la paleta, cuerpo blanco al 85% (medio transparente, con tonos pastel), foto con
+//su propio marco en gradiente, brillo que barre al pasar el mouse y hover/active en toda la tarjeta
 //el fondo de la seccion (degradé + luces + puntitos) es la clase compartida .fondo-seccion
 import SaludoPersonalizado from './SaludoPersonalizado.jsx';
 ---
@@ -15,26 +15,41 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
     data-anim
     class="group block relative max-w-6xl mx-auto [filter:drop-shadow(0_16px_24px_rgba(0,0,0,0.5))] hover:[filter:drop-shadow(0_0_28px_rgba(184,132,231,0.25))] transition-[filter] duration-300 active:scale-[0.99]"
   >
-    {/*borde de la paleta: capa de atras con 2px, asi el clip-path no corta un border normal*/}
+    {/*marco de colores: capa de atras con 4px, asi el clip-path no corta un border normal.
+      el gradiente va violeta -> blanco -> verde y se enciende entero al pasar el mouse*/}
     <div
-      class="p-[2px] forma-escudo bg-gradient-to-br from-violeta-app/50 via-zinc-700 to-verde-app/50 group-hover:from-violeta-app group-hover:via-violeta-app/70 group-hover:to-verde-app group-hover:scale-[1.01] transition-all duration-300"
+      class="p-[4px] forma-escudo bg-gradient-to-br from-violeta-app/70 via-white/90 to-verde-app/70 group-hover:from-violeta-app group-hover:via-white group-hover:to-verde-app group-hover:scale-[1.01] transition-all duration-300"
     >
-      <div class="forma-escudo overflow-hidden bg-white">
+      {/*cuerpo semitransparente: el blanco al 85% deja asomar el degradé del marco (tonos pastel)
+        y un brillo barre la card cuando entra el mouse. los tres puntitos de la esquina son la paleta*/}
+      <div
+        class="forma-escudo overflow-hidden relative bg-white/85 backdrop-blur-[2px] group-hover:bg-white/95 transition-colors duration-300 before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-1/3 before:z-10 before:bg-gradient-to-r before:from-transparent before:via-white/70 before:to-transparent before:rotate-12 before:-translate-x-[200%] before:pointer-events-none before:transition-transform before:duration-1000 group-hover:before:translate-x-[500%]"
+      >
+        <div aria-hidden="true" class="absolute top-6 right-8 hidden md:flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-violeta-app"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-verde-app"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-zinc-950/15"></span>
+        </div>
         <div class="grid md:grid-cols-[minmax(0,17rem)_1fr] gap-8 md:gap-10 p-8 sm:p-12 pb-28 sm:pb-32">
           {/*columna izquierda: firma visual de la autora, con la foto en grande*/}
           <div class="flex md:flex-col items-center md:items-start gap-5">
             <div class="relative shrink-0">
               <div
                 aria-hidden="true"
-                class="absolute inset-0 rounded-3xl bg-gradient-to-br from-violeta-app to-verde-app blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-300"
+                class="absolute inset-0 rounded-3xl bg-gradient-to-br from-violeta-app to-verde-app blur-xl opacity-50 group-hover:opacity-90 transition-opacity duration-300"
               >
               </div>
-              <img
-                src="/img/sobre-mi.jpg"
-                alt="Retrato de Agustina Ferraro"
-                loading="lazy"
-                class="relative w-40 h-40 md:w-full md:h-80 rounded-3xl object-cover border border-zinc-200 group-hover:border-violeta-app transition-colors duration-300"
-              />
+              {/*marco de la foto: mismo gradiente violeta -> blanco -> verde que el de la card*/}
+              <div
+                class="relative p-[3px] rounded-[1.35rem] bg-gradient-to-br from-violeta-app via-white to-verde-app shadow-lg shadow-zinc-950/20"
+              >
+                <img
+                  src="/img/sobre-mi.jpg"
+                  alt="Retrato de Agustina Ferraro"
+                  loading="lazy"
+                  class="block w-40 h-40 md:w-full md:h-80 rounded-[1.1rem] object-cover"
+                />
+              </div>
             </div>
             <div class="text-center md:text-left">
               <p class="text-xs uppercase tracking-[0.2em] text-zinc-950 font-semibold">Diseñadora</p>
@@ -48,7 +63,7 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
             <h2 class="text-4xl font-bold text-zinc-950 inline-flex items-center gap-3">
               <svg
                 aria-hidden="true"
-                class="w-9 h-9 text-zinc-950"
+                class="w-9 h-9 text-violeta-app"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"

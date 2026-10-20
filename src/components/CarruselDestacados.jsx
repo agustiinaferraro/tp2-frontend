@@ -33,9 +33,6 @@ export default function CarruselDestacados() {
 
   return (
     <div className="relative w-full overflow-hidden py-5">
-      <h2 className="px-10 text-3xl font-bold mb-10 relative z-10 text-left">
-        Proyectos destacados
-      </h2>
       <div
         className="flex items-start gap-6 w-max will-change-transform animate-carrusel-loop hover:[animation-play-state:paused] focus-within:[animation-play-state:paused]"
         style={{ '--carrusel-duracion': '30s' }}
