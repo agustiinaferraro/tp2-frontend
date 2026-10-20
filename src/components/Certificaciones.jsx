@@ -92,7 +92,7 @@ export default function Certificaciones({ certificaciones = [] }) {
               key={cert.nombre}
               className="shrink-0 snap-start w-[clamp(15rem,72%,20rem)] h-full"
             >
-              <div className="h-full rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden transition-all duration-200 hover:border-violeta-app/50 hover:scale-105 hover:-translate-y-1 relative z-0 hover:z-10 focus-within:z-10">
+              <div className="h-full rounded-2xl card-vidrio overflow-hidden hover:scale-105 hover:-translate-y-1 relative z-0 hover:z-10 focus-within:z-10">
                 <button
                   type="button"
                   onClick={() => setAbierta(indice)}

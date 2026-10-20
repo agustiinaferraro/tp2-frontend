@@ -274,6 +274,51 @@ secciones de la home y en el main de todas las paginas*/
   background-repeat: repeat, no-repeat, no-repeat, no-repeat;
 }
 
+/*tarjeta de vidrio: fondo semitransparente con blur (se cuela el fondo de la app) y borde
+  de 2px en gradiente violeta -> blanco -> verde (el mismo lenguaje que la card de sobre mi).
+  el hover enciende el borde y suma un glow violeta; la variante .card-destacado usa dorado*/
+.card-vidrio {
+  background:
+    linear-gradient(rgba(24, 24, 27, 0.72), rgba(24, 24, 27, 0.72)) padding-box,
+    linear-gradient(
+        135deg,
+        rgba(184, 132, 231, 0.6) 0%,
+        rgba(255, 255, 255, 0.35) 50%,
+        rgba(105, 245, 204, 0.55) 100%
+      )
+      border-box;
+  border: 2px solid transparent;
+  backdrop-filter: blur(3px);
+  transition:
+    background 0.3s,
+    box-shadow 0.3s,
+    transform 0.25s;
+}
+
+.card-vidrio:hover {
+  background:
+    linear-gradient(rgba(24, 24, 27, 0.8), rgba(24, 24, 27, 0.8)) padding-box,
+    linear-gradient(135deg, var(--color-violeta-app) 0%, #ffffff 50%, var(--color-verde-app) 100%)
+      border-box;
+  box-shadow: 0 14px 34px -14px rgba(184, 132, 231, 0.45);
+}
+
+.card-vidrio.card-destacado {
+  background:
+    linear-gradient(rgba(24, 24, 27, 0.72), rgba(24, 24, 27, 0.72)) padding-box,
+    linear-gradient(
+        135deg,
+        rgba(251, 191, 36, 0.7) 0%,
+        rgba(255, 255, 255, 0.35) 50%,
+        rgba(105, 245, 204, 0.55) 100%
+      )
+      border-box;
+}
+
+.card-vidrio.card-destacado:hover {
+  box-shadow: 0 14px 34px -14px rgba(251, 191, 36, 0.4);
+}
+
 /*si el sistema pide menos movimiento, no se anima nada y todo queda visible.
   ojo: NO se apaga el avance solo de los carruseles (clase animate-carrusel-loop):
   es el contenido principal de la home (los destacados), se frena con el mouse y con

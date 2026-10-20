@@ -7,22 +7,20 @@ import LogoHerramienta from './LogoHerramienta.jsx';
 
 const { estadisticas, recorrido, habilidades, certificaciones } = Astro.props;
 
-//estilos por tipo de paso en el recorrido (punto, pildora de periodo y borde de tarjeta)
+//estilos por tipo de paso en el recorrido (punto y pildora de periodo; el borde de la
+//tarjeta ahora es la clase compartida .card-vidrio, en gradiente violeta -> verde)
 const colores = {
   estudio: {
     punto: 'bg-verde-app ring-verde-app/25',
     pildora: 'bg-verde-app/10 text-verde-app border-verde-app/30',
-    borde: 'hover:border-verde-app/50',
   },
   trabajo: {
     punto: 'bg-violeta-app ring-violeta-app/25',
     pildora: 'bg-violeta-app/10 text-violeta-app border-violeta-app/30',
-    borde: 'hover:border-violeta-app/50',
   },
   logro: {
     punto: 'bg-amber-400 ring-amber-400/25',
     pildora: 'bg-amber-400/10 text-amber-300 border-amber-400/30',
-    borde: 'hover:border-amber-400/50',
   },
 };
 
@@ -51,7 +49,7 @@ const colores = {
     <dl class="grid grid-cols-2 md:grid-cols-4 gap-4">
       {
         estadisticas.map((numero) => (
-          <div class="rounded-2xl bg-zinc-900 border border-zinc-800 p-5 text-left transition-colors hover:border-violeta-app/40">
+          <div class="rounded-2xl card-vidrio p-5 text-left">
             <dt class="text-sm text-zinc-400 mb-2">{numero.descripcion}</dt>
             <dd class="text-4xl font-bold bg-gradient-to-r from-verde-app to-violeta-app bg-clip-text text-transparent">
               {numero.valor}
@@ -71,19 +69,21 @@ const colores = {
       </svg>
       Mi título universitario
     </h2>
-    <div class="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start transition-colors hover:border-verde-app/40">
+    <div class="rounded-2xl card-vidrio p-6 md:p-8 flex flex-col md:flex-row gap-6">
       <a
         href="/img/titulo.jpg"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Ver mi título en tamaño completo"
-        class="block w-full md:w-60 shrink-0 group"
+        class="relative block w-full md:w-60 h-64 md:h-auto shrink-0 overflow-hidden rounded-xl group border border-white/10"
       >
+        {/*la imagen va absoluta y el contenedor estira: asi mide exactamente lo mismo
+          que la columna de texto (antes la foto se pasaba de largo)*/}
         <img
           src="/img/titulo.jpg"
           alt="Título de Técnica en Comunicación Interactiva y Diseño Multimedial"
           loading="lazy"
-          class="w-full rounded-xl border border-zinc-700 object-cover bg-zinc-800 transition-transform duration-300 group-hover:scale-[1.02]"
+          class="absolute inset-0 w-full h-full object-cover bg-zinc-800 transition-transform duration-300 group-hover:scale-[1.05]"
         />
       </a>
       <div class="space-y-3">
@@ -131,10 +131,8 @@ const colores = {
                 class={`absolute left-5 top-6 md:left-1/2 md:-translate-x-1/2 w-3.5 h-3.5 rounded-full ring-4 ${color.punto}`}
               ></span>
               <div
-                class={`ml-12 md:ml-0 md:w-[calc(50%_-_2.5rem)] rounded-2xl bg-zinc-900 border border-zinc-800 p-6 transition-colors ${color.borde} ${
-                  paso.destacado
-                    ? 'border-amber-400/60 shadow-lg shadow-amber-400/5'
-                    : ''
+                class={`ml-12 md:ml-0 md:w-[calc(50%_-_2.5rem)] rounded-2xl card-vidrio p-6 ${
+                  paso.destacado ? 'card-destacado' : ''
                 } ${par ? 'md:mr-auto md:text-right' : 'md:ml-auto'}`}
               >
                 <div
@@ -170,7 +168,7 @@ const colores = {
       }
       {/*cierre del recorrido: donde estoy hoy*/}
       <li class="hidden md:flex md:justify-center">
-        <div class="inline-flex items-center gap-3 rounded-full bg-zinc-900 border border-zinc-800 px-6 py-3 text-zinc-300">
+        <div class="inline-flex items-center gap-3 rounded-full card-vidrio px-6 py-3 text-zinc-300">
           <span class="w-2.5 h-2.5 rounded-full bg-verde-app animate-pulse"></span>
           Hoy: diseño, enseño y sigo aprendiendo.
         </div>
@@ -189,7 +187,7 @@ const colores = {
     <div class="grid sm:grid-cols-2 gap-4">
       {
         habilidades.map((grupo) => (
-          <div class="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 transition-colors hover:border-verde-app/40">
+          <div class="rounded-2xl card-vidrio p-6">
             <div class="flex items-center gap-3 mb-4">
               <span class="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-verde-app/10 text-verde-app border border-verde-app/20">
                 {
