@@ -15,7 +15,7 @@ La propuesta busca comunicar identidad (paleta oscura con violeta en los botones
 ## Sitios publicados
 
 - **Frontend (este repositorio, web):** https://agustinaportfolio.vercel.app
-- **Backend (API):** https://agustinaportfolio-api.vercel.app
+- **Backend (API):** proyecto separado; en producción queda **oculta para el visitante** (el sitio la consume vía `/api` con un rewrite, ver más abajo)
 - **Repositorio frontend:** https://github.com/agustiinaferraro/tp2-frontend
 - **Repositorio backend:** https://github.com/agustiinaferraro/tp2-backend
 
@@ -82,7 +82,7 @@ yarn preview       # sirve localmente la versión generada
 
 ## Fuente dinámica / API
 
-El frontend consume la **propia API REST** (`https://agustinaportfolio-api.vercel.app`) como fuente dinámica de datos:
+El frontend consume la **propia API REST** como fuente dinámica de datos. En producción la URL de la API **no la ve el visitante**: el navegador llama a `/api` en el mismo dominio del sitio y un rewrite de Vercel enruta eso al backend por atrás; además el CORS del backend solo acepta requests desde el dominio del sitio (y localhost en desarrollo).
 
 - `GET /api/proyectos` — lista de proyectos (con filtros `?destacados=true`, `?servicio=slug`, `?ligero=true` sin imágenes para el buscador).
 - `GET /api/proyectos/:id` — detalle de un proyecto (galería completa).
