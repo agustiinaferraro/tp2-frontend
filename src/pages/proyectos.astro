@@ -11,7 +11,7 @@ import SeccionProyectos from '../components/SeccionProyectos.astro';
 
 <Layout title="Proyectos | Agustina Ferraro">
   <Navbar seccionActiva="proyectos" />
-  <main id="contenido" class="pt-16">
+  <main id="contenido" class="pt-16 fondo-seccion">
     <script is:inline>
       //si se abre el detalle de un proyecto (?id=), se oculta la portada con los videos
       if (new URLSearchParams(location.search).get('id')) {

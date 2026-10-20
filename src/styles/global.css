@@ -260,6 +260,20 @@ html.con-js .animar-grupo.animado > *:nth-child(8) { transition-delay: 460ms; }
   clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
 }
 
+/*fondo de seccion: el mismo look que quedo atras de la card de sobre mi (degradé oscuro,
+dos luces de la paleta y grama de puntos), como clase compartida para usarlo en todas las
+secciones de la home y en el main de todas las paginas*/
+.fondo-seccion {
+  background-color: var(--color-zinc-950);
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    radial-gradient(50rem 34rem at 12% -6rem, rgba(105, 245, 204, 0.15), transparent 65%),
+    radial-gradient(50rem 34rem at 90% calc(100% + 6rem), rgba(184, 132, 231, 0.1), transparent 65%),
+    linear-gradient(to bottom, var(--color-zinc-950) 0%, var(--color-zinc-900) 50%, var(--color-zinc-950) 100%);
+  background-size: 24px 24px, auto, auto, auto;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+}
+
 /*si el sistema pide menos movimiento, no se anima nada y todo queda visible.
   ojo: NO se apaga el avance solo de los carruseles (clase animate-carrusel-loop):
   es el contenido principal de la home (los destacados), se frena con el mouse y con

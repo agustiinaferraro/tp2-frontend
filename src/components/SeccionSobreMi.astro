@@ -3,25 +3,13 @@
 //es estatica, por eso es un componente astro (no manda javascript al navegador)
 //el saludo al final usa el nombre de quien esta conectado (isla de react)
 //la card es toda un enlace a /sobre-mi: forma de escudo (igual que los servicios), borde con
-//los colores de la paleta (violeta -> verde), foto mas grande y hover/active en toda la tarjeta
+//los colores de la paleta (violeta -> verde), card blanca con texto negro para contrastar
+//contra el fondo oscuro, foto mas grande y hover/active en toda la tarjeta
+//el fondo de la seccion (degradé + luces + puntitos) es la clase compartida .fondo-seccion
 import SaludoPersonalizado from './SaludoPersonalizado.jsx';
 ---
 
-<section
-  id="sobre-mi"
-  class="relative py-24 px-4 overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 border-y border-zinc-800/60"
->
-  {/*fondo decorativo: dos luces de color y una trama de puntos muy suave*/}
-  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
-    <div class="absolute -top-32 left-[12%] w-96 h-96 rounded-full bg-verde-app/15 blur-3xl"></div>
-    <div class="absolute bottom-0 right-[10%] w-96 h-96 rounded-full bg-violeta-app/10 blur-3xl"></div>
-    <div
-      class="absolute inset-0 opacity-[0.04]"
-      style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 24px 24px;"
-    >
-    </div>
-  </div>
-
+<section id="sobre-mi" class="relative py-24 px-4 overflow-hidden fondo-seccion border-y border-zinc-800/60">
   <a
     href="/sobre-mi"
     data-anim
@@ -31,7 +19,7 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
     <div
       class="p-[2px] forma-escudo bg-gradient-to-br from-violeta-app/50 via-zinc-700 to-verde-app/50 group-hover:from-violeta-app group-hover:via-violeta-app/70 group-hover:to-verde-app group-hover:scale-[1.01] transition-all duration-300"
     >
-      <div class="forma-escudo overflow-hidden bg-zinc-950">
+      <div class="forma-escudo overflow-hidden bg-white">
         <div class="grid md:grid-cols-[minmax(0,17rem)_1fr] gap-8 md:gap-10 p-8 sm:p-12 pb-28 sm:pb-32">
           {/*columna izquierda: firma visual de la autora, con la foto en grande*/}
           <div class="flex md:flex-col items-center md:items-start gap-5">
@@ -45,22 +33,22 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
                 src="/img/sobre-mi.jpg"
                 alt="Retrato de Agustina Ferraro"
                 loading="lazy"
-                class="relative w-40 h-40 md:w-full md:h-80 rounded-3xl object-cover border border-zinc-700 group-hover:border-violeta-app/60 transition-colors duration-300"
+                class="relative w-40 h-40 md:w-full md:h-80 rounded-3xl object-cover border border-zinc-200 group-hover:border-violeta-app transition-colors duration-300"
               />
             </div>
             <div class="text-center md:text-left">
-              <p class="text-xs uppercase tracking-[0.2em] text-violeta-app font-semibold">Diseñadora</p>
-              <p class="text-lg font-bold text-white leading-tight">Multimedia</p>
-              <p class="text-sm text-zinc-400 mt-1">Diseño · Código · Video</p>
+              <p class="text-xs uppercase tracking-[0.2em] text-zinc-950 font-semibold">Diseñadora</p>
+              <p class="text-lg font-bold text-zinc-950 leading-tight">Multimedia</p>
+              <p class="text-sm text-zinc-500 mt-1">Diseño · Código · Video</p>
             </div>
           </div>
 
           {/*columna derecha: el texto de presentacion*/}
           <div class="space-y-6">
-            <h2 class="text-4xl font-bold text-white inline-flex items-center gap-3">
+            <h2 class="text-4xl font-bold text-zinc-950 inline-flex items-center gap-3">
               <svg
                 aria-hidden="true"
-                  class="w-9 h-9 text-violeta-app"
+                class="w-9 h-9 text-zinc-950"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
@@ -72,9 +60,9 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
               Sobre mí
             </h2>
 
-            <div class="space-y-4 text-zinc-300 leading-relaxed text-lg text-left">
+            <div class="space-y-4 text-zinc-700 leading-relaxed text-lg text-left">
               <p>
-                Soy <span class="font-bold text-white">Diseñadora Multimedia</span>. Mi trabajo abarca
+                Soy <span class="font-bold text-zinc-950">Diseñadora Multimedia</span>. Mi trabajo abarca
                 todo el proceso de un proyecto digital: desde la identidad visual y el diseño de
                 experiencia (UX/UI), hasta el desarrollo del código, la animación y la edición
                 audiovisual.
@@ -85,13 +73,13 @@ import SaludoPersonalizado from './SaludoPersonalizado.jsx';
                 dentro y cómo comunicarla a través del lenguaje audiovisual.
               </p>
               <p>
-                Me interesa crear productos <span class="font-bold text-white">funcionales</span>,
+                Me interesa crear productos <span class="font-bold text-zinc-950">funcionales</span>,
                 correctamente diseñados y técnicamente sólidos.
               </p>
             </div>
 
             {/*saludo con el nombre de quien esta conectado (si hay sesion)*/}
-            <p class="text-lg text-zinc-300">
+            <p class="text-lg text-zinc-600">
               <SaludoPersonalizado
                 client:load
                 sinNombre="Te cuento un poco más de mi trayectoria."
