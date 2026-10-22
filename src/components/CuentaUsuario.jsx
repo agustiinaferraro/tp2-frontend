@@ -146,6 +146,19 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   const hayCambios =
     Boolean(fotoNueva) || nombreEditado.trim() !== (sesion?.nombre ?? '').trim();
 
+  //el dialogo de cuentas se cierra con Escape
+  useEffect(() => {
+    if (!ventana) return undefined;
+    const alPresionar = (e) => {
+      if (e.key === 'Escape') {
+        setVentana('');
+        setError('');
+      }
+    };
+    window.addEventListener('keydown', alPresionar);
+    return () => window.removeEventListener('keydown', alPresionar);
+  }, [ventana]);
+
   useEffect(() => {
     const guardada = leerSesion();
     setSesion(guardada);
