@@ -24,10 +24,10 @@ import {
 } from '../api/usuarios.js';
 import { comprimirImagen } from '../utils/imagen.js';
 
-const claseInput =
+const claseInput = // define los estilos css reutilizables para los campos de texto
   'w-full px-4 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-violeta-app transition-all';
 
-function IconoGoogle() {
+function IconoGoogle() {//dibuja el icono svg de google para el boton de acceso rapido
   return (
     <svg className="w-5 h-5" aria-hidden="true" viewBox="0 0 24 24">
       <path
@@ -68,15 +68,13 @@ function IconoLapiz({ className }) {
   );
 }
 
-//muestra la foto del perfil y, si no hay o no carga, la inicial del nombre
-function AvatarPerfil({ foto, nombre, className, classNameInicial }) {
-  //si la imagen falla (por ejemplo una url vencida) se cae a la inicial
-  const [falla, setFalla] = useState(false);
-  useEffect(() => {
+function AvatarPerfil({ foto, nombre, className, classNameInicial }) { //muestra la foto de perfil o la inicial del nombre si la img falla o no existe
+  const [falla, setFalla] = useState(false);//estado local para detectar si la carga de la img da error
+  useEffect(() => { //resetea el estado de fallo cada vez que cambia la url de la foto
     setFalla(false);
   }, [foto]);
 
-  if (foto && !falla) {
+  if (foto && !falla) {//si hay foto y no fallo la dibuja como etiqueta img
     return <img src={foto} alt="" className={className} onError={() => setFalla(true)} />;
   }
   return (
@@ -86,8 +84,7 @@ function AvatarPerfil({ foto, nombre, className, classNameInicial }) {
   );
 }
 
-//solo se vuelve a rutas del propio sitio (ej: /proyectos), nunca a direcciones externas
-function esRutaInterna(ruta) {
+function esRutaInterna(ruta) {//valida que la ruta de redireccion pertenezca al propio sitio web
   return typeof ruta === 'string' && ruta.startsWith('/') && !ruta.startsWith('//');
 }
 
@@ -95,59 +92,46 @@ function esRutaInterna(ruta) {
 //ocultarAccesoAdmin: esconde el boton "Gestionar mis proyectos" cuando ya se esta en el panel
 //accionInicial: { tipo, n } que dispara el panel (foto | nombre | cuenta | eliminar) al tocar una opcion del menu
 //ocultarPerfil: deja montado solo el dialogo de cuentas (se usa en el panel cuando solo se pide "Agregar otra cuenta")
-export default function CuentaUsuario({
+export default function CuentaUsuario({ //componente principal para gestionar la cuenta de usuario, inicio de sesion y perfil
   sinEncabezado = false,
   ocultarAccesoAdmin = false,
   accionInicial = null,
   ocultarPerfil = false,
 }) {
-  //la sesion se lee recien en el navegador (no existe en el servidor):
-  //hasta que no este "montado" se dibuja el estado neutro para que el html del build y el del
-  //navegador sean iguales (si no, react avisa del error de hidratacion en la consola)
-  const [montado, setMontado] = useState(false);
-  const [sesion, setSesion] = useState(null);
-  //"login" | "registro" (al llegar con ?modo=registro se abre la creacion de cuenta)
-  const [modo, setModo] = useState(() => {
+
+  const [montado, setMontado] = useState(false);//define si el componente ya esta montado en el navegador para evitar errores de hidratacion
+  const [sesion, setSesion] = useState(null);//almacena los datos de la sesion actual del usuario
+  const [modo, setModo] = useState(() => {//define si el formulario actual esta en modo login leyendo los parametros de la url
     if (typeof window === 'undefined') return 'login';
     return new URLSearchParams(window.location.search).get('modo') === 'registro' ? 'registro' : 'login';
   });
-  //pagina de la que se vino: al entrar o registrarse se vuelve ahi (viene en ?volver=)
-  //se aceptan solo rutas internas: si el link trae una direccion externa se ignora
-  const [volver] = useState(() => {
+
+  const [volver] = useState(() => {// guarda la ruta de origen para volver a ella despues de iniciar sesion
     if (typeof window === 'undefined') return '';
     const pedido = new URLSearchParams(window.location.search).get('volver') ?? '';
     return esRutaInterna(pedido) ? pedido : '';
   });
-  const [form, setForm] = useState({ nombre: '', email: '', clave: '' });
-  const [enviando, setEnviando] = useState(false);
-  const [error, setError] = useState('');
-  //true si la cuenta logueada es la dueña del sitio (para ofrecerle el panel de administracion)
-  const [esDueno, setEsDueno] = useState(false);
-  //input oculto para elegir la foto de perfil
-  const fotoInputRef = useRef(null);
-  //input del nombre, para enfocarlo cuando se entra desde "Cambiar nombre" del panel
-  const nombreInputRef = useRef(null);
-  //edicion del perfil: nombre y foto se editan y se confirman con un solo boton
-  const [nombreEditado, setNombreEditado] = useState('');
-  const [fotoNueva, setFotoNueva] = useState(null);
-  const [guardando, setGuardando] = useState(false);
-  //dialogo de cuentas: "" (cerrado) | "cambiar" | "agregar"
-  const [ventana, setVentana] = useState('');
-//confirmacion de eliminar la cuenta: primero se avisa, despues se borra
-const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
-const [borrando, setBorrando] = useState(false);
-//avisos de confirmacion: "cambios guardados" o "cuenta eliminada"
-const [guardado, setGuardado] = useState(false);
-const [aviso, setAviso] = useState('');
-//cuentas guardadas en el navegador (varias cuentas como en ig)
-const [cuentas, setCuentas] = useState(() => listarCuentas());
+  const [form, setForm] = useState({ nombre: '', email: '', clave: '' });//almacena los valores temporales del formulario de acceso
+  const [enviando, setEnviando] = useState(false);//indica si hay una peticion de red en curso para bloquear botones
+  const [error, setError] = useState('');//guarda los msj de error devueltos por la api
+  const [esDueno, setEsDueno] = useState(false);//define si la cuenta pertenece a admin
+  const fotoInputRef = useRef(null);//referencia al elemento input de tipo file oculto para cambiar la foto
+  const nombreInputRef = useRef(null);//referencia al input de texto del nombre para enfocarlo al editar
+  const [nombreEditado, setNombreEditado] = useState('');//guarda el nombre editado temporalmente antes de guardarlo
+  const [fotoNueva, setFotoNueva] = useState(null);//almacena el archivo de la nueva foto seleccionada
+  const [guardando, setGuardando] = useState(false);//indica si se estan guardando los cambios del perfil
+  const [ventana, setVentana] = useState('');//controla la apertura y tipo de los modales de gestion de cuentas
+const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);//controla si se esta mostrando el aviso de confirmacion para eliminar la cuenta
+const [borrando, setBorrando] = useState(false);//indica si se esta ejecutando la eliminacion definitiva de la cuenta
+const [guardado, setGuardado] = useState(false);//controla el estado de exito al guardar cambios
+const [aviso, setAviso] = useState('');//almacena avisos efimeros para mostrar notificaciones flotantes
+const [cuentas, setCuentas] = useState(() => listarCuentas());//lista las cuentas secundarias guardadas en el almacenamiento local del navegador
 
-  //hay cambios sin guardar en el perfil: habilita el boton general de guardado
-  const hayCambios =
+const hayCambios = // calcula si existen modificaciones sin guardar en el perfil del usuario
     Boolean(fotoNueva) || nombreEditado.trim() !== (sesion?.nombre ?? '').trim();
 
   //el dialogo de cuentas se cierra con Escape
-  useEffect(() => {
+  useEffect(() => { //agrega un escuchador de teclado para cerrar los modales al presionar la tecla escape
     if (!ventana) return undefined;
     const alPresionar = (e) => {
       if (e.key === 'Escape') {
@@ -159,7 +143,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     return () => window.removeEventListener('keydown', alPresionar);
   }, [ventana]);
 
-  useEffect(() => {
+  useEffect(() => {//lee la sesion guardada al cargar el componente y refresca el token con firebase
     const guardada = leerSesion();
     setSesion(guardada);
     setNombreEditado(guardada?.nombre ?? '');
@@ -174,9 +158,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
       .catch(() => {});
   }, []);
 
-  //al llegar al perfil con una cuenta pendiente de cambiar (se eligio desde el panel):
-  //por las dudas se vuelve a cerrar la sesion y queda el formulario listo para la otra
-  useEffect(() => {
+  useEffect(() => {// detecta si se navego para cambiar de cuenta y limpia la sesion anterior antes de pedir credenciales
     const pendiente = sessionStorage.getItem('cuenta-a-cambiar');
     if (!pendiente) return;
     sessionStorage.removeItem('cuenta-a-cambiar');
@@ -192,53 +174,51 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     setAviso(`Entrá con la contraseña de ${pendiente} para cambiar de cuenta.`);
   }, []);
 
-  //en la pagina /perfil, si la cuenta logueada es la dueña del sitio,
-  //se abre directo el panel de administracion (no tiene sentido ver el perfil ahi)
-  useEffect(() => {
-    if (sinEncabezado || !sesion?.email) return;
-    let vivo = true;
-    soyDueno()
+  useEffect(() => {//redirige automaticamente al panel de administracion si la cuenta logueada es admin
+    if (sinEncabezado || !sesion?.email) return;// si no hay encabezado o el usuario no tiene email guardado no hace nada y sale
+    let vivo = true;//crea una bandera booleana para verificar que el componente sigue montado
+    soyDueno()// llama a la funcion de la api para verificar si el usuario actual es dueño del sitio
       .then((es) => {
-        if (es && vivo) window.location.assign('/admin');
+        if (es && vivo) window.location.assign('/admin');//si el usuario es dueño y el componente sigue vivo redirige a la pag de admin
       })
       .catch(() => {});
-    return () => {
+    return () => {//funcion de limpieza que desactiva la bandera cuando el componente se desmonta
       vivo = false;
     };
   }, [sesion?.email, sinEncabezado]);
 
   //dice si la cuenta logueada es la dueña del sitio (para mostrar el acceso al panel)
   useEffect(() => {
-    if (!sesion?.email) {
-      setEsDueno(false);
+    if (!sesion?.email) {// si no hay un email de sesion activo
+      setEsDueno(false);//establece que no es dueño y sale de la funcion
       return;
     }
-    let activo = true;
-    soyDueno()
+    let activo = true;//crea un interruptor activo para controlar el ciclo de vida del efecto
+    soyDueno()//consulta al servidor si el usuario actual tiene permisos de dueño
       .then((es) => {
-        if (activo) setEsDueno(es);
+        if (activo) setEsDueno(es);//si el componente sigue activo actualiza el estado con el resultado obtenido
       })
       .catch(() => {});
-    return () => {
+    return () => {//funcion de limpieza que apaga el interruptor cuando el componente se desmonta
       activo = false;
     };
-  }, [sesion?.email]);
+  }, [sesion?.email]);//se ejecuta cada vez que cambia el correo de la sesion actual
 
   //cuando desde el menu del panel admin se pide "cambiar foto", "cambiar nombre",
   //"agregar otra cuenta" o "eliminar cuenta", se abre directamente esa accion
-  useEffect(() => {
-    if (!sesion || !accionInicial?.tipo) return;
-    const tipo = accionInicial.tipo;
-    if (tipo === 'foto') {
-      fotoInputRef.current?.click();
-    } else if (tipo === 'nombre') {
-      nombreInputRef.current?.focus();
-    } else if (tipo === 'cuenta') {
-      setError('');
-      setVentana('cambiar');
-    } else if (tipo === 'eliminar') {
-      setError('');
-      setConfirmandoBorrado(true);
+  useEffect(() => {//ejecuta acciones automaticas en el perfil cuando se pasa un parametro inicial desde el panel
+    if (!sesion || !accionInicial?.tipo) return;//si no hay una sesion activa o no viene ninguna accion inicial definida, no hace nada y sale
+    const tipo = accionInicial.tipo;//guarda el tipo de accion solicitada en una constante local
+    if (tipo === 'foto') {//si el tipo de accion es cambiar la foto
+      fotoInputRef.current?.click();//hace clic de forma programatica en el input oculto de archivos para abrir el selector de imagenes
+    } else if (tipo === 'nombre') {//si el tipo de accion es cambiar el nombre
+      nombreInputRef.current?.focus();//enfoca el campo de texto del nombre para que el usuario pueda empezar a escribir de inmediato
+    } else if (tipo === 'cuenta') {//si el tipo de accion es cambiar de cuenta
+      setError('');//limpia cualquier error anterior de la pantalla
+      setVentana('cambiar');//y abre la ventana modal para gestionar o cambiar de cuenta
+    } else if (tipo === 'eliminar') {//si el tipo de accion es eliminar la cuenta
+      setError('');//limpia cualquier error anterior
+      setConfirmandoBorrado(true);//y activa el dialogo de confirmacion para borrar la cuenta permanentemente
     }
     //cada toque del menu manda un objeto nuevo (con su marca "n"); por eso reacciona
   }, [accionInicial, sesion]);
@@ -246,143 +226,134 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   //guarda la sesion devuelta por firebase, la suma a las cuentas guardadas y actualiza la pantalla
   //si viene del dialogo "agregar cuenta", al final lo cierra
   //si se entro desde otra pagina para comentar o escribir, se vuelve a esa pagina
-  function aplicarSesion(respuesta, desdeVentana = false) {
-    const nuevaSesion = {
+  function aplicarSesion(respuesta, desdeVentana = false) {//guarda los datos de la sesion autenticada en el almacenamiento local y actualiza los estados
+    const nuevaSesion = {//crea un objeto estructurado con la informacion clave del usuario autenticado
       token: respuesta.token,
       nombre: respuesta.usuario.nombre,
       email: respuesta.usuario.email,
       foto: respuesta.usuario.foto ?? '',
     };
-    guardarCuenta(nuevaSesion);
-    setCuentas(listarCuentas());
-    guardarSesion(nuevaSesion);
-    setSesion(nuevaSesion);
-    setForm({ nombre: '', email: '', clave: '' });
-    limpiarEdicion(nuevaSesion.nombre);
-    if (desdeVentana) setVentana('');
+    guardarCuenta(nuevaSesion);//guarda la cuenta actual dentro de la lista de cuentas almacenadas en el navegador
+    setCuentas(listarCuentas());//actualiza el estado local con la lista renovada de cuentas guardadas
+    guardarSesion(nuevaSesion);//guarda la sesion activa actual en el almacenamiento local del sistema
+    setSesion(nuevaSesion);//actualiza el estado de la sesion en el componente con los nuevos datos
+    setForm({ nombre: '', email: '', clave: '' });//blanquea y limpia los campos de texto del formulario de acceso
+    limpiarEdicion(nuevaSesion.nombre);//restablece los campos de edicion del perfil usando el nombre nuevo
+    if (desdeVentana) setVentana('');//si el proceso se hizo desde el dialogo de cuentas, cierra la ventana modal
     //vuelve al punto de partida (la pagina donde estaba antes de registrarse)
     if (volver) window.location.assign(volver);
   }
 
-  //deja los campos de edicion como los datos guardados
-  function limpiarEdicion(nombre) {
-    setNombreEditado(nombre ?? '');
-    setFotoNueva(null);
-    setError('');
+  function limpiarEdicion(nombre) {//deja los campos de edicion como los datos guardados
+    setNombreEditado(nombre ?? '');//actualiza el estado del nombre editado con el valor recibido o un texto vacio si no viene nada
+    setFotoNueva(null);//resetea el estado de la nueva foto seleccionada dejandolo en nulo
+    setError('');//limpia cualquier mensaje de error que estuviera visible en la pantalla
   }
 
-  //elige una foto de perfil: se comprime y queda lista para guardar con el boton general
-  async function cambiarFoto(e) {
-    const archivo = e.target.files?.[0];
-    if (!archivo) return;
-    setError('');
+  async function cambiarFoto(e) { //elige una foto de perfil: se comprime y queda lista para guardar con el boton general
+    const archivo = e.target.files?.[0];//obtiene el primer archivo seleccionado por el usuario desde el input de tipo file
+    if (!archivo) return;//si el usuario no selecciono ningun archivo, sale de la funcion y no hace nada
+    setError('');//limpia cualquier mensaje de error que estuviera visible en la pantalla
     try {
-      setFotoNueva(await comprimirImagen(archivo));
+      setFotoNueva(await comprimirImagen(archivo));//comprime la imagen seleccionada de forma asincronica y la guarda como foto nueva pendiente
     } catch (err) {
-      setError(err.message);
+      setError(err.message);//si ocurre un error durante la compresion, captura el mensaje y lo muestra en pantalla
     }
   }
 
-  //guarda los cambios del perfil (nombre y foto) con el boton general
-  async function guardarCambios() {
-    if (guardando || !hayCambios) return;
-    const nombreLimpio = nombreEditado.trim();
-    if (!nombreLimpio) {
-      setError('El nombre no puede estar vacío.');
+  async function guardarCambios() {// guarda los cambios realizados del perfil comunicandose con el backend
+    if (guardando || !hayCambios) return;//si ya se esta guardando o no hay cambios pendientes de guardar, sale de la funcion
+    const nombreLimpio = nombreEditado.trim();//quita los espacios en blanco sobrantes del nombre editado
+    if (!nombreLimpio) {//si el nombre queda vacio
+      setError('El nombre no puede estar vacío.');//muestra un mensaje de error y detiene la ejecucion
       return;
     }
 
-    setGuardando(true);
-    setError('');
+    setGuardando(true);//activa el estado de guardado para bloquear los botones mientras procesa
+    setError('');//limpia cualquier mensaje de error
     try {
-      let sesionActual = sesion;
-      //el nombre vive en firebase (para que lo vean los demas al comentar)
-      if (nombreLimpio !== sesion?.nombre) {
-        sesionActual = await actualizarNombre(nombreLimpio);
+      let sesionActual = sesion;//asigna la sesion actual a una variable auxiliar para ir actualizandola
+      if (nombreLimpio !== sesion?.nombre) {//el nombre vive en firebase (para que lo vean los demas al comentar)
+        sesionActual = await actualizarNombre(nombreLimpio);// actualiza el nombre en el servidor a traves de la api
       }
-      //la foto se guarda solo en el navegador de esta persona
-      if (fotoNueva) {
-        sesionActual = actualizarFoto(fotoNueva);
+      if (fotoNueva) {//la foto se guarda solo en el navegador de esta persona
+        sesionActual = actualizarFoto(fotoNueva);// actualiza la foto de perfil de manera local
       }
-      if (sesionActual) {
-        guardarCuenta(sesionActual);
-        setCuentas(listarCuentas());
-        setSesion(sesionActual);
+      if (sesionActual) {// si se obtuvo una sesion actualizada correctamente
+        guardarCuenta(sesionActual);//guarda la cuenta actualizada en el almacenamiento local
+        setCuentas(listarCuentas());//actualiza el estado con la lista de cuentas renovada
+        setSesion(sesionActual);//actualiza el estado de la sesion activa en la pantalla
       }
-      limpiarEdicion(sesionActual?.nombre ?? nombreLimpio);
-    } catch (err) {
-      setError(err.message);
+      limpiarEdicion(sesionActual?.nombre ?? nombreLimpio);// limpia los campos de edicion usando el nombre definitivo
+    } catch (err) { 
+      setError(err.message);//si ocurre algun error en el proceso, lo captura y lo muestra en pantalla
     } finally {
-      setGuardando(false);
+      setGuardando(false);//pase lo que pase, al terminar desactiva el estado de guardado
     }
   }
 
-  //los avisos ("cambios guardados", cuenta eliminada, sesion cerrada...) flotan arriba a la
-  //derecha y se apagan solos a los 2 segundos: son mensajes efimeros, no ocupan lugar
-  useEffect(() => {
-    if (!guardado && !aviso) return undefined;
-    const t = setTimeout(() => {
-      setGuardado(false);
-      setAviso('');
+  useEffect(() => {//oculta los mensajes efimeros de aviso despues de dos segundos
+    if (!guardado && !aviso) return undefined; //si no hay un estado de guardado activo ni ningun aviso escrito, no hace nada y sale
+    const t = setTimeout(() => {//configura un temporizador para limpiar y apagar los avisos despues de dos segundos
+      setGuardado(false);//desactiva el indicador de guardado
+      setAviso('');//limpia el texto del aviso flotante
     }, 2000);
-    return () => clearTimeout(t);
+    return () => clearTimeout(t);//funcion de limpieza que borra el temporizador si el componente se desmonta o cambian las dependencias
   }, [guardado, aviso]);
 
-  //eliminar la cuenta: borra en el backend la conversacion y los comentarios, y cierra la sesion
-  async function confirmarBorrado() {
-    if (borrando) return;
-    setBorrando(true);
-    setError('');
+  async function confirmarBorrado() {//ejecuta la eliminacion de la cuenta de usuario y limpia la sesion local
+    if (borrando) return;//si ya se esta ejecutando la eliminacion, sale de la funcion para evitar duplicados
+    setBorrando(true);//activa el estado de borrado para bloquear las acciones mientras procesa
+    setError('');//limpia cualquier mensaje de error anterior que estuviera visible
     try {
-      await eliminarCuenta();
-      //la cuenta ya no existe: se vuelve a la pantalla de acceso
-      setSesion(null);
-      setCuentas(listarCuentas());
-      setModo('login');
-      setVentana('');
-      setConfirmandoBorrado(false);
-      setGuardado(false);
+      await eliminarCuenta();//llama a la api para eliminar permanentemente la cuenta en el servidor
+      setSesion(null);// la cuenta ya no existe: se vuelve a la pantalla de acceso
+      setCuentas(listarCuentas());//actualiza la lista de cuentas guardadas en el navegador
+      setModo('login'); //cambia el modo de la vista a inicio de sesion
+      setVentana('');//cierra cualquier ventana modal abierta
+      setConfirmandoBorrado(false);//oculta el dialogo de confirmacion de borrado
+      setGuardado(false);//desactiva el indicador general de guardado
       setAviso('Tu cuenta se eliminó. Se borraron tus conversaciones, comentarios e interacciones.');
     } catch (err) {
-      setError(err.message);
+      setError(err.message);// si ocurre un error, muestra el mensaje correspondiente y cierra el dialogo de confirmacion
       setConfirmandoBorrado(false);
     } finally {
-      setBorrando(false);
+      setBorrando(false);// pase lo que pase, al finalizar desactiva el estado de borrado
     }
   }
 
   //entra con una cuenta de google (firebase abre el selector de cuentas)
   //desdeVentana: true cuando se agrega otra cuenta desde el dialogo
   async function entrarConGoogle(desdeVentana = false) {
-    if (enviando) return;
-    setEnviando(true);
-    setError('');
+    if (enviando) return;// si ya se esta procesando otra peticion de envio, sale de la funcion para evitar duplicados
+    setEnviando(true);// activa el estado de envio para bloquear los botones mientras se abre la ventana de google
+    setError('');// limpia cualquier mensaje de error anterior que estuviera visible en la pantalla
     try {
-      aplicarSesion(await entrarConGoogleCuenta(), desdeVentana);
+      aplicarSesion(await entrarConGoogleCuenta(), desdeVentana);//espera a que firebase autentique con google y aplica la sesion obtenida, pasando el indicador de ventana
     } catch (err) {
-      setError(err.message);
+      setError(err.message);//si ocurre algun error durante el proceso de acceso, captura el mensaje y lo muestra en pantalla
     } finally {
-      setEnviando(false);
+      setEnviando(false);//pase lo que pase, al terminar desactiva el estado de envio
     }
   }
 
-  function cambiarCampo(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  function cambiarCampo(e) {//actualiza los campos de texto del formulario al escribir el usuario
+    setForm({ ...form, [e.target.name]: e.target.value });// toma el objeto de estado anterior del formulario y sobreescribe unicamente la propiedad
+  // cuyo nombre coincide con el atributo 'name' del input que genero el evento, asignandole su nuevo valor
   }
 
-  //registro o login: guarda la sesion y muestra los datos del usuario
-  async function manejarEnvio(e, desdeVentana = false) {
-    e.preventDefault();
-    if (enviando) return;
-    setEnviando(true);
-    setError('');
+  async function manejarEnvio(e, desdeVentana = false) {//registro o login: guarda la sesion y muestra los datos del usuario
+    e.preventDefault();//previene el comportamiento por defecto de recarga de la pagina al enviar el formulario html
+    if (enviando) return;//si ya se esta procesando una solicitud de envio, sale de la funcion para evitar envios duplicados
+    setEnviando(true);//activa el estado de envio para bloquear los elementos del formulario mientras procesa
+    setError('');// limpia cualquier mensaje de error previo que estuviera visible en la pantalla
     try {
-      const respuesta = modo === 'registro' ? await registrarUsuario(form) : await iniciarSesion(form);
-      aplicarSesion(respuesta, desdeVentana);
+      const respuesta = modo === 'registro' ? await registrarUsuario(form) : await iniciarSesion(form);//evalua si el modo actual es de registro o inicio de sesion, llamando a la funcion correspondiente de la api
+      aplicarSesion(respuesta, desdeVentana);//procesa la respuesta obtenida aplicando y guardando la nueva sesion del usuario
     } catch (err) {
-      setError(err.message);
+      setError(err.message);//si ocurre algun error durante el registro o login, captura el mensaje y lo muestra en pantalla
     } finally {
-      setEnviando(false);
+      setEnviando(false);//pase lo que pase, al finalizar la operacion desactiva el estado de envio
     }
   }
 
@@ -391,37 +362,38 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
   //(si se cerrara alla, alguna llamada en vuelo podria resucitar la cuenta anterior)
   //y al llegar queda el formulario listo con el email de la otra cuenta
   async function cambiarCuentaActiva(cuenta) {
-    sessionStorage.setItem('cuenta-a-cambiar', cuenta.email);
+    sessionStorage.setItem('cuenta-a-cambiar', cuenta.email); //guarda temporalmente en el almacenamiento de sesion el correo de la cuenta a la que se quiere cambiar
     try {
-      await cerrarSesionFirebase();
+      await cerrarSesionFirebase();// intenta cerrar la sesion activa actual en firebase de manera asincronica
     } catch {}
-    borrarSesion();
-    window.location.assign('/perfil');
+    borrarSesion();//borra los datos de la sesion actual del almacenamiento local del navegador
+    window.location.assign('/perfil');//redirige la ventana del navegador hacia la pagina de perfil para iniciar con la nueva cuenta
   }
 
-  //cerrar sesion de la cuenta activa: la cuenta sigue existiendo, solo se sale de ella
+  //cierra la sesion activa actual conservando la cuenta registrada en el sistema
   function cerrarSesion() {
-    cerrarSesionFirebase();
-    borrarSesion();
-    setSesion(null);
-    setModo('login');
-    limpiarEdicion('');
-    setGuardado(false);
-    setConfirmandoBorrado(false);
-    setVentana('');
-    setAviso('Cerraste sesión. Tu cuenta sigue existiendo.');
+    cerrarSesionFirebase();// cierra la sesion activa en firebase de forma remota
+    borrarSesion();// borra los datos de la sesion almacenados localmente en el navegador
+    setSesion(null);// limpia el estado de la sesion actual dejandolo en nulo
+    setModo('login');// cambia el modo del formulario de vuelta al inicio de sesion
+    limpiarEdicion('');// limpia los campos de edicion del perfil pasando un texto vacio
+    setGuardado(false);// desactiva el indicador general de guardado
+    setConfirmandoBorrado(false);// oculta el dialogo de confirmacion para borrar la cuenta
+    setVentana('');// cierra cualquier ventana modal que estuviera abierta
+    setAviso('Cerraste sesión. Tu cuenta sigue existiendo.');// muestra un aviso flotante informando que se cerro la sesion pero la cuenta sigue existiendo
   }
 
-  //olvida una cuenta guardada en el navegador
+  //elimina una cuenta guardada de la lista secundaria almacenada localmente
   function olvidarCuentaGuardada(email) {
-    olvidarCuenta(email);
-    setCuentas(listarCuentas());
+    olvidarCuenta(email);// llama a la funcion de la api para remover el correo especificado de las cuentas guardadas en el navegador
+    setCuentas(listarCuentas());// actualiza el estado local obteniendo la lista renovada de cuentas almacenadas
   }
 
   //formulario de acceso (google + entrar/crear) usado en la portada y en "agregar cuenta"
   function renderAcceso(desdeVentana) {
     return (
       <>
+      {/* boton para iniciar sesion rapidamente usando una cuenta de google */}
         <button
           type="button"
           onClick={() => entrarConGoogle(desdeVentana)}
@@ -431,14 +403,16 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
           <IconoGoogle />
           Continuar con Google
         </button>
-
+      {/* separador visual con la letra "o" en el medio para dividir las opciones de acceso */}
         <div className="flex items-center gap-3 text-xs text-zinc-500">
           <span className="flex-1 h-px bg-zinc-700" aria-hidden="true" />
           o
           <span className="flex-1 h-px bg-zinc-700" aria-hidden="true" />
         </div>
 
+       {/* formulario principal para ingresar con correo y contraseña o registrarse */} 
         <form onSubmit={(e) => manejarEnvio(e, desdeVentana)} className="space-y-3">
+          {/* si el modo actual es registro, muestra un campo adicional para pedir el nombre del usuario */}
           {modo === 'registro' && (
             <input
               name="nombre"
@@ -452,6 +426,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               className={claseInput}
             />
           )}
+          {/* campo de texto para ingresar el correo electronico */}
           <input
             name="email"
             type="email"
@@ -463,6 +438,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
             required
             className={claseInput}
           />
+          {/* campo de texto para ingresar la contraseña, con texto adaptable segun el modo */}
           <input
             name="clave"
             type="password"
@@ -474,7 +450,10 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
             required
             className={claseInput}
           />
+          {/* si existe algun mensaje de error, lo muestra en pantalla resaltado en rojo */}
           {error && <p role="alert" className="text-red-400 text-sm">{error}</p>}
+          
+          {/* boton principal de envio del formulario, cambia su texto segun el estado y el modo */}
           <button
             type="submit"
             disabled={enviando}
@@ -511,6 +490,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
           </p>
         )}
 
+        {/* texto informativo explicando que el registro es opcional solo para comentar */}
         <p className="text-xs text-zinc-500 text-center">
           Con tu cuenta podés dejar comentarios en los proyectos. Sin registro podés mirar todo.
         </p>
@@ -518,12 +498,12 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
     );
   }
 
-  return (
+  return (// seccion principal del componente que renderiza la vista completa del perfil de usuario
     <section
       className={sinEncabezado ? '' : 'max-w-md mx-auto px-4 py-16'}
       aria-label="Perfil"
     >
-      {!ocultarPerfil && !sinEncabezado && (
+      {!ocultarPerfil && !sinEncabezado && ({/* cabecera principal del perfil que muestra el titulo y el estado actual de la sesion */}
         <div className="text-center space-y-2 mb-8">
           <h1 className="text-3xl font-extrabold text-white">Perfil</h1>
           <p className="text-zinc-400">
@@ -546,12 +526,11 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
         </p>
       )}
 
-      {/*antes de que se lea la sesion del navegador se ve un contenedor vacio,
-          para que el html del build y el de la pagina coincidan*/}
-      {!ocultarPerfil && (!montado ? (
+      {!ocultarPerfil && (!montado ? ({/* contenedor condicional que muestra la interfaz segun el estado de montaje y la sesion del usuario */}
         <div className="rounded-2xl bg-zinc-900 border border-zinc-800 h-64" aria-hidden="true" />
       ) : sesion ? (
         <div className="rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden">
+          {/* input de tipo archivo oculto para seleccionar y actualizar la foto de perfil */}
           <input
             ref={fotoInputRef}
             type="file"
@@ -628,7 +607,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
               </div>
             </div>
 
-            {/*boton general de guardado: maneja cualquier cambio del perfil (nombre y foto)*/}
+            {/*boton general de guardado: guarda los cambios del perfil (nombre y foto)*/}
             <div className="px-6 py-4">
               <button
                 type="button"
@@ -741,7 +720,7 @@ const [cuentas, setCuentas] = useState(() => listarCuentas());
           </div>
         </div>
       ) : (
-        /*sin sesion: se ve igual el perfil, como "Anonimo", y desde ahi se entra o se crea cuenta*/
+        /* vista alternativa para usuarios anonimos que muestra la opcion de ingresar o registrarse */
         <div className="rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden">
           <div className="flex items-center gap-4 p-6">
             <span

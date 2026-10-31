@@ -1,4 +1,4 @@
-//seccion de la dueña para ver los mensajes del formulario de contacto como chats
+//seccion admin para ver los mensajes del formulario de contacto como chats
 //primero se muestra la lista de conversaciones (una por cuenta/persona), como en whatsapp:
 //nombre de la persona, el ultimo mensaje, la hora y la cantidad de mensajes sin leer
 //al tocar una se abre el hilo completo (burbujas) y se puede responder
@@ -120,48 +120,40 @@ function IconoWhatsapp({ className = 'w-5 h-5' }) {
   );
 }
 
+// funcion principal del componente para administrar mensajes desde el panel admin
 export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, sinEncabezado = false }) {
-  const [conversaciones, setConversaciones] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
-  //chat abierto: la conversacion completa que se esta viendo (null = lista)
-  const [chat, setChat] = useState(null);
-  //texto de la respuesta del hilo abierto
-  const [respuesta, setRespuesta] = useState('');
-  //true mientras se envia la respuesta (deshabilita el boton)
-  const [enviando, setEnviando] = useState(false);
-  //referencia al final del hilo para bajar el scroll cuando llega o se manda un mensaje
-  const finDelHiloRef = useRef(null);
+  const [conversaciones, setConversaciones] = useState([]); //guarda la lista de las convers obtenidas del servidor
+  const [cargando, setCargando] = useState(true);//indica si se esta cargando la lista por primera vez
+  const [error, setError] = useState(null);//guarda los mensajes de error en caso de que ocurra algun fallo
+  const [chat, setChat] = useState(null);// chat abierto: la conversacion completa que se esta viendo (null si esta en la lista general)
+  const [respuesta, setRespuesta] = useState(''); // guarda el texto que escribe admin en la caja de respuesta del hilo abierto
+  const [enviando, setEnviando] = useState(false); //indica si se esta enviando una respuesta para deshabilitar los botones temporalmente
+  const finDelHiloRef = useRef(null);// referencia al elemento final del hilo para hacer scroll automatico hacia abajo
 
-  //trae las conversaciones. silencioso=true para el refresco automatico
-  //(no muestra el spinner ni pisa la pantalla mientras el usuario lee)
-  const cargar = useCallback((silencioso = false) => {
-    if (!silencioso) setCargando(true);
-    setError(null);
-    obtenerConversaciones()
-      .then((lista) => setConversaciones(lista.map(ordenarConversacion)))
-      .catch((e) => setError(e.message))
+  const cargar = useCallback((silencioso = false) => { //trae las conversaciones del servidor. silencioso=true para el refresco automatico sin mostrar spinner
+    if (!silencioso) setCargando(true); //si no es silencioso activa el estado de carga general
+    setError(null);// limpia errores antes de recargar
+    obtenerConversaciones()// llama a la api para obtener todas las conversaciones
+      .then((lista) => setConversaciones(lista.map(ordenarConversacion)))//guarda las convers ordenadas cronologicamente en el estado
+      .catch((e) => setError(e.message))//si falla captura el error y lo guarda en el estado
       .finally(() => {
-        if (!silencioso) setCargando(false);
+        if (!silencioso) setCargando(false);//al terminar desactiva el estado de carga si no era silencioso
       });
   }, []);
 
-  //carga inicial + refresco automatico cada pocos segundos
-  useEffect(() => {
-    cargar();
-    const id = setInterval(() => cargar(true), INTERVALO_REFRESCO);
-    return () => clearInterval(id);
+  useEffect(() => { //carga inicial + refresco automatico cada pocos segundos
+    cargar(); //carga los datos al iniciar
+    const id = setInterval(() => cargar(true), INTERVALO_REFRESCO);//temporizador para refrescar la lista cada pocos segs
+    return () => clearInterval(id); //limpia el intervalo cuando el componente se desmonta
   }, [cargar]);
 
-  //mantiene el chat abierto al dia: si entra un mensaje nuevo se actualiza solo
-  //y queda marcado como leido (la persona lo esta viendo en este momento)
-  useEffect(() => {
-    if (!chat) return;
-    const fresco = conversaciones.find((c) => c._id === chat._id);
-    if (!fresco) return;
-    if (fresco.mensajes.length !== chat.mensajes.length || fresco.ultimaFecha !== chat.ultimaFecha) {
-      marcarComoLeido(chat.email).catch(() => {});
-      setChat({
+  useEffect(() => { //mantiene el chat abierto sincronizado, si entra un mensaje nuevo de la persona lo actualiza solo
+    if (!chat) return; //si no hay ningun chat abierto no hace nada y sale
+    const fresco = conversaciones.find((c) => c._id === chat._id); //busca la conver actual dentro de la lista de conversaciones
+    if (!fresco) return; //si no la encuentra sale
+    if (fresco.mensajes.length !== chat.mensajes.length || fresco.ultimaFecha !== chat.ultimaFecha) {//si la cant de msj o la ultima fecha cambiaron respecto a lo que se veia
+      marcarComoLeido(chat.email).catch(() => {}); //avisa al servidor que los msj ya fueron leidos
+      setChat({ //actualiza el chat abierto con los datos frescos y marca los msj como leidos localmente
         ...fresco,
         cantidad: 0,
         mensajes: fresco.mensajes.map((m) =>
@@ -171,103 +163,92 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
     }
   }, [conversaciones, chat]);
 
-  //baja el scroll al final cada vez que se abre un chat o entra/manda un mensaje
-  useEffect(() => {
-    const caja = finDelHiloRef.current;
-    if (caja) caja.scrollTop = caja.scrollHeight;
+  useEffect(() => { //baja el scroll al final cada vez que se abre un chat o entra/manda un mensaje
+    const caja = finDelHiloRef.current; //obtiene la referencia al final del hilo de mensajes
+    if (caja) caja.scrollTop = caja.scrollHeight; //si el elemento existe ajusta el scroll hacia abajo del todo
   }, [chat?._id, chat?.mensajes.length]);
 
-  function abrirChat(conversacion) {
-    //al abrir el chat los mensajes quedan como leidos: se avisa al backend y ademas se
-    //refleja al toque en el estado local (el contador de la lista baja a cero)
-    marcarComoLeido(conversacion.email).catch(() => {});
-    setChat({
+  function abrirChat(conversacion) {//abre una conver especifica al hacer clic en ella desde la lista
+    marcarComoLeido(conversacion.email).catch(() => {}); //avisa al servidor que se marcaron como leidos los mensajes de este email
+    setChat({//actualiza el estado del chat abierto poniendo el contador de no leidos en cero y marcando los mensajes
       ...conversacion,
       cantidad: 0,
       mensajes: conversacion.mensajes.map((m) =>
         m.esRespuesta ? m : { ...m, leidoEn: m.leidoEn ?? new Date().toISOString() }
       ),
     });
-    setError(null);
-    setRespuesta('');
+    setError(null); // limpia errores previos
+    setRespuesta(''); //deja la caja de respuesta vacia
   }
 
-  function volverAlista() {
-    setChat(null);
-    setRespuesta('');
-    //se recarga para que la lista muestre la respuesta recien enviada
-    cargar(true);
-    if (alCambiar) alCambiar();
+  function volverAlista() {//cierra el chat actual y vuelve a la lista de convers
+    setChat(null); //limpia el chat activo para volver a la vista de la bandeja
+    setRespuesta(''); //limpia el texto de respuesta
+    cargar(true); //se recarga para que la lista muestre la respuesta recien enviada
+    if (alCambiar) alCambiar();//si se paso una funcion al cambiar por props se ejecuta
   }
 
-  async function borrarUnMensaje(mensaje) {
-    if (!window.confirm(`¿Borrar el mensaje de ${chat.nombre}?`)) return;
-    setError(null);
+  async function borrarUnMensaje(mensaje) { //borra un mensaje suelto dentro de un chat abierto previa confirmacion
+    if (!window.confirm(`¿Borrar el mensaje de ${chat.nombre}?`)) return;//pide confirmacion antes de borrar el msj
+    setError(null); //limpia errores previos
     try {
-      await borrarMensaje(mensaje._id);
-      const nuevos = chat.mensajes.filter((m) => m._id !== mensaje._id);
-      if (nuevos.length === 0) {
-        //si no queda ninguno, se cierra el chat y se recarga la lista
-        setChat(null);
-        cargar(true);
+      await borrarMensaje(mensaje._id); //llama a la api para borrar el mensaje por su id
+      const nuevos = chat.mensajes.filter((m) => m._id !== mensaje._id);//filtra la lista de msj sacando el que se acaba de borrar
+      if (nuevos.length === 0) {//si ya no queda ningun mensaje en la conver
+        setChat(null); //cierra el chat actual
+        cargar(true); //recarga la lista general
         if (alCambiar) alCambiar();
       } else {
-        //la cantidad cuenta solo los mensajes de la persona que queden sin leer
-        setChat({
+        setChat({//actualiza el chat manteniendo los msj restantes y recalculando los no leidos
           ...chat,
           cantidad: nuevos.filter((m) => !m.esRespuesta && !m.leidoEn).length,
           mensajes: nuevos,
         });
       }
     } catch (e) {
-      setError(e.message);
+      setError(e.message); //si falla guarda el msj de error
     }
   }
 
   //elimina la conversacion completa (todo el chat con esa persona)
   async function borrarChat(conversacion) {
-    if (!window.confirm(`¿Eliminar todo el chat con ${conversacion.nombre}? No se puede deshacer.`)) return;
-    setError(null);
+    if (!window.confirm(`¿Eliminar todo el chat con ${conversacion.nombre}? No se puede deshacer.`)) return; //pide confirmacion
     try {
-      await borrarConversacion(conversacion._id);
-      //si era el chat abierto, se vuelve a la lista
-      if (chat?._id === conversacion._id) {
+      await borrarConversacion(conversacion._id);//llama a la api para eliminar toda la conver por su id
+      if (chat?._id === conversacion._id) {//si era el chat abierto, se vuelve a la lista
         setChat(null);
         setRespuesta('');
       }
-      cargar(true);
+      cargar(true);//recarga la lista general y ejecuta el callback si existe
       if (alCambiar) alCambiar();
     } catch (e) {
-      setError(e.message);
+      setError(e.message);//si falla guarda el mensaje de error
     }
   }
 
-  //guarda la respuesta dentro del chat y la muestra como burbuja propia
-  //porWhatsapp=true: ademas se abre whatsapp con el texto para que le llegue a su celular
-  //(se abre antes del await porque despues el navegador bloquearia la ventana nueva)
-  async function enviarRespuesta(evento, porWhatsapp = false) {
-    evento.preventDefault();
-    const texto = respuesta.trim();
-    if (enviando || !texto) return;
-    if (porWhatsapp && chat.telefono) {
+  async function enviarRespuesta(evento, porWhatsapp = false) {//guarda la rta de admin y abre wsp para enviarla al celular del visitante
+    evento.preventDefault();//evita que el formulario recargue la pagina por defecto
+    const texto = respuesta.trim();//limpia espacios del texto escrito
+    if (enviando || !texto) return;//si ya se esta enviando o el texto esta vacio sale
+    if (porWhatsapp && chat.telefono) {//si se pidio enviar por wsp y el chat tiene tel abre wsp
       const link = `https://wa.me/${chat.telefono}?text=${encodeURIComponent(texto)}`;
       window.open(link, '_blank', 'noopener,noreferrer');
     }
-    setEnviando(true);
-    setError(null);
+    setEnviando(true);//activa el estado de envio para bloquear los botones
+    setError(null);// limpia errores previos
     try {
-      const cuerpo = await responderConversacion(chat._id, texto, nombre, porWhatsapp);
+      const cuerpo = await responderConversacion(chat._id, texto, nombre, porWhatsapp);//llama a la api para registrar la rta en la base de datos
       //la respuesta se agrega al final: queda debajo del mensaje que mando la persona
       setChat({ ...chat, mensajes: [...chat.mensajes, cuerpo.datos] });
-      setRespuesta('');
+      setRespuesta(''); // limpia el campo de texto de la rta
     } catch (e) {
-      setError(claveIncorrecta(e) ? 'La sesión expiró. Volvé a entrar.' : e.message);
+      setError(claveIncorrecta(e) ? 'La sesión expiró. Volvé a entrar.' : e.message);//si hay error de autenticacion muestra sesion expirada, sino el msj original
     } finally {
-      setEnviando(false);
+      setEnviando(false);//desactiva el estado de envio al finalizar
     }
   }
 
-  //hilo con los mensajes de una persona (burbujas estilo whatsapp) y caja para responder
+  //hilo con los mensajes de una persona
   if (chat) {
     return (
       //alto fijo (como una ventana de chat): el header y la barra de escribir quedan fijos
@@ -311,14 +292,13 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
           </div>
         </div>
 
-        {error && (
+        {error && ( {/*muestra msj de error en el chat si ocurre algo */}
           <p role="alert" className="shrink-0 text-sm text-red-400 px-1">
             {error}
           </p>
         )}
 
-        {/*hilo de mensajes (unico que hace scroll): lo que manda la persona a la izquierda (gris)
-            y lo que responde la dueña a la derecha (verde, como whatsapp)*/}
+        {/*msj del chat ordenados cronologicamente*/}
         <ul
           ref={finDelHiloRef}
           className="flex-1 min-h-0 space-y-2 overflow-y-auto p-3 rounded-2xl bg-zinc-950/60 border border-zinc-800"
@@ -352,7 +332,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
           ))}
         </ul>
 
-        {/*caja para responder (como la barra de escritura de whatsapp)*/}
+        {/*formulario para responder al usuario*/}
         <form onSubmit={enviarRespuesta} className="shrink-0 flex items-center gap-2">
           <label htmlFor="admin-respuesta" className="sr-only">
             Responder en este chat

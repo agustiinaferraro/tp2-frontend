@@ -18,130 +18,130 @@ function IconoWhatsapp({ className = 'w-3.5 h-3.5' }) {
 }
 
 export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro', whatsapp = '5491131166948' }) {
-  const { nombre } = sesion ?? {};
-  const [token, setToken] = useState(null);
-  const [mensajes, setMensajes] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState('');
-  const [texto, setTexto] = useState('');
-  const [enviando, setEnviando] = useState(false);
+  const { nombre } = sesion ?? {}; //si sesion (prop) tiene un valor se usa, si no tiene usa un objeto vacio
+  const [token, setToken] = useState(null); //token empieza vacio
+  const [mensajes, setMensajes] = useState([]); //historial de mensajes empieza vacio
+  const [cargando, setCargando] = useState(true); //carga al principio
+  const [error, setError] = useState(''); //el string empeiza vacio hasta que haya un error
+  const [texto, setTexto] = useState(''); //texto que escribe el usuario empieza vacio hasta que escriba 
+  const [enviando, setEnviando] = useState(false); //solo pasa a true cuando lo toca el usuario
   //whatsapp de la persona: si lo deja, la admin puede responderle por whatsapp desde el panel
   //se carga con un boton que abre un modal (el input fijo hacia zoom en mobile al tocarlo)
   //telefonoGuardado = lo que quedo persistido; telefono = lo que se esta tipeando en el modal
   const [telefonoGuardado, setTelefonoGuardado] = useState(() => {
-    if (typeof window === 'undefined') return '';
-    return localStorage.getItem('chat-whatsapp') ?? '';
+    if (typeof window === 'undefined') return ''; //si esta en el servidor (donde no hay navegador), sale y devuelve un texto vacio
+    return localStorage.getItem('chat-whatsapp') ?? ''; // si esta en el navegador busca el numero guardado,si no existe devuelve undefined
   });
-  const [telefono, setTelefono] = useState(telefonoGuardado);
-  const [ventanaTel, setVentanaTel] = useState(false);
-  const [errorTel, setErrorTel] = useState('');
-  const [guardandoTel, setGuardandoTel] = useState(false);
-  const sincronizado = Boolean(telefonoGuardado);
+  const [telefono, setTelefono] = useState(telefonoGuardado); // va actualizando el telefono y lo guarda en telefonoguardado
+  const [ventanaTel, setVentanaTel] = useState(false); //ventana para poner el telwfono, empieza en false
+  const [errorTel, setErrorTel] = useState(''); //empieza vacio, guarda los errores del usuario al escribir el telefono
+  const [guardandoTel, setGuardandoTel] = useState(false);//empieza en false, se vuelve true una vez que el usuario guarda
+  const sincronizado = Boolean(telefonoGuardado); //si tiene un numero guardado devuelve true, si esta vacio es false
 
   //el modal de whatsapp se cierra con Escape
   useEffect(() => {
-    if (!ventanaTel) return undefined;
-    const alPresionar = (e) => {
-      if (e.key === 'Escape') setVentanaTel(false);
+    if (!ventanaTel) return undefined; //si la ventana del telefono esta abierta no funciona
+    const alPresionar = (e) => { // la funcion  alPresionar recibe el evento del teclado (e)
+      if (e.key === 'Escape') setVentanaTel(false); // si presiona escape se cierra el modal
     };
-    window.addEventListener('keydown', alPresionar);
-    return () => window.removeEventListener('keydown', alPresionar);
+    window.addEventListener('keydown', alPresionar); //conecta la funcion anterior a la ventana del anvegador para que este atenta a la tecla que presione el usuario
+    return () => window.removeEventListener('keydown', alPresionar); //limpia el detector de teclas cuando se cierra el modal
   }, [ventanaTel]);
 
   //pide un token vigente: el del navegador puede estar vencido y la api responderia 401
   useEffect(() => {
-    let activo = true;
-    sesionConTokenFresco().then((nueva) => {
-      if (activo) setToken(nueva?.token ?? '');
+    let activo = true; //crea un interruptor de seguridad que arranca encendido (activo)
+    sesionConTokenFresco().then((nueva) => { //pide automaticamente al servidor un token fresco
+      if (activo) setToken(nueva?.token ?? ''); //si el usuario sigue en la pantalla cuando el servidor responde guarda el nuevo token en el estado o vacio si no vino nada
     });
     return () => {
-      activo = false;
+      activo = false; //si el usuario se va antes que el servidor responda se apaga el interruptor
     };
   }, []);
 
   //con el token en mano trae la conversacion completa (lo que mando y lo que le respondieron)
   useEffect(() => {
-    if (!token) return undefined;
-    let activo = true;
-    obtenerMensajesMios(token)
+    if (!token) return undefined; // si todavia no hay un token disponible no hace nada y sale
+    let activo = true; //interruptor de seguridad para saber si el componente sigue montado
+    obtenerMensajesMios(token) //llama a la api usando el token para descargar el historial de mensajes
       .then((lista) => {
         if (!activo) return;
-        setMensajes(lista);
+        setMensajes(lista); //guarda todos los mensajes obtenidos en el estado principal del chat
         //si el numero ya quedo guardado en la conversacion se recupera de ahi
         const guardado = lista.find((m) => m.telefono)?.telefono ?? '';
-        if (guardado) {
-          setTelefono((actual) => actual || guardado);
-          setTelefonoGuardado((actual) => actual || guardado);
+        if (guardado) { //si encontro el telefono guardado en la charla
+          setTelefono((actual) => actual || guardado); //lo actualiza en el estado temporal si estaba vacio
+          setTelefonoGuardado((actual) => actual || guardado); //y tambien en el estado oficial definitivo (si estaba vacio)
         }
       })
       .catch((err) => {
-        if (activo) setError(err.message);
+        if (activo) setError(err.message); //si hubo un error al traer los mensajes lo guarda en el estado de error
       })
       .finally(() => {
-        if (activo) setCargando(false);
+        if (activo) setCargando(false);//apaga el cargando
       });
     return () => {
-      activo = false;
+      activo = false; //si el usuario se va antes de terminar desactiva la bandera
     };
-  }, [token]);
+  }, [token]); //se ejecuta cada vez que el token cambia o aparece por primera vez
 
   //manda un mensaje nuevo: se guarda en el chat del portfolio y, en el mismo gesto del
   //click, se abre whatsapp con el texto listo para que le llegue al celular de la admin
   //(si se abriera despues del await lo bloquearia el navegador)
   async function manejarEnvio(e) {
-    e.preventDefault();
-    if (enviando || !texto.trim() || !token) return;
+    e.preventDefault();//evita que la pagina recargue sola
+    if (enviando || !texto.trim() || !token) return; //si ya se esta enviando otro mensaje, si el texto esta vacio, o si no hay token, no hace nada
 
-    const textoLimpio = texto.trim();
-    setEnviando(true);
-    setError('');
-    setTexto('');
-    const link = `https://wa.me/${whatsapp}?text=${encodeURIComponent(
+    const textoLimpio = texto.trim(); //limpia los espacios en blanco
+    setEnviando(true); //activa el estado de carga/envio
+    setError(''); //limpia errores previos
+    setTexto(''); //limpia el input para que pueda escribir
+    const link = `https://wa.me/${whatsapp}?text=${encodeURIComponent( //arma el link de wsp con el nro de la admin y el texto codificado para url
       `¡Hola! Te escribo desde tu portfolio:\n\n${textoLimpio}`
     )}`;
-    window.open(link, '_blank', 'noopener,noreferrer');
-    try {
+    window.open(link, '_blank', 'noopener,noreferrer');//abre wsp antes del await para evitar que el bloqueador de ventanas emergentes del navegador censure la pestana nueva
+    try { //intenta guardar el mensaje en la base de datos de manera asincronica
       const respuesta = await enviarMensaje(
         { mensaje: textoLimpio, telefono: telefonoGuardado },
         token
       );
-      const nuevo = respuesta?.datos;
+      const nuevo = respuesta?.datos; //si el servidor responde con exito agrega el nuevo mensaje a la lista actual en pantalla
       if (nuevo) setMensajes((prev) => [...prev, nuevo]);
-    } catch (err) {
+    } catch (err) { //si falla el guardado captura el error y lo muestra en pantalla
       setError(err.message);
     } finally {
-      setEnviando(false);
+      setEnviando(false); //apaga el estado de envio
     }
   }
 
   //guarda el whatsapp de la persona en su conversacion (para que la admin le responda por ahi)
   //y cierra el modal mostrando el estado sincronizado
   async function guardarTel() {
-    const numero = telefono.trim();
-    if (!numero || guardandoTel) return;
-    setGuardandoTel(true);
-    setErrorTel('');
+    const numero = telefono.trim();// limpia los espacios en blanco del numero ingresado
+    if (!numero || guardandoTel) return; // si el campo esta vacio o ya se esta guardando no hace nada y sale
+    setGuardandoTel(true); // activa el estado de guardado para bloquear botones
+    setErrorTel(''); // limpia cualquier error anterior del telefono
     try {
-      if (mensajes.length > 0 && token) await guardarTelefono(numero, token);
-      localStorage.setItem('chat-whatsapp', numero);
-      setTelefonoGuardado(numero);
-      setVentanaTel(false);
+      if (mensajes.length > 0 && token) await guardarTelefono(numero, token);//si ya hay mensajes y token manda el telefono al servidor de manera asincronica
+      localStorage.setItem('chat-whatsapp', numero);// guarda el nro en la memoria local del navegador para recordarlo dps
+      setTelefonoGuardado(numero); //actualiza el estado oficial del telefono guardado
+      setVentanaTel(false); //cierra el modal
     } catch (err) {
-      setErrorTel(err.message);
+      setErrorTel(err.message); //si falla al guardar captura el error y lo muestra en el modal
     } finally {
-      setGuardandoTel(false);
+      setGuardandoTel(false); //desactiva ek estado de guardado
     }
   }
 
   function abrirModalTel() {
-    setErrorTel('');
-    setVentanaTel(true);
+    setErrorTel(''); //borra cualquier msj de error anterior en el formulario del tel
+    setVentanaTel(true); //cambia el estado de la ventana a verdadero para que aparezca en la pantalla
   }
 
-  let contenido;
-  if (cargando || !token) {
+  let contenido; //variable para guardar el contenido visual del chat segun la situacion
+  if (cargando || !token) {// si todavia esta cargando o no hay token muestra el componente de carga
     contenido = <Loading claseContenedor="h-48" />;
-  } else if (error && mensajes.length === 0) {
+  } else if (error && mensajes.length === 0) { //si hubo un error y la lista de mensajes esta vacia muestra un aviso con boton para reintentar
     contenido = (
       <div className="py-12 text-center space-y-3">
         <p className="text-zinc-400 text-sm">No se pudo cargar la conversación.</p>
@@ -154,7 +154,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
         </button>
       </div>
     );
-  } else if (mensajes.length === 0) {
+  } else if (mensajes.length === 0) { //si no hay error pero la lista de mensajes esta vacia muestra un mensaje invitando a escribir
     contenido = (
       <div className="py-12 text-center">
         <p className="text-zinc-400 text-sm">
@@ -162,7 +162,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
         </p>
       </div>
     );
-  } else {
+  } else { //si hay mensajes los recorre con map y arma la lista visual del chat
     contenido = (
       <ul className="space-y-3 overflow-y-auto max-h-72 pr-1" aria-label={`Conversación con ${nombreAdmin}`}>
         {mensajes.map((m) => {
@@ -207,9 +207,13 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
     <div className="p-6 rounded-2xl bg-black/60 border border-zinc-800 space-y-4">
       {/*header tipo redes: el nombre de agustina arriba con un indicador de en linea*/}
       <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
+
+        {/* circulo con la inicial del nombre de la admin */}
         <span className="flex items-center justify-center w-10 h-10 rounded-full bg-verde-app/20 border border-verde-app/30 text-verde-app font-bold text-lg">
           {nombreAdmin.charAt(0).toUpperCase()}
         </span>
+
+        {/* textos de la cabecera con el nombre y el estado verde de en linea */}
         <div className="leading-tight">
           <p className="font-bold text-zinc-100">
             {nombre ? `Chatea con ${nombreAdmin.split(' ')[0]}` : nombreAdmin}
@@ -227,14 +231,16 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
         abre WhatsApp con tu texto, para que me llegue a mi celular.
       </p>
 
-      {contenido}
+      {contenido} {/* muestra la lista de mensajes, la carga o los estados vacios segun corresponda */}
 
+      {/* si hay un error y ya existen mensajes los muestra abajo de la conversacion */}
       {error && mensajes.length > 0 && (
         <p role="alert" className="text-red-400 text-sm">
           {error}
         </p>
       )}
 
+      {/* formulario para escribir y enviar un nuevo mensaje */}
       <form onSubmit={manejarEnvio} className="flex items-end gap-2">
         <input
           value={texto}
@@ -252,7 +258,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
         </button>
       </form>
 
-      {/*whatsapp de la persona: abajo del chat, un boton que abre el modal o el estado guardado*/}
+      {/* whatsapp de la persona: abajo del chat, un boton que abre el modal o el estado guardado */}
       <div className="border-t border-zinc-800 pt-4">
         {sincronizado ? (
           <span className="inline-flex items-center gap-2 text-sm text-whatsapp font-medium">
