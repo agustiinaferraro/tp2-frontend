@@ -503,7 +503,8 @@ const hayCambios = // calcula si existen modificaciones sin guardar en el perfil
       className={sinEncabezado ? '' : 'max-w-md mx-auto px-4 py-16'}
       aria-label="Perfil"
     >
-      {!ocultarPerfil && !sinEncabezado && ({/* cabecera principal del perfil que muestra el titulo y el estado actual de la sesion */}
+      {/* cabecera principal del perfil que muestra el titulo y el estado actual de la sesion */}
+      {!ocultarPerfil && !sinEncabezado && (
         <div className="text-center space-y-2 mb-8">
           <h1 className="text-3xl font-extrabold text-white">Perfil</h1>
           <p className="text-zinc-400">
@@ -526,7 +527,8 @@ const hayCambios = // calcula si existen modificaciones sin guardar en el perfil
         </p>
       )}
 
-      {!ocultarPerfil && (!montado ? ({/* contenedor condicional que muestra la interfaz segun el estado de montaje y la sesion del usuario */}
+      {/* contenedor condicional que muestra la interfaz segun el estado de montaje y la sesion del usuario */}
+      {!ocultarPerfil && (!montado ? (
         <div className="rounded-2xl bg-zinc-900 border border-zinc-800 h-64" aria-hidden="true" />
       ) : sesion ? (
         <div className="rounded-2xl bg-zinc-900 border border-zinc-800 overflow-hidden">

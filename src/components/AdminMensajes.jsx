@@ -292,7 +292,8 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
           </div>
         </div>
 
-        {error && ( {/*muestra msj de error en el chat si ocurre algo */}
+        {/*muestra msj de error en el chat si ocurre algo */}
+        {error && ( 
           <p role="alert" className="shrink-0 text-sm text-red-400 px-1">
             {error}
           </p>
