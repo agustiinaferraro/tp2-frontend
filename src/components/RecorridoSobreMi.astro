@@ -5,11 +5,54 @@
 import Certificaciones from './Certificaciones.jsx';
 import LogoHerramienta from './LogoHerramienta.jsx';
 
-const { estadisticas, recorrido, habilidades, certificaciones } = Astro.props;
+// Definición de tipos para TypeScript
+interface Estadistica {
+  descripcion: string;
+  valor: string | number;
+}
 
-//estilos por tipo de paso en el recorrido (punto y pildora de periodo; el borde de la
-//tarjeta ahora es la clase compartida .card-vidrio, en gradiente violeta -> verde)
-const colores = {
+interface PasoRecorrido {
+  tipo: 'estudio' | 'trabajo' | 'logro';
+  periodo: string;
+  destacado?: boolean;
+  insignia?: string;
+  titulo: string;
+  lugar: string;
+  texto: string;
+}
+
+interface HabilidadItemTexto {
+  logo: string;
+  texto: string;
+}
+
+type HabilidadItem = string | HabilidadItemTexto;
+
+interface GrupoHabilidad {
+  version: 'pen-tool' | 'layout' | 'video' | 'codigo';
+  grupo: string;
+  items: HabilidadItem[];
+}
+
+interface Certificacion {
+  titulo: string;
+  institucion: string;
+  imagen: string;
+  fecha: string;
+}
+
+interface Props {
+  estadisticas: Estadistica[];
+  recorrido: PasoRecorrido[];
+  habilidades: GrupoHabilidad[];
+  certificaciones: Certificacion[];
+}
+
+// Única desestructuración de props con tipado
+const { estadisticas, recorrido, habilidades, certificaciones } = Astro.props as Props;
+
+// Objeto de colores tipado correctamente
+const colores: Record<'estudio' | 'trabajo' | 'logro', { punto: string; pildora: string }> = {
   estudio: {
     punto: 'bg-violeta-app ring-violeta-app/25',
     pildora: 'bg-violeta-app/10 text-violeta-app border-violeta-app/30',
@@ -23,7 +66,6 @@ const colores = {
     pildora: 'bg-amber-400/10 text-amber-300 border-amber-400/30',
   },
 };
-
 //iconos de cada grupo de habilidades (se eligen abajo segun la version)
 ---
 
@@ -51,7 +93,7 @@ const colores = {
         estadisticas.map((numero) => (
           <div class="rounded-2xl card-vidrio p-5 text-left">
             <dt class="text-sm text-zinc-400 mb-2">{numero.descripcion}</dt>
-            <dd class="text-4xl font-bold bg-gradient-to-r from-violeta-app to-verde-app bg-clip-text text-transparent">
+            <dd class="text-4xl font-bold bg-linear-to-r from-violeta-app to-verde-app bg-clip-text text-transparent">
               {numero.valor}
             </dd>
           </div>
@@ -63,7 +105,7 @@ const colores = {
   {/*titulo universitario: formacion destacada con la imagen del diploma*/}
   <div class="px-4 py-10 max-w-4xl mx-auto">
     <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
-      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
         <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
         <path d="M6 12v5c3 3 9 3 12 0v-5" />
       </svg>
@@ -111,7 +153,7 @@ const colores = {
   {/*el recorrido en linea de tiempo: alterna las tarjetas a los lados en pantallas grandes*/}
   <div class="px-4 py-14 max-w-4xl mx-auto">
     <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
-      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" />
         <polyline points="12 6 12 12 16 14" />
       </svg>
@@ -119,7 +161,7 @@ const colores = {
     </h2>
 
     <ol class="relative space-y-8 md:space-y-12">
-      <div aria-hidden="true" class="absolute top-2 bottom-2 left-5 w-px bg-gradient-to-b from-verde-app via-zinc-700 to-violeta-app md:left-1/2 md:-translate-x-1/2"></div>
+      <div aria-hidden="true" class="absolute top-2 bottom-2 left-5 w-px bg-linear-to-b from-verde-app via-zinc-700 to-violeta-app md:left-1/2 md:-translate-x-1/2"></div>
       {
         recorrido.map((paso, index) => {
           const color = colores[paso.tipo];
@@ -131,7 +173,7 @@ const colores = {
                 class={`absolute left-5 top-6 md:left-1/2 md:-translate-x-1/2 w-3.5 h-3.5 rounded-full ring-4 ${color.punto}`}
               ></span>
               <div
-                class={`ml-12 md:ml-0 md:w-[calc(50%_-_2.5rem)] rounded-2xl card-vidrio p-6 ${
+                class={`ml-12 md:ml-0 md:w-[calc(50%-2.5rem)] rounded-2xl card-vidrio p-6 ${
                   paso.destacado ? 'card-destacado' : ''
                 } ${par ? 'md:mr-auto md:text-right' : 'md:ml-auto'}`}
               >
@@ -179,7 +221,7 @@ const colores = {
   {/*habilidades agrupadas por area*/}
   <div class="px-4 pb-14 max-w-4xl mx-auto">
     <h2 class="text-3xl font-bold text-white text-left inline-flex items-center gap-3 mb-8">
-      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+      <svg aria-hidden="true" class="w-8 h-8 text-verde-app" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
         <polyline points="20 6 9 17 4 12" />
       </svg>
       Lo que manejo
@@ -192,7 +234,7 @@ const colores = {
               <span class="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-violeta-app/10 text-violeta-app border border-violeta-app/20">
                 {
                   grupo.version === 'pen-tool' && (
-                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                       <path d="M12 19l7-7 3 3-7 7-3-3z" />
                       <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
                       <path d="M2 2l7.586 7.586" />
@@ -202,7 +244,7 @@ const colores = {
                 }
                 {
                   grupo.version === 'layout' && (
-                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                       <rect x="3" y="3" width="18" height="18" rx="2" />
                       <line x1="3" y1="9" x2="21" y2="9" />
                       <line x1="9" y1="21" x2="9" y2="9" />
@@ -211,7 +253,7 @@ const colores = {
                 }
                 {
                   grupo.version === 'video' && (
-                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                       <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
                       <line x1="7" y1="2" x2="7" y2="22" />
                       <line x1="17" y1="2" x2="17" y2="22" />
@@ -221,7 +263,7 @@ const colores = {
                 }
                 {
                   grupo.version === 'codigo' && (
-                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
                       <polyline points="16 18 22 12 16 6" />
                       <polyline points="8 6 2 12 8 18" />
                     </svg>
@@ -253,5 +295,5 @@ const colores = {
   </div>
 
   {/*certificaciones: imagen que se abre en grande (isla de react)*/}
-  <Certificaciones certificaciones={certificaciones} client:visible />
+  <Certificaciones certificaciones={certificaciones as any} client:visible />
 </section>

@@ -97,8 +97,7 @@ const enlaces = [
   //resalta el link de la seccion que esta en pantalla al scrollear
   //en la home "inicio" queda siempre resaltado, por mas que se baje hasta servicios o proyectos
   const header = document.querySelector('header');
-  const links = [...document.querySelectorAll('header a[data-link]')];
-  const ids = [...document.querySelectorAll('main section[id]')].map((s) => s.id);
+  const links = [...document.querySelectorAll<HTMLElement>('header a[data-link]')];  const ids = [...document.querySelectorAll('main section[id]')].map((s) => s.id);
   const esLaHome = header?.dataset.activo === 'inicio';
   function resaltarActivo() {
     //en la home no hay que calcular nada: siempre se esta en inicio

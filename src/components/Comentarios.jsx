@@ -128,7 +128,7 @@ export default function Comentarios({ proyectoId }) {
                 <span className="font-bold text-zinc-100 text-sm">{nombreVisible(comentario.nombre)}</span>
                 <span className="text-xs text-zinc-500">{formatearFecha(comentario.createdAt)}</span>
               </div>
-              <p className="text-zinc-300 text-sm whitespace-pre-wrap break-words mt-1">{comentario.texto}</p>
+              <p className="text-zinc-300 text-sm whitespace-pre-wrap wrap-break-words mt-1">{comentario.texto}</p>
             </div>
           </li>
         ))}

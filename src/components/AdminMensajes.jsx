@@ -255,7 +255,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
       //y solo se desplaza la lista de mensajes de adentro
       <section
         aria-label={`Chat con ${chat.nombre}`}
-        className="flex flex-col gap-3 h-[34rem] text-left"
+        className="flex flex-col gap-3 h-136rem text-left"
       >
         {/*cabecera del chat: volver, avatar, nombre y email*/}
         <div className="shrink-0 flex items-center gap-3 p-3 rounded-2xl bg-zinc-900 border border-zinc-800">
@@ -313,7 +313,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
                     : 'bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-bl-sm'
                 }`}
               >
-                <p className="text-sm leading-relaxed whitespace-pre-line break-words m-0">{mensaje.mensaje}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-line wrap-break-words m-0">{mensaje.mensaje}</p>
                 <div className={`flex items-center gap-2 mt-0.5 ${mensaje.esRespuesta ? 'justify-end' : 'justify-between'}`}>
                   <span className={`text-[10px] ${mensaje.esRespuesta ? 'text-black/60' : 'text-zinc-500'}`}>
                     {formatearHora(mensaje.createdAt)}
@@ -418,7 +418,7 @@ export default function AdminMensajes({ nombre = 'Agustina Ferraro', alCambiar, 
                       <span className="flex items-center justify-between gap-3 mt-0.5">
                         <span className="text-sm text-zinc-400 truncate">{textoUltimo}</span>
                         {conversacion.cantidad > 0 && (
-                          <span className="shrink-0 min-w-[20px] text-center text-xs px-1.5 py-0.5 rounded-full bg-whatsapp text-black font-semibold">
+                          <span className="shrink-0 min-w-5px text-center text-xs px-1.5 py-0.5 rounded-full bg-whatsapp text-black font-semibold">
                             {conversacion.cantidad}
                           </span>
                         )}

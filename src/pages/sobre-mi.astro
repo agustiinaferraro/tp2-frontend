@@ -29,7 +29,7 @@ try {
   } else {
     console.warn(`No se pudo obtener el perfil (${respuesta.status}); se usa el respaldo local.`);
   }
-} catch (error) {
+} catch (error: any) {
   console.warn(`No se pudo conectar a la api; se usa el respaldo local. ${error.message}`);
 }
 ---

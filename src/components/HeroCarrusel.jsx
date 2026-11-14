@@ -153,7 +153,7 @@ export default function HeroCarrusel({ variante = 'hero' }) {
   if (cargando) {
     return (
       <section aria-label="Proyectos en video" className="max-w-5xl mx-auto px-4 pb-10">
-        <div className="h-[400px] md:h-[500px] bg-black rounded-2xl flex overflow-hidden">
+        <div className="h-100px md:h-125px bg-black rounded-2xl flex overflow-hidden">
           <Loading claseContenedor="" />
         </div>
       </section>
@@ -222,7 +222,7 @@ export default function HeroCarrusel({ variante = 'hero' }) {
         )}
 
         {/*degradado suave para dar profundidad sin tapar el video*/}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/40" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-black/40" />
       </a>
     </section>
   );

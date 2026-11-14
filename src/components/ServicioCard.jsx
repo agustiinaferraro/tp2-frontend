@@ -2,7 +2,7 @@
 //la portada se elige sola (un proyecto destacado del servicio), no se carga a mano
 //la portada va sola, sin el nombre del proyecto ni el sitio encima: solo la imagen
 //se reusa en la grilla de servicios
-//la forma es la de un escudo (clase .forma-escudo en global.css): el borde verde es una capa
+//la forma es la de un cuadrado el borde verde es una capa
 //de atras con 2px de padding, porque un border normal queda cortado por el clip-path en la punta
 import IconoServicio from './IconoServicio.jsx';
 import ImagenProyecto from './ImagenProyecto.jsx';
@@ -11,15 +11,15 @@ export default function ServicioCard({ servicio, proyecto = null }) {
   return (
     <a
       href={`/servicios/${servicio.slug ?? servicio._id}`}
-      className="block h-full group relative [filter:drop-shadow(0_8px_12px_rgba(0,0,0,0.5))] group-hover:[filter:drop-shadow(0_0_18px_rgba(184,132,231,0.2))]"
+      class="block h-full group relative [filter-[drop-shadow(0_8px_12px_rgba(0,0,0,0.5))] group-hover:filter-[drop-shadow(0_0_18px_rgba(184,132,231,0.2))]"
     >
-      {/*resplandor ambiental de hover: va fuera del escudo para que el clip no lo corte*/}
-      <div className="absolute -inset-1 bg-gradient-to-r from-violeta-app/0 via-violeta-app/20 to-violeta-app/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none" />
+      {/*resplandor ambiental de hover: va fuera del cuadro para que el clip no lo corte*/}
+      <div className="absolute -inset-1 bg-linear-to-r from-violeta-app/0 via-violeta-app/20 to-violeta-app/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl pointer-events-none" />
 
-      <article className="h-full p-[2px] bg-violeta-app/25 group-hover:bg-violeta-app/90 group-hover:scale-[1.03] active:scale-95 transition-all duration-300 forma-escudo relative z-0 hover:z-10 focus-within:z-10">
+      <article className="h-full p-0.5 bg-violeta-app/25 group-hover:bg-violeta-app/90 group-hover:scale-[1.03] active:scale-95 transition-all duration-300 rounded-3xl relative z-0 hover:z-10 focus-within:z-10">
         {/*min-h: la tarjeta crece un poco mas alla de su contenido (el alto lo manda la portada).
           va en la capa interna para que el article siempre la siga sin importar el contexto*/}
-        <div className="h-full min-h-[26rem] bg-zinc-950 forma-escudo overflow-hidden relative flex flex-col">
+        <div className="h-full min-h-104 bg-zinc-950 rounded-3xl overflow-hidden relative flex flex-col">
           {/* Portada o Fallback cuando NO hay imagen de proyecto (ej. Programación) */}
           <figure className="m-0 absolute inset-0 w-full h-full overflow-hidden bg-zinc-900 z-0">
             {proyecto ? (
@@ -30,14 +30,14 @@ export default function ServicioCard({ servicio, proyecto = null }) {
               />
             ) : (
               /* Fondo abstracto con trama tecnológica para servicios sin imagen */
-              <div className="w-full h-full bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px] opacity-15 group-hover:opacity-30 group-hover:scale-105 transition-all duration-500" />
+              <div className="w-full h-full bg-[radial-gradient(#10b981_1px,transparent_1px)] bg-size-[16px_16px] opacity-15 group-hover:opacity-30 group-hover:scale-105 transition-all duration-500" />
             )}
           </figure>
 
           {/* Overlays de lectura: degradado superior e inferior */}
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/85 to-zinc-950/60 group-hover:via-zinc-950/75 transition-colors duration-300 pointer-events-none z-10" />
+          <div className="absolute inset-0 bg-linear-to-t from-zinc-950 via-zinc-950/85 to-zinc-950/60 group-hover:via-zinc-950/75 transition-colors duration-300 pointer-events-none z-10" />
 
-          {/* Contenido principal: el pb deja libre la punta del escudo (20% del alto) para
+          {/* Contenido principal
               que nada quede cortado ni con la tarjeta mas alta de lo minimo */}
           <div className="p-5 pb-28 flex flex-col flex-1 relative z-20 justify-between">
             <div>

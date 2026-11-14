@@ -42,10 +42,10 @@ export default function AdminProyectoCard({ proyecto, grupoNombre, alEditar, alE
         <PreviewProyecto
           proyecto={proyecto}
           alternativa={false}
-          className="w-full aspect-[4/3]"
+          className="w-full aspect-4/3"
         />
       ) : (
-        <div className="w-full aspect-[4/3] bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs">
+        <div className="w-full aspect-4/3 bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs">
           Sin portada
         </div>
       )}

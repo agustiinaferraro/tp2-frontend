@@ -178,7 +178,7 @@ export default function ChatVisitante({ sesion, nombreAdmin = 'Agustina Ferraro'
                     : 'rounded-tr-sm bg-whatsapp text-black'
                 }`}
               >
-                <p className="m-0 whitespace-pre-wrap break-words">{m.mensaje}</p>
+                <p className="m-0 whitespace-pre-wrap wrap-break-words">{m.mensaje}</p>
               </div>
               <span className={`text-[11px] text-zinc-500 mt-1 inline-flex items-center gap-1 ${esDeAgustina ? '' : 'text-right'}`}>
                 {esDeAgustina ? m.nombre || nombreAdmin : nombre}
