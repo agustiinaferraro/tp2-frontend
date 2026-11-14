@@ -521,7 +521,7 @@ const hayCambios = // calcula si existen modificaciones sin guardar en el perfil
       {!ocultarPerfil && (guardado || aviso) && (
         <p
           role="status"
-          className="fixed top-20 right-4 z-[60] max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border border-violeta-app/30 bg-violeta-app/10 text-violeta-app shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer"
+          className="fixed top-20 right-4 z-60 max-w-[calc(100vw-2rem)] sm:max-w-sm text-sm px-4 py-2 rounded-lg border border-violeta-app/30 bg-violeta-app/10 text-violeta-app shadow-lg backdrop-blur-sm pointer-events-none animacion-aparecer"
         >
           {aviso || 'Cambios guardados'}
         </p>

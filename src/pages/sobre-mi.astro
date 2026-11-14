@@ -13,7 +13,7 @@ import { contenidoRespaldo } from '../data/contenido-respaldo.js';
 const API_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:4000';
 
 //por defecto arranca con el respaldo; si la api responde, se reemplaza
-let contenido = contenidoRespaldo;
+let contenido: any = contenidoRespaldo; // O tiparlo con as any en el spreadtry {
 try {
   const respuesta = await fetch(`${API_BASE}/api/perfil`);
   if (respuesta.ok) {
