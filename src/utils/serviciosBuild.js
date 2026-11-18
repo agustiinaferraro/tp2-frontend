@@ -4,8 +4,18 @@ import { serviciosRespaldo } from '../data/servicios-respaldo.js';
 
 const API_BASE = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:4000';
 
-//se cachea la promesa para pedir la lista una sola vez en todo el build
+/**
+ * @typedef {Object} Servicio
+ * @property {string} slug
+ * @property {string} nombre
+ */
+
+/** @type {Promise<Servicio[]> | undefined} */
 let promesaServicios;
+
+/**
+ * @returns {Promise<Servicio[]>}
+ */
 
 export function obtenerServiciosParaBuild() {
   if (!promesaServicios) {
